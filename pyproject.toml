@@ -8,7 +8,12 @@ packages = [{include = "labelu_backend"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+fastapi = {extras = ["all"], version = "^0.85.1"}
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+flake8 = "^5.0.4"
 
 [build-system]
 requires = ["poetry-core"]
