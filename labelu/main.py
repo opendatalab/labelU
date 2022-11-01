@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
-from internal.adapter.routers import user
+from labelu.internal.adapter.routers import user
 
 description = """
 labelU backend.

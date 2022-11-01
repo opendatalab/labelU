@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Header
-from internal.application.command.user import LoginCommand, SignupCommand
-from internal.application.response.base import OkResp
-from internal.application.response.user import (
+from labelu.internal.application.command.user import LoginCommand, SignupCommand
+from labelu.internal.application.response.base import OkResp
+from labelu.internal.application.response.user import (
     LoginResponse,
     LogoutResponse,
     SignupResponse,
