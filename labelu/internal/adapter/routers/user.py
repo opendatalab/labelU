@@ -29,7 +29,7 @@ async def signup(signup_command: SignupCommand) -> OkResp[SignupResponse]:
 )
 async def login(login_command: LoginCommand):
     """
-    User login
+    User login, get an access token for future requests
     \f
     :param login_command: User input
     """
@@ -45,4 +45,4 @@ async def logout(token: str | None = Header(default=None, description="your toke
     :header token: User input
     \f
     """
-    return OkResp[LoginResponse](data=LogoutResponse(msg="succeeded"))
+    return OkResp[LogoutResponse](data=LogoutResponse(msg="succeeded"))
