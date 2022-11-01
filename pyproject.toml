@@ -9,6 +9,7 @@ packages = [{include = "labelu_backend"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 fastapi = {extras = ["all"], version = "^0.85.1"}
+loguru = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
