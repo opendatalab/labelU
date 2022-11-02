@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from labelu.internal.adapter.routers import user
+from labelu.internal.common.config import settings
 
 description = """
 labelU backend.
@@ -39,7 +40,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
 )
 
-app.include_router(user.router)
+app.include_router(user.router, prefix=settings.API_V1_STR)
 
 
 if __name__ == "__main__":
