@@ -1,5 +1,3 @@
-from http import client
-
 from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
@@ -65,3 +63,27 @@ class TestClassUserRouter:
         # check
         assert r.status_code == 200
         assert r.json()["data"]["token"].startswith(settings.TOKEN_TYPE)
+
+    def test_user_login_cannot_find_user(self, client: TestClient, db: Session):
+        # prepare data
+        username = random_email()
+        password = random_lower_string()
+        data = {"email": username, "password": password}
+
+        # run
+        r = client.post(f"{settings.API_V1_STR}/users/login", json=data)
+
+        # check
+        user = r.json()
+        assert r.status_code == 401
+        assert user["err_code"] == 40000
+
+    def test_user_logout(self, client: TestClient, db: Session):
+        # prepare data
+        headers = {"Authorization": f"Bearer token"}
+
+        # run
+        r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
+
+        # check
+        assert r.status_code == 200
