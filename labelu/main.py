@@ -1,7 +1,13 @@
-from fastapi import FastAPI
 import uvicorn
+from fastapi import FastAPI
+
+from labelu.internal.common import db
 from labelu.internal.adapter.routers import user
 from labelu.internal.common.config import settings
+from labelu.internal.application.response.error_code import exception_handlers
+
+# create database tables
+db.Base.metadata.create_all(bind=db.engine)
 
 description = """
 labelU backend.
@@ -10,8 +16,8 @@ labelU backend.
 
 You will be able to:
 
-* **Signup** (_not implemented_).
-* **Login** (_not implemented_).
+* **Signup**
+* **Login**
 * **Logout** (_not implemented_).
 """
 
@@ -24,7 +30,7 @@ tags_metadata = [
 
 
 app = FastAPI(
-    title="labelU-backend",
+    title="labelU",
     description=description,
     version="0.1.0",
     terms_of_service="",
@@ -40,6 +46,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
 )
 
+exception_handlers(app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
 
 

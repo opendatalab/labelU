@@ -1,21 +1,25 @@
 [tool.poetry]
-name = "labelu-backend"
+name = "labelu"
 version = "0.1.0"
 description = ""
 authors = ["pengjinhu <pengjinhu@pjlab.org.cn>"]
 readme = "README.md"
-packages = [{include = "labelu_backend"}]
+packages = [{include = "labelu"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 fastapi = {extras = ["all"], version = "^0.85.1"}
 loguru = "^0.6.0"
+sqlalchemy = "^1.4.42"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 flake8 = "^5.0.4"
 pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
 
 [build-system]
 requires = ["poetry-core"]

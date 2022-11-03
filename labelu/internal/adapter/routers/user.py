@@ -1,11 +1,14 @@
-from fastapi import APIRouter, status, Header
-from labelu.internal.application.command.user import LoginCommand, SignupCommand
+from sqlalchemy.orm import Session
+from fastapi import APIRouter, status, Header, Depends
+
+from labelu.internal.common import db
 from labelu.internal.application.response.base import OkResp
-from labelu.internal.application.response.user import (
-    LoginResponse,
-    LogoutResponse,
-    SignupResponse,
-)
+from labelu.internal.application.service import user as service
+from labelu.internal.application.command.user import LoginCommand
+from labelu.internal.application.command.user import SignupCommand
+from labelu.internal.application.response.user import LoginResponse
+from labelu.internal.application.response.user import LogoutResponse
+from labelu.internal.application.response.user import SignupResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -15,34 +18,49 @@ router = APIRouter(prefix="/users", tags=["users"])
     response_model=OkResp[SignupResponse],
     status_code=status.HTTP_201_CREATED,
 )
-async def signup(signup_command: SignupCommand) -> OkResp[SignupResponse]:
+async def signup(cmd: SignupCommand, db: Session = Depends(db.get_db)):
     """
     User signup a account
-    \f
-    :param signup_command: User input
     """
-    return OkResp[SignupResponse](data=SignupResponse(id=5, email="user@example.com"))
+
+    # business logic
+    data = await service.signup(db=db, cmd=cmd)
+
+    # response
+    return OkResp[SignupResponse](data=data)
 
 
 @router.post(
-    "/login", response_model=OkResp[LoginResponse], status_code=status.HTTP_200_OK
+    "/login",
+    response_model=OkResp[LoginResponse],
+    status_code=status.HTTP_200_OK,
 )
-async def login(login_command: LoginCommand):
+async def login(cmd: LoginCommand, db: Session = Depends(db.get_db)):
     """
     User login, get an access token for future requests
-    \f
-    :param login_command: User input
     """
-    return OkResp[LoginResponse](data=LoginResponse(token="token"))
+
+    # business logic
+    data = await service.login(db=db, cmd=cmd)
+
+    # response
+    return OkResp[LoginResponse](data=data)
 
 
 @router.post(
-    "/logout", response_model=OkResp[LogoutResponse], status_code=status.HTTP_200_OK
+    "/logout",
+    response_model=OkResp[LogoutResponse],
+    status_code=status.HTTP_200_OK,
 )
 async def logout(token: str | None = Header(default=None, description="your token")):
     """
     User logout
-    :header token: User input
-    \f
     """
-    return OkResp[LogoutResponse](data=LogoutResponse(msg="succeeded"))
+
+    # business logic
+    pass
+
+    # response
+    data = LogoutResponse(msg="succeeded")
+
+    return OkResp[LogoutResponse](data=data)
