@@ -1,10 +1,15 @@
 [tool.poetry]
 name = "labelu"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
+license = "Apache-2.0"
 authors = ["pengjinhu <pengjinhu@pjlab.org.cn>"]
 readme = "README.md"
+repository = "https://github.com/opendatalab/labelU"
 packages = [{include = "labelu"}]
+
+[tool.poetry.scripts]
+labelu = "labelu.main:cli"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -13,6 +18,7 @@ loguru = "^0.6.0"
 sqlalchemy = "^1.4.42"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+typer = {extras = ["all"], version = "^0.7.0"}
 
 
 [tool.poetry.group.dev.dependencies]
@@ -20,6 +26,13 @@ black = "^22.10.0"
 flake8 = "^5.0.4"
 pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
+
+
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/legacy/"
+default = false
+secondary = false
 
 [build-system]
 requires = ["poetry-core"]

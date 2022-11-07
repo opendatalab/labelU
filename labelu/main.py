@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from typer import Typer
 
 from labelu.internal.common import db
 from labelu.internal.adapter.routers import user
@@ -49,6 +50,13 @@ app = FastAPI(
 exception_handlers(app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
 
+cli = Typer()
+
+
+@cli.command()
+def main(port: int = 8000):
+    uvicorn.run(app=app, port=port)
+
 
 if __name__ == "__main__":
-    uvicorn.run(app=app)
+    cli()
