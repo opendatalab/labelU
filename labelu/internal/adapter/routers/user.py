@@ -1,3 +1,4 @@
+from typing import Union
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Header, Depends
 
@@ -52,7 +53,9 @@ async def login(cmd: LoginCommand, db: Session = Depends(db.get_db)):
     response_model=OkResp[LogoutResponse],
     status_code=status.HTTP_200_OK,
 )
-async def logout(token: str | None = Header(default=None, description="your token")):
+async def logout(
+    token: Union[str, None] = Header(default=None, description="your token")
+):
     """
     User logout
     """

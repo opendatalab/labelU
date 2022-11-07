@@ -12,7 +12,7 @@ packages = [{include = "labelu"}]
 labelu = "labelu.main:cli"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.7"
 fastapi = {extras = ["all"], version = "^0.85.1"}
 loguru = "^0.6.0"
 sqlalchemy = "^1.4.42"

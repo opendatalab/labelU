@@ -1,3 +1,5 @@
+from typing import Union
+
 from pydantic import BaseModel
 from typing import Generic, TypeVar
 from typing import Generic, TypeVar
@@ -17,5 +19,5 @@ class OkResp(GenericModel, Generic[DataT]):
 
 
 class OkRespWithMeta(GenericModel, Generic[DataT]):
-    meta_data: MetaData | None
+    meta_data: Union[MetaData, None] = None
     data: DataT
