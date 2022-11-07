@@ -1,6 +1,7 @@
 import uvicorn
-from fastapi import FastAPI
 from typer import Typer
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.common import db
 from labelu.internal.adapter.routers import user
@@ -49,6 +50,9 @@ app = FastAPI(
 
 exception_handlers(app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
+
+
+app.mount("", StaticFiles(directory="./labelu/internal/static", html=True))
 
 cli = Typer()
 
