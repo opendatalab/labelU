@@ -7,7 +7,7 @@ from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.common.security import get_password_hash
 from labelu.internal.application.response.error_code import ErrorCode
 
-from labelu.tests.utils.utils import random_email
+from labelu.tests.utils.utils import random_username
 from labelu.tests.utils.utils import random_lower_string
 
 
@@ -15,9 +15,9 @@ class TestClassUserRouter:
     def test_user_signup_successful(self, client: TestClient, db: Session):
 
         # prepare data
-        username = random_email()
+        username = random_username()
         password = random_lower_string()
-        data = {"email": username, "password": password}
+        data = {"username": username, "password": password}
 
         # run
         r = client.post(f"{settings.API_V1_STR}/users/signup", json=data)
@@ -25,18 +25,18 @@ class TestClassUserRouter:
         # check
         assert r.status_code == 201
         created_user = r.json()
-        user = crud_user.get_user_by_email(db, email=username)
+        user = crud_user.get_user_by_username(db, username=username)
         assert user
-        assert user.email == created_user["data"]["email"]
+        assert user.username == created_user["data"]["username"]
 
     def test_create_user_existing_username(self, client: TestClient, db: Session):
         # prepare data
-        username = random_email()
+        username = random_username()
         password = random_lower_string()
-        data = {"email": username, "password": password}
+        data = {"username": username, "password": password}
         crud_user.create_user(
             db=db,
-            user=User(email=username, hashed_password=get_password_hash(password)),
+            user=User(username=username, hashed_password=get_password_hash(password)),
         )
 
         # run
@@ -49,12 +49,12 @@ class TestClassUserRouter:
 
     def test_user_login_sucessful(self, client: TestClient, db: Session):
         # prepare data
-        username = random_email()
+        username = random_username()
         password = random_lower_string()
-        data = {"email": username, "password": password}
+        data = {"username": username, "password": password}
         crud_user.create_user(
             db=db,
-            user=User(email=username, hashed_password=get_password_hash(password)),
+            user=User(username=username, hashed_password=get_password_hash(password)),
         )
 
         # run
@@ -66,9 +66,9 @@ class TestClassUserRouter:
 
     def test_user_login_cannot_find_user(self, client: TestClient, db: Session):
         # prepare data
-        username = random_email()
+        username = random_username()
         password = random_lower_string()
-        data = {"email": username, "password": password}
+        data = {"username": username, "password": password}
 
         # run
         r = client.post(f"{settings.API_V1_STR}/users/login", json=data)

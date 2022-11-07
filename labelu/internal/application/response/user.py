@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 class SignupResponse(BaseModel):
     id: int
-    email: EmailStr
+    username: EmailStr
 
 
 class LoginResponse(BaseModel):

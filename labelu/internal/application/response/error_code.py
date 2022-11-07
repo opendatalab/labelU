@@ -15,7 +15,7 @@ class ErrorCode(Enum):
     )
     CODE_40001_USERNAME_ALREADY_EXISTS = (
         40001,
-        "Email Aready exists in the system",
+        "Username Aready exists in the system",
     )
 
 

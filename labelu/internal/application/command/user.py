@@ -1,11 +1,12 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class SignupCommand(BaseModel):
-    email: EmailStr
+    username: EmailStr
     password: str
 
 
 class LoginCommand(BaseModel):
-    email: EmailStr
+    username: EmailStr
     password: str
+    remember_me: bool = Field(default=False)
