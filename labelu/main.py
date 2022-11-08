@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.common import db
 from labelu.internal.adapter.routers import user
+from labelu.internal.adapter.routers import task
 from labelu.internal.common.config import settings
 from labelu.internal.application.response.error_code import exception_handlers
 
@@ -21,12 +22,24 @@ You will be able to:
 * **Signup**
 * **Login**
 * **Logout** (_not implemented_).
+
+## Tasks
+
+You will be able to:
+
+* **New** (_not implemented_).
+* **Upload Files** (_not implemented_).
+* **Update** (_not implemented_).
 """
 
 tags_metadata = [
     {
         "name": "users",
         "description": "Operations with users.",
+    },
+    {
+        "name": "tasks",
+        "description": "Annotation task manangement.",
     },
 ]
 
@@ -50,6 +63,7 @@ app = FastAPI(
 
 exception_handlers(app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
+app.include_router(task.router, prefix=settings.API_V1_STR)
 
 
 app.mount("", StaticFiles(directory="./labelu/internal/static", html=True))

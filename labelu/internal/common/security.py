@@ -4,8 +4,11 @@ from datetime import datetime, timedelta
 from jose import jwt
 from pydantic import BaseModel
 from passlib.context import CryptContext
+from fastapi.security import HTTPBearer
 
 from labelu.internal.common.config import settings
+
+security = HTTPBearer()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

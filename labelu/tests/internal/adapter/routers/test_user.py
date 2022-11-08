@@ -5,7 +5,6 @@ from labelu.internal.common.config import settings
 from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.common.security import get_password_hash
-from labelu.internal.application.response.error_code import ErrorCode
 
 from labelu.tests.utils.utils import random_username
 from labelu.tests.utils.utils import random_lower_string
