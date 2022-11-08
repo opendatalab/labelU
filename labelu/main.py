@@ -65,8 +65,7 @@ exception_handlers(app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
 app.include_router(task.router, prefix=settings.API_V1_STR)
 
-
-app.mount("", StaticFiles(directory="./labelu/internal/static", html=True))
+app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
 
 cli = Typer()
 
