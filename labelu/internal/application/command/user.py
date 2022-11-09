@@ -9,4 +9,3 @@ class SignupCommand(BaseModel):
 class LoginCommand(BaseModel):
     username: EmailStr
     password: str
-    remember_me: bool = Field(default=False)

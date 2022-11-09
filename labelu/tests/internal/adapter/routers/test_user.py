@@ -1,10 +1,14 @@
+from datetime import timedelta
+
 from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
-from labelu.internal.common.config import settings
 from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
+from labelu.internal.common.config import settings
+from labelu.internal.common.security import AccessToken
 from labelu.internal.common.security import get_password_hash
+from labelu.internal.common.security import create_access_token
 
 from labelu.tests.utils.utils import random_username
 from labelu.tests.utils.utils import random_lower_string
@@ -103,9 +107,13 @@ class TestClassUserRouter:
     def test_user_not_found(self, client: TestClient, db: Session) -> None:
 
         # prepare data
-        headers = {
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwidXNlcm5hbWUiOiJyYW5kb21fZm9yX3Rlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE2Njc5NjA0NDh9.5NTFkijCO5Ir1PWfsRHHgoQ21zy0DB1qX8c1lXbZhTk"
-        }
+        username = random_username()
+        access_token_expires = timedelta(minutes=settings.TOKEN_ACCESS_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            token=AccessToken(id=-1, username=username),
+            expires_delta=access_token_expires,
+        )
+        headers = {"Authorization": f"Bearer {access_token}"}
         # run
         r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
 
