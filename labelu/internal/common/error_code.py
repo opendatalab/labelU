@@ -2,6 +2,9 @@ from enum import Enum
 
 from fastapi.responses import JSONResponse
 from fastapi import Request, status, HTTPException
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+USER_INIT_CODE = 40000
 
 
 class ErrorCode(Enum):
@@ -10,15 +13,18 @@ class ErrorCode(Enum):
     """
 
     CODE_40000_USERNAME_OR_PASSWORD_INCORRECT = (
-        40000,
+        USER_INIT_CODE,
         "Incorrect username or password",
     )
     CODE_40001_USERNAME_ALREADY_EXISTS = (
-        40001,
+        USER_INIT_CODE + 1,
         "Username Aready exists in the system",
     )
-    CODE_40002_USER_NOT_FOUND = (40002, "User not found")
-    CODE_40003_CREDENTIAL_ERROR = (40003, "Could not validate credentials")
+    CODE_40002_USER_NOT_FOUND = (USER_INIT_CODE + 2, "User not found")
+    CODE_40003_CREDENTIAL_ERROR = (USER_INIT_CODE + 3, "Could not validate credentials")
+    CODE_40004_NOT_AUTHENTICATED = (USER_INIT_CODE + 4, "Not authenticated")
+
+    CODE_50000_INTERNAL_ERROR = (50000, "Internal Error")
 
 
 class UnicornException(HTTPException):
@@ -26,7 +32,6 @@ class UnicornException(HTTPException):
         self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     ):
         self.msg = code.value[1]
-        self.detail = code.value[1]
         self.code = code.value[0]
         self.status_code = status_code
 
@@ -39,5 +44,17 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 
 
+# only for HTTPAuthorizationCredentials
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "msg": str(exc.detail),
+            "err_code": ErrorCode.CODE_40004_NOT_AUTHENTICATED.value[0],
+        },
+    )
+
+
 def exception_handlers(app):
     app.add_exception_handler(UnicornException, unicorn_exception_handler)
+    app.add_exception_handler(StarletteHTTPException, http_exception_handler)
