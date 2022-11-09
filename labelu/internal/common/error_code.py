@@ -17,6 +17,8 @@ class ErrorCode(Enum):
         40001,
         "Username Aready exists in the system",
     )
+    CODE_40002_USER_NOT_FOUND = (40002, "User not found")
+    CODE_40003_CREDENTIAL_ERROR = (40003, "Could not validate credentials")
 
 
 class UnicornException(HTTPException):

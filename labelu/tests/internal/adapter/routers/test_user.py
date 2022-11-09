@@ -77,12 +77,38 @@ class TestClassUserRouter:
         assert r.status_code == 401
         assert user["err_code"] == 40000
 
-    def test_user_logout(self, client: TestClient, db: Session):
-        # prepare data
-        headers = {"Authorization": f"Bearer token"}
+    def test_user_logout(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ):
 
+        # run
+        r = client.post(
+            f"{settings.API_V1_STR}/users/logout", headers=testuser_token_headers
+        )
+
+        # check
+        assert r.status_code == 200
+
+    def test_user_token_error(self, client: TestClient, db: Session) -> None:
+
+        # prepare data
+        headers = {"Authorization": "Bearer token"}
         # run
         r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
 
         # check
-        assert r.status_code == 200
+        assert r.status_code == 403
+        assert r.json()["err_code"] == 40003
+
+    def test_user_not_found(self, client: TestClient, db: Session) -> None:
+
+        # prepare data
+        headers = {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwidXNlcm5hbWUiOiJyYW5kb21fZm9yX3Rlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE2Njc5NjA0NDh9.5NTFkijCO5Ir1PWfsRHHgoQ21zy0DB1qX8c1lXbZhTk"
+        }
+        # run
+        r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
+
+        # check
+        assert r.status_code == 404
+        assert r.json()["err_code"] == 40002

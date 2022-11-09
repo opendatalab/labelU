@@ -7,7 +7,7 @@ from labelu.internal.common import db
 from labelu.internal.adapter.routers import user
 from labelu.internal.adapter.routers import task
 from labelu.internal.common.config import settings
-from labelu.internal.application.response.error_code import exception_handlers
+from labelu.internal.common.error_code import exception_handlers
 
 # create database tables
 db.Base.metadata.create_all(bind=db.engine)

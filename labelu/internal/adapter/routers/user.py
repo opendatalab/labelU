@@ -1,8 +1,11 @@
-from typing import Union
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, status, Header, Depends
+from fastapi import APIRouter, status, Depends, Security
+from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
+from labelu.internal.domain.models.user import User
+from labelu.internal.common.security import security
+from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.response.base import OkResp
 from labelu.internal.application.service import user as service
 from labelu.internal.application.command.user import LoginCommand
@@ -54,7 +57,9 @@ async def login(cmd: LoginCommand, db: Session = Depends(db.get_db)):
     status_code=status.HTTP_200_OK,
 )
 async def logout(
-    token: Union[str, None] = Header(default=None, description="your token")
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     User logout
@@ -65,5 +70,4 @@ async def logout(
 
     # response
     data = LogoutResponse(msg="succeeded")
-
     return OkResp[LogoutResponse](data=data)
