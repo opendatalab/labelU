@@ -15,12 +15,15 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
       - name: Run image
         uses: abatilo/actions-poetry@v2.0.0
         with:
@@ -31,11 +34,15 @@ jobs:
         run: poetry run pytest --cov=./ --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
+      - name: Build frontend
+        run: |
+          npm run build --prefix=./frontend
+          mv frontend/build/* labelu/internal/statics
       - name: Manage version
         env:
           PROVIDED_VERSION: 0.1.${{ github.run_number }}
         run: |
-          sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" /prproject.toml
+          sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" prproject.toml
       - name: Publish
         env:
           TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
