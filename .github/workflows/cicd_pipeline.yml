@@ -29,7 +29,7 @@ jobs:
           npm ci --prefix=./frontend
           npm install --prefix=./frontend
           npm run build --prefix=./frontend --if-present
-          mv frontend/build/* labelu/internal/statics
+          mv frontend/dist/* labelu/internal/statics
       - name: Run image
         uses: abatilo/actions-poetry@v2.0.0
         with:
