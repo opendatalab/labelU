@@ -16,6 +16,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -33,9 +35,7 @@ jobs:
         env:
           PROVIDED_VERSION: 0.1.${{ github.run_number }}
         run: |
-          set -x
-          version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
-          sed -i "s/^version[ ]*=.*/version = '${version}'/g" /prproject.toml
+          sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" /prproject.toml
       - name: Publish
         env:
           TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
