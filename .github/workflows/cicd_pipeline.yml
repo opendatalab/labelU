@@ -36,8 +36,9 @@ jobs:
         uses: codecov/codecov-action@v1
       - name: Build frontend
         run: |
+          npm ci
           npm install --prefix=./frontend
-          npm run build --prefix=./frontend
+          npm run build --prefix=./frontend --if-present
           mv frontend/build/* labelu/internal/statics
       - name: Manage version
         env:
