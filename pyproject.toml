@@ -13,7 +13,7 @@ labelu = "labelu.main:cli"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-fastapi = {extras = ["all"], version = "^0.85.1"}
+fastapi = {extras = ["encoders", "responses", "security", "staticfiles", "testclient"], version = "^0.86.0"}
 loguru = "^0.6.0"
 sqlalchemy = "^1.4.42"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
