@@ -11,7 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.7]
-        poetry-version: [1.2.2]
+        poetry-version: ["1.2.2"]
+        node-version: [14]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -23,19 +24,18 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: ${{ matrix.node-version }}
       - name: Build frontend
         run: |
           npm ci --prefix=./frontend
           npm install --prefix=./frontend
           npm run build --prefix=./frontend --if-present
           mv frontend/dist/* labelu/internal/statics
-      - name: Run image
-        uses: abatilo/actions-poetry@v2.0.0
+      - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --without dev
       - name: Run tests
         run: poetry run pytest --cov=./ --cov-report=xml
       - name: Upload coverage to Codecov
