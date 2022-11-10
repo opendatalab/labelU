@@ -11,7 +11,7 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
 
 TEST_USERNAME = "test@example.com"
-TEST_USER_PASSWORD = "test"
+TEST_USER_PASSWORD = "test@123"
 
 
 @pytest.fixture(scope="session")
