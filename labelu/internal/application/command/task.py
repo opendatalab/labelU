@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 from pydantic import BaseModel, Field
 from fastapi import UploadFile, File
 
@@ -14,7 +14,7 @@ class BasicConfigCommand(BaseModel):
 
 
 class UploadCommand(BaseModel):
-    files: List[UploadFile] = File()
+    file: UploadFile = File()
 
 
 class UpdateCommand(BaseModel):

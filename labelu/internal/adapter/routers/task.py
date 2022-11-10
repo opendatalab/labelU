@@ -44,13 +44,13 @@ async def create(
 
 
 @router.post(
-    "/{task_id}/uploads",
+    "/{task_id}/upload",
     response_model=OkResp[TaskResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def uploads(
     task_id: int,
-    files: List[UploadFile] = File(...),
+    file: UploadFile = File(...),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -60,7 +60,7 @@ async def uploads(
     """
 
     # business logic
-    cmd = UploadCommand(files=files)
+    cmd = UploadCommand(file=file)
     data = await service.uploads(db=db, cmd=cmd)
 
     # response

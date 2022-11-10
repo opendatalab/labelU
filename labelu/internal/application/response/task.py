@@ -16,4 +16,4 @@ class TaskResponse(BaseModel):
 
 
 class UploadResponse(BaseModel):
-    files: Optional[List[str]]
+    files: Optional[str]

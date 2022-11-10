@@ -64,9 +64,9 @@ class TestClassTaskRouter:
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
 
             r = client.post(
-                f"{settings.API_V1_STR}/tasks/1/uploads",
+                f"{settings.API_V1_STR}/tasks/1/upload",
                 headers=testuser_token_headers,
-                files=[("files", f)],
+                files={"file": f},
             )
 
         # check
