@@ -44,7 +44,7 @@ jobs:
         env:
           PROVIDED_VERSION: 0.1.${{ github.run_number }}
         run: |
-          sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" prproject.toml
+          sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
       - name: Publish
         env:
           TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
