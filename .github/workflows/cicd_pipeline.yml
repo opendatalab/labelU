@@ -40,10 +40,10 @@ jobs:
         run: poetry run pytest --cov=./ --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-          with:
-            token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-            files: ./coverage.xml
-            verbose: true
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./coverage.xml
+          verbose: true
       - name: Manage version
         env:
           PROVIDED_VERSION: 0.1.${{ github.run_number }}
