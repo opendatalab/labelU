@@ -54,4 +54,4 @@ jobs:
           TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
           poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
-          poetry publish --build -r testpypi
+          poetry publish --build --skip-existing -r testpypi 
