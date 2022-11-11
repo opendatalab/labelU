@@ -3,14 +3,12 @@ from typer import Typer
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from labelu.internal.common import db
+from labelu.internal.common.db import create_tables
 from labelu.internal.adapter.routers import user
 from labelu.internal.adapter.routers import task
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import exception_handlers
 
-# create database tables
-db.Base.metadata.create_all(bind=db.engine)
 
 description = """
 labelU backend.
@@ -61,6 +59,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
 )
 
+create_tables()
 exception_handlers(app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
 app.include_router(task.router, prefix=settings.API_V1_STR)

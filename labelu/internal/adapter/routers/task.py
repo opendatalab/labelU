@@ -37,7 +37,7 @@ async def create(
     """
 
     # business logic
-    data = await service.create(db=db, cmd=cmd)
+    data = await service.create(db=db, cmd=cmd, current_user=current_user)
 
     # response
     return OkResp[TaskResponse](data=data)

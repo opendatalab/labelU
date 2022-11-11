@@ -24,7 +24,9 @@ class TestClassTaskRouter:
         )
 
         # check
+        json = r.json()
         assert r.status_code == 201
+        assert json["data"]["id"] > 0
 
     def test_create_task_no_authentication(
         self, client: TestClient, testuser_token_headers: dict, db: Session

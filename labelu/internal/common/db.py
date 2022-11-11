@@ -10,6 +10,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+# create database tables
+def create_tables() -> None:
+    Base.metadata.create_all(bind=engine)
+
 
 def get_db() -> Generator:
     try:

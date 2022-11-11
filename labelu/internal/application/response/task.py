@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -9,7 +9,6 @@ class TaskResponse(BaseModel):
         default=None, description="description: task description"
     )
     tips: Optional[str] = Field(default=None, description="description: task tips")
-    files: List[str] = Field(default=None, description="description: task files")
     config: Optional[str] = Field(
         default=None, description="description: task config content"
     )
