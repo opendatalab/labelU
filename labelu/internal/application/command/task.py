@@ -6,10 +6,10 @@ from fastapi import UploadFile, File
 class BasicConfigCommand(BaseModel):
     name: str = Field(description="description: task name", max_length=50)
     description: str = Field(
-        default=None, description="description: task description", max_length=1000
+        default=None, description="description: task description", max_length=500
     )
     tips: Optional[str] = Field(
-        default=None, description="description: task tips", max_length=500
+        default=None, description="description: task tips", max_length=1000
     )
 
 

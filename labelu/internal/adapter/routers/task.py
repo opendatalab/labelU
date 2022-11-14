@@ -45,10 +45,10 @@ async def create(
 
 @router.post(
     "/{task_id}/upload",
-    response_model=OkResp[TaskResponse],
+    response_model=OkResp[UploadResponse],
     status_code=status.HTTP_201_CREATED,
 )
-async def uploads(
+async def upload(
     task_id: int,
     file: UploadFile = File(...),
     authorization: HTTPAuthorizationCredentials = Security(security),
@@ -56,12 +56,14 @@ async def uploads(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Upload files as annnotate data.
+    Upload file annnotate data.
     """
 
     # business logic
     cmd = UploadCommand(file=file)
-    data = await service.uploads(db=db, cmd=cmd)
+    data = await service.upload(
+        db=db, task_id=task_id, cmd=cmd, current_user=current_user
+    )
 
     # response
     return OkResp[UploadResponse](data=data)

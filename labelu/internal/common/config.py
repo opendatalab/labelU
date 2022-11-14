@@ -1,5 +1,7 @@
 from pydantic import BaseSettings
 
+from labelu.internal.common.io import get_data_dir
+
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
@@ -12,6 +14,8 @@ class Settings(BaseSettings):
     TOKEN_GENERATE_ALGORITHM = "HS256"
     TOKEN_ACCESS_EXPIRE_MINUTES = 30
     TOKEN_TYPE = "Bearer"
+
+    BASE_DATA_DIR = get_data_dir()
 
     class Config:
         env_prefix = ""

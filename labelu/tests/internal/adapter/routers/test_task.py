@@ -64,15 +64,15 @@ class TestClassTaskRouter:
 
         # run
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
-
-            r = client.post(
-                f"{settings.API_V1_STR}/tasks/1/upload",
+            new_res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/upload",
                 headers=testuser_token_headers,
                 files={"file": f},
             )
 
         # check
-        assert r.status_code == 201
+        assert new_res.status_code == 201
+        assert new_res.json()["data"]["filename"] == "test.png"
 
     def test_update_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
