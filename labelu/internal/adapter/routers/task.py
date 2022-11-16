@@ -115,7 +115,7 @@ async def update(
     """
 
     # business logic
-    data = await service.update(db=db, cmd=cmd)
+    data = await service.update(db=db, task_id=task_id, cmd=cmd)
 
     # response
     return OkResp[TaskResponse](data=data)

@@ -20,7 +20,7 @@ async def create(
     db: Session, cmd: BasicConfigCommand, current_user: User
 ) -> TaskResponse:
     # new a task
-    task = crud_task.create(
+    new_task = crud_task.create(
         db=db,
         task=Task(
             user_id=current_user.id,
@@ -34,7 +34,12 @@ async def create(
 
     # response
     return TaskResponse(
-        id=task.id, name=task.name, description=task.description, tips=task.tips
+        id=new_task.id,
+        name=new_task.name,
+        description=new_task.description,
+        tips=new_task.tips,
+        config=new_task.config,
+        media_type=new_task.media_type,
     )
 
 
@@ -105,6 +110,22 @@ async def upload(
     return UploadResponse(filename=cmd.file.filename)
 
 
-async def update(db: Session, cmd: UpdateCommand) -> TaskResponse:
+async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
+
+    # get old task
+    task = crud_task.get(db=db, id=task_id)
+
+    # update
+    updated_task = crud_task.update(
+        db=db, db_obj=task, obj_in=cmd.dict(exclude_unset=True)
+    )
+
     # response
-    return TaskResponse()
+    return TaskResponse(
+        id=updated_task.id,
+        name=updated_task.name,
+        description=updated_task.description,
+        tips=updated_task.tips,
+        config=updated_task.config,
+        media_type=updated_task.media_type,
+    )

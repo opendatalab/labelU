@@ -65,6 +65,47 @@ class TestClassTaskRouter:
         # check
         assert r.status_code == 200
 
+    def test_task_update(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        for_update_task_data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+            "config": "config",
+            "media_type": "IMAGE",
+        }
+        for_update_task = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=for_update_task_data,
+        )
+        for_updated_task_data = {
+            "name": "new name",
+            "description": "new description",
+            "tips": "new tips",
+            "config": "new config",
+            "media_type": "IMAGE",
+        }
+
+        # run
+        task_id = for_update_task.json()["data"]["id"]
+        updated_task = client.put(
+            f"{settings.API_V1_STR}/tasks/{task_id}",
+            headers=testuser_token_headers,
+            json=for_updated_task_data,
+        )
+
+        # check
+        json = updated_task.json()
+        assert json["data"]["name"] == "new name"
+        assert json["data"]["description"] == "new description"
+        assert json["data"]["tips"] == "new tips"
+        assert json["data"]["config"] == "new config"
+        assert json["data"]["media_type"] == "IMAGE"
+
     def test_upload_file_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:

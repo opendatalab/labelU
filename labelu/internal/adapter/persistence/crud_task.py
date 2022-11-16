@@ -1,7 +1,9 @@
-from typing import List
+from typing import Any, Dict, List, Optional, Union
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from fastapi.encoders import jsonable_encoder
+
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskFile
 
@@ -21,6 +23,21 @@ def list(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[Tas
         .limit(limit=size)
         .all()
     )
+
+
+def get(db: Session, id: str) -> Task:
+    return db.query(Task).filter(Task.id == id).first()
+
+
+def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
+    obj_data = jsonable_encoder(obj_in)
+    for field in obj_data:
+        if field in obj_in:
+            setattr(db_obj, field, obj_in[field])
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
 
 
 def count(db: Session, owner_id: int) -> List[Task]:

@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 from labelu.internal.common.db import Base
 
 
-class TaskStatus(Enum):
+class TaskStatus(str, Enum):
     """
     task status
     """
@@ -17,21 +17,13 @@ class TaskStatus(Enum):
     FINISHED = "DRAFT"
 
 
-class MediaType(Enum):
+class MediaType(str, Enum):
     """
     task meida type
     """
 
     IMAGE = "IMAGE"
     VIDEO = "VIDEO"
-
-
-class TaskDataType(Enum):
-    """
-    business error code
-    """
-
-    IMAGE = "IMAGE"
 
 
 class Task(Base):
