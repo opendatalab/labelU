@@ -12,6 +12,13 @@ class TaskResponse(BaseModel):
     config: Optional[str] = Field(
         default=None, description="description: task config content"
     )
+    media_type: Optional[str] = Field(
+        default="", description="description: task media type: IMAGE, VIDEO"
+    )
+    annotated_count: Optional[int] = Field(
+        default=0, description="description: task file already labeled"
+    )
+    total: Optional[int] = Field(default=0, description="description: task files count")
 
 
 class UploadResponse(BaseModel):

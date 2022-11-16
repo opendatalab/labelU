@@ -9,12 +9,21 @@ from labelu.internal.common.db import Base
 
 class TaskStatus(Enum):
     """
-    business error code
+    task status
     """
 
     DRAFT = "DRAFT"
     INPROGRESS = "INPROGRESS"
     FINISHED = "DRAFT"
+
+
+class MediaType(Enum):
+    """
+    task meida type
+    """
+
+    IMAGE = "IMAGE"
+    VIDEO = "VIDEO"
 
 
 class TaskDataType(Enum):
@@ -35,21 +44,24 @@ class Task(Base):
     description = Column(String(1024), comment="task description")
     tips = Column(String(1024), comment="task tips")
     config = Column(Text, comment="task config yaml")
-    data_type = Column(Text, comment="task config yaml")
+    media_type = Column(
+        String(32),
+        comment="task media type: image, video",
+    )
     created_at = Column(
         DateTime, default=datetime.utcnow(), comment="Time a task was created"
     )
     updated_at = Column(
         DateTime, default=datetime.utcnow(), comment="Last time a task was updated"
     )
-    updated_by = Column(Integer, index=True)
+    updated_by = Column(Integer, comment="Last time a task was updated")
 
 
 class TaskFile(Base):
     __tablename__ = "task_file"
 
     id = Column(Integer, primary_key=True, index=True)
-    path = Column(String(32), default=TaskStatus.DRAFT.value, comment="task status")
+    path = Column(String(32), comment="task status")
     user_id = Column(Integer, ForeignKey("user.id"), index=True)
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
     created_at = Column(
@@ -59,7 +71,7 @@ class TaskFile(Base):
         DateTime, default=datetime.utcnow(), comment="Last time a task was updated"
     )
     updated_by = Column(Integer, ForeignKey("user.id"), index=True)
-    is_labeled = Column(
+    annotated = Column(
         SmallInteger,
         default=0,
         comment="0 is has not start yet, 1 is completed, 2 is skipped",

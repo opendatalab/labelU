@@ -1,5 +1,6 @@
 import os
 import aiofiles
+from typing import List, Tuple
 from sqlalchemy.orm import Session
 
 from labelu.internal.common.config import settings
@@ -23,10 +24,11 @@ async def create(
         db=db,
         task=Task(
             user_id=current_user.id,
-            status=TaskStatus.DRAFT,
+            status=TaskStatus.DRAFT.value,
             name=cmd.name,
             description=cmd.description,
             tips=cmd.tips,
+            updated_by=current_user.id,
         ),
     )
 
@@ -34,6 +36,45 @@ async def create(
     return TaskResponse(
         id=task.id, name=task.name, description=task.description, tips=task.tips
     )
+
+
+async def list(
+    db: Session,
+    current_user: User,
+    page: int,
+    size: int,
+) -> Tuple[List[TaskResponse], int]:
+
+    # get task total count
+    total_task = crud_task.count(db=db, owner_id=current_user.id)
+
+    # get task list
+    tasks = crud_task.list(db=db, owner_id=current_user.id, page=page, size=size)
+
+    # get progress
+    total_task_file = crud_task.count_group_by_task(
+        db=db,
+        owner_id=current_user.id,
+    )
+    count_task_file_in_progress = crud_task.count_group_by_task(
+        db=db, owner_id=current_user.id, annotated_status=[TaskStatus.INPROGRESS.value]
+    )
+
+    # response
+    list = [
+        TaskResponse(
+            id=t.id,
+            name=t.name,
+            description=t.description,
+            tips=t.tips,
+            config=t.config,
+            media_type=t.media_type,
+            annotated_count=count_task_file_in_progress.get(t.id, 0),
+            total=total_task_file.get(t.id, 0),
+        )
+        for t in tasks
+    ]
+    return list, total_task
 
 
 async def upload(

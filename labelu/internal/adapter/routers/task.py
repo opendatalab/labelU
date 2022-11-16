@@ -14,6 +14,8 @@ from labelu.internal.application.command.task import UploadCommand
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
 from labelu.internal.application.response.base import OkResp
+from labelu.internal.application.response.base import MetaData
+from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
 
@@ -41,6 +43,32 @@ async def create(
 
     # response
     return OkResp[TaskResponse](data=data)
+
+
+@router.get(
+    "",
+    response_model=OkRespWithMeta[List[TaskResponse]],
+    status_code=status.HTTP_200_OK,
+)
+async def list(
+    page: int = 0,
+    size: int = 100,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Create a task with basic config.
+    """
+
+    # business logic
+    data, total = await service.list(
+        db=db, current_user=current_user, page=page, size=size
+    )
+
+    # response
+    meta_data = MetaData(total=total, page=page, size=len(data))
+    return OkRespWithMeta[List[TaskResponse]](meta_data=meta_data, data=data)
 
 
 @router.post(

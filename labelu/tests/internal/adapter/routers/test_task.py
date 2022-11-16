@@ -47,6 +47,24 @@ class TestClassTaskRouter:
         # check
         assert r.status_code == 201
 
+    def test_task_list(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        page = 0
+        size = 10
+
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            params={"page": page, "size": size},
+        )
+
+        # check
+        assert r.status_code == 200
+
     def test_upload_file_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
