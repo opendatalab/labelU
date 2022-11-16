@@ -32,6 +32,7 @@ def get_current_user(
             token,
             settings.PASSWORD_SECRET_KEY,
             algorithms=[settings.TOKEN_GENERATE_ALGORITHM],
+            options={"verify_exp": False},
         )
         token_data = AccessToken(**payload)
     except (jwt.JWTError, ValidationError):

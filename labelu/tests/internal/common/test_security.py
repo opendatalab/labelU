@@ -27,3 +27,19 @@ def test_create_access_token_successful():
         < payload["exp"]
         <= (datetime.now() + timedelta(minutes=15, seconds=1)).timestamp()
     )
+
+
+def test_access_token_no_exp_time():
+    # prepare data
+
+    # run
+    access_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjpudWxsfQ.ZSN0TVuafP6h0xnI7SpCz6NIyC8UxMYTk37ySfzSfBU"
+
+    # check
+    payload = jwt.decode(
+        access_token,
+        settings.PASSWORD_SECRET_KEY,
+        algorithms=[settings.TOKEN_GENERATE_ALGORITHM],
+        options={"verify_exp": False},
+    )
+    assert payload
