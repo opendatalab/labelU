@@ -1,7 +1,7 @@
 from typing import List
 
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, status, Depends, Security
+from fastapi import APIRouter, Form, status, Depends, Security
 from fastapi import UploadFile, File
 from fastapi.security import HTTPAuthorizationCredentials
 
@@ -79,6 +79,7 @@ async def list(
 async def upload(
     task_id: int,
     file: UploadFile = File(...),
+    path: str = Form(default=""),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -88,7 +89,7 @@ async def upload(
     """
 
     # business logic
-    cmd = UploadCommand(file=file)
+    cmd = UploadCommand(file=file, path=path)
     data = await service.upload(
         db=db, task_id=task_id, cmd=cmd, current_user=current_user
     )

@@ -82,7 +82,7 @@ async def upload(
 ) -> UploadResponse:
 
     # save file
-    path = os.path.join(settings.BASE_DATA_DIR, f"{task_id}")
+    path = os.path.join(settings.BASE_DATA_DIR, f"{task_id}", f"{cmd.path}")
     os.makedirs(path, exist_ok=True)
     filepath = os.path.join(path, cmd.file.filename)
     async with aiofiles.open(filepath, "wb") as out_file:

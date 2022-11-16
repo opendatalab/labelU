@@ -15,6 +15,7 @@ class BasicConfigCommand(BaseModel):
 
 class UploadCommand(BaseModel):
     file: UploadFile = File()
+    path: Optional[str] = Field(default="", description="description: file path")
 
 
 class UpdateCommand(BaseModel):
