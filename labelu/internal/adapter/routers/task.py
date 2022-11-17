@@ -71,6 +71,28 @@ async def list(
     return OkRespWithMeta[List[TaskResponse]](meta_data=meta_data, data=data)
 
 
+@router.get(
+    "/{task_id}",
+    response_model=OkResp[TaskResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get(
+    task_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    get task detail.
+    """
+
+    # business logic
+    data = await service.get(db=db, task_id=task_id, current_user=current_user)
+
+    # response
+    return OkResp[TaskResponse](data=data)
+
+
 @router.post(
     "/{task_id}/upload",
     response_model=OkResp[UploadResponse],

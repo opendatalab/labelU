@@ -57,11 +57,11 @@ async def list(
     tasks = crud_task.list(db=db, owner_id=current_user.id, page=page, size=size)
 
     # get progress
-    total_task_file = crud_task.count_group_by_task(
+    total_task_file = crud_task.count_task_file_group_by_task(
         db=db,
         owner_id=current_user.id,
     )
-    count_task_file_in_progress = crud_task.count_group_by_task(
+    count_task_file_in_progress = crud_task.count_task_file_group_by_task(
         db=db, owner_id=current_user.id, annotated_status=[TaskStatus.INPROGRESS.value]
     )
 
@@ -80,6 +80,37 @@ async def list(
         for t in tasks
     ]
     return list, total_task
+
+
+async def get(db: Session, task_id: int, current_user: User) -> TaskResponse:
+
+    # get task detail
+    task = crud_task.get(db=db, id=task_id)
+
+    # get progress
+    total_task_file = crud_task.count_task_file_group_by_task(
+        db=db,
+        owner_id=current_user.id,
+        task_id=task.id,
+    )
+    count_task_file_in_progress = crud_task.count_task_file_group_by_task(
+        db=db,
+        owner_id=current_user.id,
+        task_id=task.id,
+        annotated_status=[TaskStatus.INPROGRESS.value],
+    )
+
+    # response
+    return TaskResponse(
+        id=task.id,
+        name=task.name,
+        description=task.description,
+        tips=task.tips,
+        config=task.config,
+        media_type=task.media_type,
+        annotated_count=count_task_file_in_progress.get(task.id, 0),
+        total=total_task_file.get(task.id, 0),
+    )
 
 
 async def upload(

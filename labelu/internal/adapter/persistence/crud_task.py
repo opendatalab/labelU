@@ -40,10 +40,6 @@ def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
     return db_obj
 
 
-def count(db: Session, owner_id: int) -> List[Task]:
-    return db.query(Task).filter(Task.user_id == owner_id).count()
-
-
 def add_file(db: Session, task_file: TaskFile) -> TaskFile:
     db.add(task_file)
     db.commit()
@@ -51,14 +47,21 @@ def add_file(db: Session, task_file: TaskFile) -> TaskFile:
     return task_file
 
 
-def count_group_by_task(
+def count(db: Session, owner_id: int) -> List[Task]:
+    return db.query(Task).filter(Task.user_id == owner_id).count()
+
+
+def count_task_file_group_by_task(
     db: Session,
     owner_id: int,
+    task_id: int = None,
     annotated_status: List[int] = None,
 ) -> dict:
     query_filter = [TaskFile.user_id == owner_id]
     if annotated_status:
         query_filter.append(TaskFile.annotated in annotated_status)
+    if task_id:
+        query_filter.append(TaskFile.task_id == task_id)
 
     task_file_count = (
         db.query(TaskFile.task_id, func.count(TaskFile.task_id).label("count"))

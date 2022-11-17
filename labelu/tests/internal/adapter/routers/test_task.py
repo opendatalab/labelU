@@ -65,6 +65,36 @@ class TestClassTaskRouter:
         # check
         assert r.status_code == 200
 
+    def test_task_get(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+            "config": "config",
+            "media_type": "IMAGE",
+        }
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=data,
+        )
+
+        # run
+        task_id = task.json()["data"]["id"]
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task_id}",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()["data"]
+        assert r.status_code == 200
+        assert json["name"] == "task name"
+
     def test_task_update(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
