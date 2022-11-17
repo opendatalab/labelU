@@ -39,7 +39,7 @@ def init_db() -> None:
             username=TEST_USERNAME,
             hashed_password=get_password_hash(TEST_USER_PASSWORD),
         )
-        user = crud_user.create_user(db, user=user_in)
+        user = crud_user.create(db, user=user_in)
 
 
 def get_testuser_token_headers(client: TestClient) -> Dict[str, str]:

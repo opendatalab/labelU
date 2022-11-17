@@ -8,12 +8,15 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskFile
 from labelu.internal.domain.models.task import TaskStatus
+from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.application.command.task import UploadCommand
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
 from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
+from labelu.internal.application.response.task import TaskFileResponse
+from labelu.internal.application.response.task import User as UserResponse
 
 
 async def create(
@@ -132,7 +135,7 @@ async def upload(
             db=db,
             task_file=TaskFile(
                 path=f"{task_id}/{cmd.file.filename}",
-                user_id=current_user.id,
+                created_by=current_user.id,
                 task_id=task_id,
             ),
         )
@@ -160,3 +163,48 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
         config=updated_task.config,
         media_type=updated_task.media_type,
     )
+
+
+async def list_upload_files(
+    db: Session,
+    task_id: int,
+    current_user: User,
+    page: int,
+    size: int,
+) -> Tuple[List[TaskFileResponse], int]:
+
+    # get task file total count
+    total_task_file = crud_task.count(db=db, owner_id=current_user.id)
+
+    # get task file list
+    task_files = crud_task.list_upload_files(
+        db=db, task_id=task_id, owner_id=current_user.id, page=page, size=size
+    )
+
+    # all annotated user
+    user_ids = [f.updated_by for f in task_files]
+    users = crud_user.list(db=db, user_ids=user_ids)
+    user_id_map = {}
+    for u in users:
+        user_id_map[u.id] = u
+
+    # response
+    list = []
+    for f in task_files:
+        user = user_id_map.get(f.updated_by)
+        if user:
+            annotated_by = UserResponse(id=user.id, username=user.username)
+        else:
+            annotated_by = None
+        list.append(
+            TaskFileResponse(
+                id=f.id,
+                path=f.path,
+                task_id=f.task_id,
+                annotated=f.annotated,
+                result=f.result,
+                annotated_by=annotated_by,
+                annotated_at=f.updated_at,
+            )
+        )
+    return list, total_task_file

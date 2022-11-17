@@ -37,7 +37,7 @@ class TestClassUserRouter:
         username = random_username()
         password = random_lower_string()
         data = {"username": username, "password": password}
-        crud_user.create_user(
+        crud_user.create(
             db=db,
             user=User(username=username, hashed_password=get_password_hash(password)),
         )
@@ -55,7 +55,7 @@ class TestClassUserRouter:
         username = random_username()
         password = random_lower_string()
         data = {"username": username, "password": password}
-        crud_user.create_user(
+        crud_user.create(
             db=db,
             user=User(username=username, hashed_password=get_password_hash(password)),
         )

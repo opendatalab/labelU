@@ -192,3 +192,39 @@ class TestClassTaskRouter:
         )
         # check
         assert r.status_code == 200
+
+    def test_list_upload_file_successful(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        page = 0
+        size = 10
+        data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
+        )
+        task_id = task.json()["data"]["id"]
+
+        # upload file
+        with Path("labelu/tests/data/test.png").open(mode="rb") as f:
+            new_res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/upload",
+                headers=testuser_token_headers,
+                files={"file": f},
+            )
+
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task_id}/uploads",
+            headers=testuser_token_headers,
+            params={"page": page, "size": size},
+        )
+
+        # check
+        assert r.status_code == 200
+        assert len(r.json()["data"]) > 0

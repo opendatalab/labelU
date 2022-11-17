@@ -40,7 +40,7 @@ def get_current_user(
             code=ErrorCode.CODE_40003_CREDENTIAL_ERROR,
             status_code=status.HTTP_403_FORBIDDEN,
         )
-    user = crud_user.get_user(db, id=token_data.id)
+    user = crud_user.get(db, id=token_data.id)
     if not user:
         raise UnicornException(
             code=ErrorCode.CODE_40002_USER_NOT_FOUND, status_code=404

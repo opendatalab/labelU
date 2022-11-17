@@ -47,8 +47,28 @@ def add_file(db: Session, task_file: TaskFile) -> TaskFile:
     return task_file
 
 
+def list_upload_files(
+    db: Session, task_id: int, owner_id: int, page: int = 0, size: int = 100
+) -> List[TaskFile]:
+    return (
+        db.query(TaskFile)
+        .filter(TaskFile.created_by == owner_id, TaskFile.task_id == task_id)
+        .offset(offset=page * size)
+        .limit(limit=size)
+        .all()
+    )
+
+
 def count(db: Session, owner_id: int) -> List[Task]:
     return db.query(Task).filter(Task.user_id == owner_id).count()
+
+
+def count_task_file(db: Session, task_id: int, owner_id: int) -> List[Task]:
+    return (
+        db.query(TaskFile)
+        .filter(TaskFile.created_by == owner_id, TaskFile.task_id == task_id)
+        .count()
+    )
 
 
 def count_task_file_group_by_task(
@@ -57,7 +77,7 @@ def count_task_file_group_by_task(
     task_id: int = None,
     annotated_status: List[int] = None,
 ) -> dict:
-    query_filter = [TaskFile.user_id == owner_id]
+    query_filter = [TaskFile.created_by == owner_id]
     if annotated_status:
         query_filter.append(TaskFile.annotated in annotated_status)
     if task_id:

@@ -1,25 +1,51 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from datetime import datetime
+
+from typing import Union
+from pydantic import BaseModel, EmailStr, Field
 
 
 class TaskResponse(BaseModel):
-    id: Optional[int] = Field(default=None, description="description: task id")
-    name: Optional[str] = Field(default=None, description="description: task name")
-    description: Optional[str] = Field(
+    id: Union[int, None] = Field(default=None, description="description: task id")
+    name: Union[str, None] = Field(default=None, description="description: task name")
+    description: Union[str, None] = Field(
         default=None, description="description: task description"
     )
-    tips: Optional[str] = Field(default=None, description="description: task tips")
-    config: Optional[str] = Field(
+    tips: Union[str, None] = Field(default=None, description="description: task tips")
+    config: Union[str, None] = Field(
         default=None, description="description: task config content"
     )
-    media_type: Optional[str] = Field(
+    media_type: Union[str, None] = Field(
         default="", description="description: task media type: IMAGE, VIDEO"
     )
-    annotated_count: Optional[int] = Field(
+    annotated_count: Union[int, None] = Field(
         default=0, description="description: task file already labeled"
     )
-    total: Optional[int] = Field(default=0, description="description: task files count")
+    total: Union[int, None] = Field(
+        default=0, description="description: task files count"
+    )
 
 
 class UploadResponse(BaseModel):
-    filename: Optional[str]
+    filename: Union[str, None]
+
+
+class User(BaseModel):
+    id: Union[int, None] = None
+    username: Union[EmailStr, None] = None
+
+
+class TaskFileResponse(BaseModel):
+    id: int
+    path: str = Field(default="", description="description: task status")
+    task_id: int = Field(default=0, description="description: task id")
+    annotated: int = Field(
+        default=0,
+        description="description: 0 is has not start yet, 1 is completed, 2 is skipped",
+    )
+    result: Union[str, None] = Field(
+        default=None, description="description: task file annnotation result"
+    )
+    annotated_by: Union[User, None] = None
+    annotated_at: Union[datetime, None] = Field(
+        default=None, description="description: task file annnotated time"
+    )

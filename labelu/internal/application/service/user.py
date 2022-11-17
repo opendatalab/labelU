@@ -28,7 +28,7 @@ async def signup(db: Session, cmd: SignupCommand) -> SignupResponse:
         )
 
     # new a user
-    user = crud_user.create_user(
+    user = crud_user.create(
         db,
         User(
             username=cmd.username,

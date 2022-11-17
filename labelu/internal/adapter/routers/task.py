@@ -18,6 +18,7 @@ from labelu.internal.application.response.base import MetaData
 from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
+from labelu.internal.application.response.task import TaskFileResponse
 
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -141,3 +142,30 @@ async def update(
 
     # response
     return OkResp[TaskResponse](data=data)
+
+
+@router.get(
+    "/{task_id}/uploads",
+    response_model=OkRespWithMeta[List[TaskFileResponse]],
+    status_code=status.HTTP_200_OK,
+)
+async def list_upload_files(
+    task_id: int,
+    page: int = 0,
+    size: int = 100,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    get task upload file detail.
+    """
+
+    # business logic
+    data, total = await service.list_upload_files(
+        db=db, task_id=task_id, current_user=current_user, page=page, size=size
+    )
+
+    # response
+    meta_data = MetaData(total=total, page=page, size=len(data))
+    return OkRespWithMeta[List[TaskFileResponse]](meta_data=meta_data, data=data)

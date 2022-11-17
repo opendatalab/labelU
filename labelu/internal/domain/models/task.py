@@ -54,15 +54,15 @@ class TaskFile(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     path = Column(String(32), comment="task status")
-    user_id = Column(Integer, ForeignKey("user.id"), index=True)
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
+    created_by = Column(Integer, ForeignKey("user.id"), index=True)
+    updated_by = Column(Integer, ForeignKey("user.id"), index=True)
     created_at = Column(
         DateTime, default=datetime.utcnow(), comment="Time a task was created"
     )
     updated_at = Column(
         DateTime, default=datetime.utcnow(), comment="Last time a task was updated"
     )
-    updated_by = Column(Integer, ForeignKey("user.id"), index=True)
     annotated = Column(
         SmallInteger,
         default=0,
