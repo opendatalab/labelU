@@ -59,6 +59,10 @@ def list_upload_files(
     )
 
 
+def get_file(db: Session, id: str) -> TaskFile:
+    return db.query(TaskFile).filter(TaskFile.id == id).first()
+
+
 def count(db: Session, owner_id: int) -> List[Task]:
     return db.query(Task).filter(Task.user_id == owner_id).count()
 

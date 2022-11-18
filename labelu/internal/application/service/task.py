@@ -1,6 +1,7 @@
-import os
 import aiofiles
 from typing import List, Tuple
+from pathlib import Path
+
 from sqlalchemy.orm import Session
 
 from labelu.internal.common.config import settings
@@ -121,27 +122,31 @@ async def upload(
 ) -> UploadResponse:
 
     # save file
-    path = os.path.join(settings.BASE_DATA_DIR, f"{task_id}", f"{cmd.path}")
-    os.makedirs(path, exist_ok=True)
-    filepath = os.path.join(path, cmd.file.filename)
-    async with aiofiles.open(filepath, "wb") as out_file:
+    file_relative_path = Path(settings.UPLOAD_DIR).joinpath(
+        str(task_id), cmd.path.strip()
+    )
+    file_dir = Path(settings.MEDIA_ROOT).joinpath(file_relative_path)
+    file_full_path = file_dir.joinpath(cmd.file.filename)
+    file_dir.mkdir(parents=True, exist_ok=True)
+
+    async with aiofiles.open(file_full_path, "wb") as out_file:
         content = await cmd.file.read()  # async read
         await out_file.write(content)  # async write
 
     # check file already saved
-    if os.path.exists(filepath):
+    if file_full_path.exists():
         # add a task file record
         task_file = crud_task.add_file(
             db=db,
             task_file=TaskFile(
-                path=f"{task_id}/{cmd.file.filename}",
+                path=str(file_relative_path.joinpath(cmd.file.filename)),
                 created_by=current_user.id,
                 task_id=task_id,
             ),
         )
 
     # response
-    return UploadResponse(filename=cmd.file.filename)
+    return UploadResponse(id=task_file.id, filename=cmd.file.filename)
 
 
 async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
@@ -208,3 +213,14 @@ async def list_upload_files(
             )
         )
     return list, total_task_file
+
+
+async def get_upload_file(
+    db: Session, task_id: int, file_id: int, current_user: User
+) -> str:
+
+    # get file path
+    task_file = crud_task.get_file(db=db, id=file_id)
+
+    # response
+    return Path(settings.MEDIA_ROOT, f"{task_file.path}")

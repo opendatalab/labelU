@@ -3,6 +3,7 @@ from typing import List
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Form, status, Depends, Security
 from fastapi import UploadFile, File
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
@@ -169,3 +170,28 @@ async def list_upload_files(
     # response
     meta_data = MetaData(total=total, page=page, size=len(data))
     return OkRespWithMeta[List[TaskFileResponse]](meta_data=meta_data, data=data)
+
+
+@router.get(
+    "/{task_id}/uploads/{file_id}",
+    response_class=FileResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_upload_file(
+    task_id: int,
+    file_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    get task upload file detail.
+    """
+
+    # business logic
+    data = await service.get_upload_file(
+        db=db, task_id=task_id, file_id=file_id, current_user=current_user
+    )
+
+    # response
+    return data

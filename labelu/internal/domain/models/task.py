@@ -53,7 +53,7 @@ class TaskFile(Base):
     __tablename__ = "task_file"
 
     id = Column(Integer, primary_key=True, index=True)
-    path = Column(String(32), comment="task status")
+    path = Column(String(256), comment="task status")
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
     updated_by = Column(Integer, ForeignKey("user.id"), index=True)

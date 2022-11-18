@@ -1,3 +1,5 @@
+import os
+
 from pydantic import BaseSettings
 
 from labelu.internal.common.io import get_data_dir
@@ -16,6 +18,9 @@ class Settings(BaseSettings):
     TOKEN_TYPE = "Bearer"
 
     BASE_DATA_DIR = get_data_dir()
+    MEDIA_ROOT = os.path.join(BASE_DATA_DIR, "media")
+    UPLOAD_DIR = "upload"
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     class Config:
         env_prefix = ""

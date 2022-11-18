@@ -26,7 +26,12 @@ class TaskResponse(BaseModel):
 
 
 class UploadResponse(BaseModel):
-    filename: Union[str, None]
+    id: Union[int, None] = Field(
+        default=None, description="description: upload file id"
+    )
+    filename: Union[str, None] = Field(
+        default=None, description="description: upload file name"
+    )
 
 
 class User(BaseModel):
