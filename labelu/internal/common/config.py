@@ -1,5 +1,6 @@
 import os
 
+from loguru import logger
 from pydantic import BaseSettings
 
 from labelu.internal.common.io import get_data_dir
@@ -12,6 +13,7 @@ class Settings(BaseSettings):
     MEDIA_ROOT = os.path.join(BASE_DATA_DIR, "media")
     UPLOAD_DIR = "upload"
     os.makedirs(MEDIA_ROOT, exist_ok=True)
+    logger.info("Database and media directory: {}", BASE_DATA_DIR)
 
     DATABASE_URL: str = f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite"
 
