@@ -4,7 +4,11 @@ from fastapi.responses import JSONResponse
 from fastapi import Request, status, HTTPException
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+# user init error code
 USER_INIT_CODE = 40000
+
+# task init error code
+TASK_INIT_CODE = 50000
 
 
 class ErrorCode(Enum):
@@ -12,6 +16,7 @@ class ErrorCode(Enum):
     business error code
     """
 
+    # user error code
     CODE_40000_USERNAME_OR_PASSWORD_INCORRECT = (
         USER_INIT_CODE,
         "Incorrect username or password",
@@ -24,7 +29,12 @@ class ErrorCode(Enum):
     CODE_40003_CREDENTIAL_ERROR = (USER_INIT_CODE + 3, "Could not validate credentials")
     CODE_40004_NOT_AUTHENTICATED = (USER_INIT_CODE + 4, "Not authenticated")
 
-    CODE_50000_INTERNAL_ERROR = (50000, "Internal Error")
+    # task error code
+    CODE_50000_TASK_ERROR = (TASK_INIT_CODE, "Internal Error")
+    CODE_51000_TASK_FILE_UPLOAD_ERROR = (
+        TASK_INIT_CODE + 1000,
+        "Upload file error, save file failure",
+    )
 
 
 class UnicornException(HTTPException):

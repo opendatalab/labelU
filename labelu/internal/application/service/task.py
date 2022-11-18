@@ -2,9 +2,12 @@ import aiofiles
 from typing import List, Tuple
 from pathlib import Path
 
+from fastapi import status
 from sqlalchemy.orm import Session
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.error_code import ErrorCode
+from labelu.internal.common.error_code import UnicornException
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskFile
@@ -27,11 +30,11 @@ async def create(
     new_task = crud_task.create(
         db=db,
         task=Task(
-            user_id=current_user.id,
             status=TaskStatus.DRAFT.value,
             name=cmd.name,
             description=cmd.description,
             tips=cmd.tips,
+            created_by=current_user.id,
             updated_by=current_user.id,
         ),
     )
@@ -42,8 +45,6 @@ async def create(
         name=new_task.name,
         description=new_task.description,
         tips=new_task.tips,
-        config=new_task.config,
-        media_type=new_task.media_type,
     )
 
 
@@ -121,14 +122,20 @@ async def upload(
     db: Session, task_id: int, cmd: UploadCommand, current_user: User
 ) -> UploadResponse:
 
-    # save file
-    file_relative_path = Path(settings.UPLOAD_DIR).joinpath(
+    # file relative path
+    file_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
         str(task_id), cmd.path.strip()
     )
-    file_dir = Path(settings.MEDIA_ROOT).joinpath(file_relative_path)
-    file_full_path = file_dir.joinpath(cmd.file.filename)
-    file_dir.mkdir(parents=True, exist_ok=True)
+    file_relative_path = str(file_relative_base_dir.joinpath(cmd.file.filename))
 
+    # file full path
+    file_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(file_relative_base_dir)
+    file_full_path = file_full_base_dir.joinpath(cmd.file.filename)
+
+    # create dicreatory
+    file_full_base_dir.mkdir(parents=True, exist_ok=True)
+
+    # save file
     async with aiofiles.open(file_full_path, "wb") as out_file:
         content = await cmd.file.read()  # async read
         await out_file.write(content)  # async write
@@ -139,14 +146,19 @@ async def upload(
         task_file = crud_task.add_file(
             db=db,
             task_file=TaskFile(
-                path=str(file_relative_path.joinpath(cmd.file.filename)),
+                path=file_relative_path,
                 created_by=current_user.id,
                 task_id=task_id,
             ),
         )
+    else:
+        raise UnicornException(
+            code=ErrorCode.CODE_51000_TASK_FILE_UPLOAD_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     # response
-    return UploadResponse(id=task_file.id, filename=cmd.file.filename)
+    return UploadResponse(id=task_file.id, filename=file_relative_path)
 
 
 async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
@@ -165,8 +177,8 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
         name=updated_task.name,
         description=updated_task.description,
         tips=updated_task.tips,
-        config=updated_task.config,
         media_type=updated_task.media_type,
+        config=updated_task.config,
     )
 
 

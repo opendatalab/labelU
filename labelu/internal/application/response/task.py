@@ -15,7 +15,7 @@ class TaskResponse(BaseModel):
         default=None, description="description: task config content"
     )
     media_type: Union[str, None] = Field(
-        default="", description="description: task media type: IMAGE, VIDEO"
+        default=None, description="description: task media type: IMAGE, VIDEO"
     )
     annotated_count: Union[int, None] = Field(
         default=0, description="description: task file already labeled"

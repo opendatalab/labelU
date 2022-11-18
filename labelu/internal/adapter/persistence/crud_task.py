@@ -18,7 +18,7 @@ def create(db: Session, task: Task) -> Task:
 def list(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[Task]:
     return (
         db.query(Task)
-        .filter(Task.user_id == owner_id)
+        .filter(Task.created_by == owner_id)
         .offset(offset=page * size)
         .limit(limit=size)
         .all()
@@ -64,7 +64,7 @@ def get_file(db: Session, id: str) -> TaskFile:
 
 
 def count(db: Session, owner_id: int) -> List[Task]:
-    return db.query(Task).filter(Task.user_id == owner_id).count()
+    return db.query(Task).filter(Task.created_by == owner_id).count()
 
 
 def count_task_file(db: Session, task_id: int, owner_id: int) -> List[Task]:

@@ -30,8 +30,6 @@ class Task(Base):
     __tablename__ = "task"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("user.id"), index=True)
-    status = Column(String(32), default=TaskStatus.DRAFT.value, comment="task status")
     name = Column(String(64), index=True)
     description = Column(String(1024), comment="task description")
     tips = Column(String(1024), comment="task tips")
@@ -40,13 +38,17 @@ class Task(Base):
         String(32),
         comment="task media type: image, video",
     )
+    status = Column(String(32), default=TaskStatus.DRAFT.value, comment="task status")
+    created_by = Column(Integer, ForeignKey("user.id"), index=True)
+    updated_by = Column(
+        Integer, ForeignKey("user.id"), comment="Last time a task was updated"
+    )
     created_at = Column(
         DateTime, default=datetime.utcnow(), comment="Time a task was created"
     )
     updated_at = Column(
         DateTime, default=datetime.utcnow(), comment="Last time a task was updated"
     )
-    updated_by = Column(Integer, comment="Last time a task was updated")
 
 
 class TaskFile(Base):

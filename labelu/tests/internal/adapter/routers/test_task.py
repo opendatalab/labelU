@@ -161,7 +161,10 @@ class TestClassTaskRouter:
 
         # check
         assert new_res.status_code == 201
-        assert new_res.json()["data"]["filename"] == "test.png"
+        assert (
+            new_res.json()["data"]["filename"]
+            == f"{settings.UPLOAD_DIR}/{task_id}/test.png"
+        )
 
     def test_update_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
