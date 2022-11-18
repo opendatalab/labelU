@@ -21,6 +21,7 @@ from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
 from labelu.internal.application.response.task import TaskFileResponse
 from labelu.internal.application.response.task import User as UserResponse
+from labelu.internal.application.response.task import TaskResponseWithProgress
 
 
 async def create(
@@ -45,6 +46,8 @@ async def create(
         name=new_task.name,
         description=new_task.description,
         tips=new_task.tips,
+        status=new_task.status,
+        created_at=new_task.created_at,
     )
 
 
@@ -53,7 +56,7 @@ async def list(
     current_user: User,
     page: int,
     size: int,
-) -> Tuple[List[TaskResponse], int]:
+) -> Tuple[List[TaskResponseWithProgress], int]:
 
     # get task total count
     total_task = crud_task.count(db=db, owner_id=current_user.id)
@@ -72,13 +75,15 @@ async def list(
 
     # response
     list = [
-        TaskResponse(
+        TaskResponseWithProgress(
             id=t.id,
             name=t.name,
             description=t.description,
             tips=t.tips,
-            config=t.config,
             media_type=t.media_type,
+            config=t.config,
+            status=t.status,
+            created_at=t.created_at,
             annotated_count=count_task_file_in_progress.get(t.id, 0),
             total=total_task_file.get(t.id, 0),
         )
@@ -87,7 +92,9 @@ async def list(
     return list, total_task
 
 
-async def get(db: Session, task_id: int, current_user: User) -> TaskResponse:
+async def get(
+    db: Session, task_id: int, current_user: User
+) -> TaskResponseWithProgress:
 
     # get task detail
     task = crud_task.get(db=db, id=task_id)
@@ -106,13 +113,15 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponse:
     )
 
     # response
-    return TaskResponse(
+    return TaskResponseWithProgress(
         id=task.id,
         name=task.name,
         description=task.description,
         tips=task.tips,
-        config=task.config,
         media_type=task.media_type,
+        config=task.config,
+        status=task.status,
+        created_at=task.created_at,
         annotated_count=count_task_file_in_progress.get(task.id, 0),
         total=total_task_file.get(task.id, 0),
     )
@@ -179,6 +188,8 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
         tips=updated_task.tips,
         media_type=updated_task.media_type,
         config=updated_task.config,
+        status=updated_task.status,
+        created_at=updated_task.created_at,
     )
 
 

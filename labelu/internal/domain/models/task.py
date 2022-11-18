@@ -14,7 +14,7 @@ class TaskStatus(str, Enum):
 
     DRAFT = "DRAFT"
     INPROGRESS = "INPROGRESS"
-    FINISHED = "DRAFT"
+    FINISHED = "FINISHED"
 
 
 class MediaType(str, Enum):

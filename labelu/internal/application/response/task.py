@@ -17,6 +17,16 @@ class TaskResponse(BaseModel):
     media_type: Union[str, None] = Field(
         default=None, description="description: task media type: IMAGE, VIDEO"
     )
+    status: Union[str, None] = Field(
+        default=None,
+        description="description: task status: DRAFT, INPROGRESS, FINISHED",
+    )
+    created_at: Union[datetime, None] = Field(
+        default=0, description="description: task created at time"
+    )
+
+
+class TaskResponseWithProgress(TaskResponse):
     annotated_count: Union[int, None] = Field(
         default=0, description="description: task file already labeled"
     )

@@ -20,6 +20,7 @@ from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
 from labelu.internal.application.response.task import TaskFileResponse
+from labelu.internal.application.response.task import TaskResponseWithProgress
 
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -49,7 +50,7 @@ async def create(
 
 @router.get(
     "",
-    response_model=OkRespWithMeta[List[TaskResponse]],
+    response_model=OkRespWithMeta[List[TaskResponseWithProgress]],
     status_code=status.HTTP_200_OK,
 )
 async def list(
@@ -70,12 +71,14 @@ async def list(
 
     # response
     meta_data = MetaData(total=total, page=page, size=len(data))
-    return OkRespWithMeta[List[TaskResponse]](meta_data=meta_data, data=data)
+    return OkRespWithMeta[List[TaskResponseWithProgress]](
+        meta_data=meta_data, data=data
+    )
 
 
 @router.get(
     "/{task_id}",
-    response_model=OkResp[TaskResponse],
+    response_model=OkResp[TaskResponseWithProgress],
     status_code=status.HTTP_200_OK,
 )
 async def get(
@@ -92,7 +95,7 @@ async def get(
     data = await service.get(db=db, task_id=task_id, current_user=current_user)
 
     # response
-    return OkResp[TaskResponse](data=data)
+    return OkResp[TaskResponseWithProgress](data=data)
 
 
 @router.post(
