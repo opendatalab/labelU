@@ -2,13 +2,14 @@ from typing import List
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Form, status, Depends, Security
-from fastapi import UploadFile, File
+from fastapi import File, Header, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
-from labelu.internal.domain.models.user import User
+from labelu.internal.common.config import settings
 from labelu.internal.common.security import security
+from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.service import task as service
 from labelu.internal.application.command.task import UploadCommand
@@ -107,6 +108,7 @@ async def upload(
     task_id: int,
     file: UploadFile = File(...),
     path: str = Form(default=""),
+    content_length: int = Header(..., lt=settings.UPLOAD_FILE_MAX_SIZE),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -114,7 +116,6 @@ async def upload(
     """
     Upload file annnotate data.
     """
-
     # business logic
     cmd = UploadCommand(file=file, path=path)
     data = await service.upload(

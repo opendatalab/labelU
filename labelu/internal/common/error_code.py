@@ -65,6 +65,6 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 
-def exception_handlers(app):
+def add_exception_handler(app):
     app.add_exception_handler(UnicornException, unicorn_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)

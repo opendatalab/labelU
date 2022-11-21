@@ -7,9 +7,9 @@ from fastapi.staticfiles import StaticFiles
 from labelu.internal.adapter.routers import user
 from labelu.internal.adapter.routers import task
 from labelu.internal.common.logger import init_logging
-from labelu.internal.common.db import create_tables
+from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
-from labelu.internal.common.error_code import exception_handlers
+from labelu.internal.common.error_code import add_exception_handler
 
 
 description = """
@@ -62,8 +62,8 @@ app = FastAPI(
 )
 
 init_logging()
-create_tables()
-exception_handlers(app)
+init_tables()
+add_exception_handler(app=app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
 app.include_router(task.router, prefix=settings.API_V1_STR)
 
