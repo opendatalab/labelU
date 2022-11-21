@@ -132,45 +132,48 @@ async def upload(
     db: Session, task_id: int, cmd: UploadCommand, current_user: User
 ) -> UploadResponse:
 
-    # file relative path
-    file_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
-        str(task_id), cmd.path.strip()
-    )
-    file_relative_path = str(
-        file_relative_base_dir.joinpath(
-            str(uuid.uuid4())[0:8] + "-" + cmd.file.filename
-        )
-    )
-
-    # file full path
-    file_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(file_relative_base_dir)
-    file_full_path = Path(settings.MEDIA_ROOT).joinpath(file_relative_path)
-
-    # create dicreatory
-    file_full_base_dir.mkdir(parents=True, exist_ok=True)
-
     # save file
-    async with aiofiles.open(file_full_path, "wb") as out_file:
-        content = await cmd.file.read()  # async read
-        await out_file.write(content)  # async write
-
-    # check file already saved
-    if file_full_path.exists():
-        # add a task file record
-        task_file = crud_task.add_file(
-            db=db,
-            task_file=TaskFile(
-                path=file_relative_path,
-                created_by=current_user.id,
-                task_id=task_id,
-            ),
+    try:
+        # file relative path
+        file_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
+            str(task_id), cmd.path.strip()
         )
-    else:
+        file_relative_path = str(
+            file_relative_base_dir.joinpath(
+                str(uuid.uuid4())[0:8] + "-" + cmd.file.filename
+            )
+        )
+
+        # file full path
+        file_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(file_relative_base_dir)
+        file_full_path = Path(settings.MEDIA_ROOT).joinpath(file_relative_path)
+
+        # create dicreatory
+        file_full_base_dir.mkdir(parents=True, exist_ok=True)
+        async with aiofiles.open(file_full_path, "wb") as out_file:
+            content = await cmd.file.read()  # async read
+            await out_file.write(content)  # async write
+    except:
         raise UnicornException(
             code=ErrorCode.CODE_51000_TASK_FILE_UPLOAD_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+    # check file already saved
+    status = False
+    if file_full_path.exists():
+        status = True
+    # add a task file record
+    task_file = crud_task.add_file(
+        db=db,
+        task_file=TaskFile(
+            path=file_relative_path,
+            created_by=current_user.id,
+            updated_by=current_user.id,
+            task_id=task_id,
+            status=status,
+        ),
+    )
     # response
     return UploadResponse(id=task_file.id, filename=file_relative_path)
 

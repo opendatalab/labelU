@@ -108,7 +108,6 @@ async def upload(
     task_id: int,
     file: UploadFile = File(...),
     path: str = Form(default=""),
-    content_length: int = Header(..., lt=settings.UPLOAD_FILE_MAX_SIZE),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),

@@ -2,7 +2,11 @@ from enum import Enum
 
 from fastapi.responses import JSONResponse
 from fastapi import Request, status, HTTPException
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+# common init error code
+COMMON_INIT_CODE = 30000
 
 # user init error code
 USER_INIT_CODE = 40000
@@ -15,6 +19,12 @@ class ErrorCode(Enum):
     """
     business error code
     """
+
+    # common init error code
+    CODE_30000_SQL_ERROR = (
+        COMMON_INIT_CODE,
+        "Excute SQL Error",
+    )
 
     # user error code
     CODE_40000_USERNAME_OR_PASSWORD_INCORRECT = (
@@ -65,6 +75,18 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 
+# only for sqlalchemy
+async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "msg": str(exc.__dict__["orig"]),
+            "err_code": ErrorCode.CODE_30000_SQL_ERROR.value[0],
+        },
+    )
+
+
 def add_exception_handler(app):
     app.add_exception_handler(UnicornException, unicorn_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+    app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
