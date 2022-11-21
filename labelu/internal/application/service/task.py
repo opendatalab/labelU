@@ -176,9 +176,13 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     task = crud_task.get(db=db, id=task_id)
 
     # update
-    updated_task = crud_task.update(
-        db=db, db_obj=task, obj_in=cmd.dict(exclude_unset=True)
-    )
+    obj_in = cmd.dict(exclude_unset=True)
+    if cmd.config and cmd.media_type:
+        obj_in[Task.status.key] = TaskStatus.CONFIGURED
+    else:
+        obj_in[Task.media_type.key] = None
+        obj_in[Task.config.key] = None
+    updated_task = crud_task.update(db=db, db_obj=task, obj_in=obj_in)
 
     # response
     return TaskResponse(

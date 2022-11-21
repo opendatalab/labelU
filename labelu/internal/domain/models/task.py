@@ -12,6 +12,7 @@ class TaskStatus(str, Enum):
     """
 
     DRAFT = "DRAFT"
+    CONFIGURED = "CONFIGURED"
     INPROGRESS = "INPROGRESS"
     FINISHED = "FINISHED"
 
