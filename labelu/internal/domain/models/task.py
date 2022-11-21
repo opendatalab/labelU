@@ -28,7 +28,7 @@ class MediaType(str, Enum):
 class Task(Base):
     __tablename__ = "task"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     name = Column(String(64), index=True)
     description = Column(String(1024), comment="task description")
     tips = Column(String(1024), comment="task tips")
@@ -56,7 +56,7 @@ class Task(Base):
 class TaskFile(Base):
     __tablename__ = "task_file"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     path = Column(String(256), comment="task status")
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
