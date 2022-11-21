@@ -19,6 +19,7 @@ def list(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[Tas
     return (
         db.query(Task)
         .filter(Task.created_by == owner_id)
+        .order_by(Task.id.desc())
         .offset(offset=page * size)
         .limit(limit=size)
         .all()
