@@ -89,8 +89,8 @@ def init_logging():
         "fastapi",
         "uvicorn",
         "uvicorn.access",
+        "sqlalchemy",
         "sqlalchemy.pool",
-        "sqlalchemy.engine.Engine",
     ]
     for log_name in log_names:
         logging.getLogger(log_name).handlers = [intercept_handler]

@@ -2,7 +2,6 @@ from enum import Enum
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, SmallInteger, String, Text
-from sqlalchemy.orm import relationship
 
 from labelu.internal.common.db import Base
 
@@ -44,10 +43,13 @@ class Task(Base):
         Integer, ForeignKey("user.id"), comment="Last time a task was updated"
     )
     created_at = Column(
-        DateTime, default=datetime.utcnow(), comment="Time a task was created"
+        DateTime, default=datetime.utcnow, comment="Time a task was created"
     )
     updated_at = Column(
-        DateTime, default=datetime.utcnow(), comment="Last time a task was updated"
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        comment="Last time a task was updated",
     )
 
 
@@ -60,10 +62,13 @@ class TaskFile(Base):
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
     updated_by = Column(Integer, ForeignKey("user.id"), index=True)
     created_at = Column(
-        DateTime, default=datetime.utcnow(), comment="Time a task was created"
+        DateTime, default=datetime.utcnow, comment="Time a task was created"
     )
     updated_at = Column(
-        DateTime, default=datetime.utcnow(), comment="Last time a task was updated"
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        comment="Last time a task was updated",
     )
     annotated = Column(
         SmallInteger,
