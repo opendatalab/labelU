@@ -1,4 +1,5 @@
 import aiofiles
+import uuid
 from typing import List, Tuple
 from pathlib import Path
 
@@ -135,11 +136,15 @@ async def upload(
     file_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
         str(task_id), cmd.path.strip()
     )
-    file_relative_path = str(file_relative_base_dir.joinpath(cmd.file.filename))
+    file_relative_path = str(
+        file_relative_base_dir.joinpath(
+            str(uuid.uuid4())[0:8] + "-" + cmd.file.filename
+        )
+    )
 
     # file full path
     file_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(file_relative_base_dir)
-    file_full_path = file_full_base_dir.joinpath(cmd.file.filename)
+    file_full_path = Path(settings.MEDIA_ROOT).joinpath(file_relative_path)
 
     # create dicreatory
     file_full_base_dir.mkdir(parents=True, exist_ok=True)
