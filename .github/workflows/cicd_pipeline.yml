@@ -4,10 +4,7 @@ on:
   push:
     branches:
       - main
-  # Manual Trigger
   workflow_dispatch:
-      - main
-
 jobs:
   test:
     strategy:
