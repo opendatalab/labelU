@@ -1,11 +1,14 @@
 import pytest
 from typing import Dict, Generator
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 from labelu.main import app
 from labelu.internal.common.config import settings
-from labelu.internal.common.db import SessionLocal
+from labelu.internal.common.db import Base
+from labelu.internal.common.db import get_db
 from labelu.internal.common.security import get_password_hash
 from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
@@ -14,9 +17,52 @@ TEST_USERNAME = "test@example.com"
 TEST_USER_PASSWORD = "test@123"
 
 
-@pytest.fixture(scope="session")
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base.metadata.create_all(bind=engine)
+
+
+def override_get_db():
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_db] = override_get_db
+
+
+@pytest.fixture(autouse=True, scope="session")
 def db() -> Generator:
-    yield SessionLocal()
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    # Code that will run before your test, for example:
+    print("start up")
+    init_db()
+    # A test function will be run at this point
+    yield
+    # Code that will run after your test, for example:
+    print("tear down")
+    try:
+        db = TestingSessionLocal()
+        meta = Base.metadata
+        for table in reversed(meta.sorted_tables):
+            if table.key != "user":
+                db.execute(table.delete())
+        db.commit()
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="module")
@@ -27,19 +73,7 @@ def client() -> Generator:
 
 @pytest.fixture(scope="module")
 def testuser_token_headers(client: TestClient) -> Dict[str, str]:
-    init_db()
     return get_testuser_token_headers(client)
-
-
-def init_db() -> None:
-    db = SessionLocal()
-    user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
-    if not user:
-        user_in = User(
-            username=TEST_USERNAME,
-            hashed_password=get_password_hash(TEST_USER_PASSWORD),
-        )
-        user = crud_user.create(db, user=user_in)
 
 
 def get_testuser_token_headers(client: TestClient) -> Dict[str, str]:
@@ -51,3 +85,17 @@ def get_testuser_token_headers(client: TestClient) -> Dict[str, str]:
     token = r.json()["data"]["token"]
     headers = {"Authorization": f"{token}"}
     return headers
+
+
+def init_db() -> None:
+    try:
+        db = TestingSessionLocal()
+        user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
+        if not user:
+            user_in = User(
+                username=TEST_USERNAME,
+                hashed_password=get_password_hash(TEST_USER_PASSWORD),
+            )
+            user = crud_user.create(db, user=user_in)
+    finally:
+        db.close()

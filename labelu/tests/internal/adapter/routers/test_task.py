@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
 from labelu.internal.domain.models.task import Task
+from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
 
 
@@ -54,8 +55,22 @@ class TestClassTaskRouter:
     ) -> None:
 
         # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         page = 0
         size = 10
+        for i in range(15):
+            crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
 
         # run
         r = client.get(
@@ -65,7 +80,10 @@ class TestClassTaskRouter:
         )
 
         # check
+        json = r.json()
         assert r.status_code == 200
+        assert json["meta_data"]["total"] == 15
+        assert len(json["data"]) == 10
 
     def test_task_get(
         self, client: TestClient, testuser_token_headers: dict, db: Session
