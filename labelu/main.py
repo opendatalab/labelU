@@ -30,6 +30,7 @@ You will be able to:
 * **New** (_not implemented_).
 * **Upload Files** (_not implemented_).
 * **Update** (_not implemented_).
+* **Delete** (_not implemented_).
 """
 
 tags_metadata = [
