@@ -25,6 +25,14 @@ class ErrorCode(Enum):
         COMMON_INIT_CODE,
         "Excute SQL Error",
     )
+    CODE_30001_NOT_FOUND = (
+        COMMON_INIT_CODE + 1,
+        "Entity not found",
+    )
+    CODE_30003_NO_PERMISSION = (
+        COMMON_INIT_CODE + 2,
+        "Forbidden, No permission",
+    )
 
     # user error code
     CODE_40000_USERNAME_OR_PASSWORD_INCORRECT = (

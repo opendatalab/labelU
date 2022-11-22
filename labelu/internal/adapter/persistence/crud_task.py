@@ -41,6 +41,11 @@ def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
     return db_obj
 
 
+def delete(db: Session, db_obj: Task) -> None:
+    db.delete(db_obj)
+    db.commit()
+
+
 def add_file(db: Session, task_file: TaskFile) -> TaskFile:
     db.add(task_file)
     db.commit()

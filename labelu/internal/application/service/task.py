@@ -1,4 +1,5 @@
 import aiofiles
+import shutil
 import uuid
 from typing import List, Tuple
 from pathlib import Path
@@ -19,6 +20,7 @@ from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.application.command.task import UploadCommand
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
+from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
 from labelu.internal.application.response.task import TaskFileResponse
@@ -220,6 +222,36 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
         status=updated_task.status,
         created_at=updated_task.created_at,
     )
+
+
+async def delete(db: Session, task_id: int, current_user: User) -> CommonDataResp:
+
+    # get old task
+    task = crud_task.get(db=db, id=task_id)
+    if not task:
+        raise UnicornException(
+            code=ErrorCode.CODE_30001_NOT_FOUND, status_code=status.HTTP_404_NOT_FOUND
+        )
+
+    if task.created_by != current_user.id:
+        raise UnicornException(
+            code=ErrorCode.CODE_30003_NO_PERMISSION,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    # delete
+    crud_task.delete(db=db, db_obj=task)
+
+    # delete media
+    try:
+        file_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(str(task_id))
+        file_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(file_relative_base_dir)
+        shutil.rmtree(file_full_base_dir)
+    except Exception as e:
+        logger.error(e)
+
+    # response
+    return CommonDataResp(ok=True)
 
 
 async def list_upload_files(

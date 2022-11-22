@@ -17,6 +17,7 @@ from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
 from labelu.internal.application.response.base import OkResp
 from labelu.internal.application.response.base import MetaData
+from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
@@ -146,6 +147,28 @@ async def update(
 
     # response
     return OkResp[TaskResponse](data=data)
+
+
+@router.delete(
+    "/{task_id}",
+    response_model=OkResp[CommonDataResp],
+    status_code=status.HTTP_200_OK,
+)
+async def delete(
+    task_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    delete task.
+    """
+
+    # business logic
+    data = await service.delete(db=db, task_id=task_id, current_user=current_user)
+
+    # response
+    return OkResp[CommonDataResp](data=data)
 
 
 @router.get(

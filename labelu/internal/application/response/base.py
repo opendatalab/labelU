@@ -8,6 +8,10 @@ from pydantic.generics import GenericModel
 DataT = TypeVar("DataT", bound=BaseModel)
 
 
+class CommonDataResp(BaseModel):
+    ok: bool
+
+
 class MetaData(BaseModel):
     total: int
     page: int
