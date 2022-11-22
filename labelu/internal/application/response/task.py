@@ -42,6 +42,10 @@ class UploadResponse(BaseModel):
     filename: Union[str, None] = Field(
         default=None, description="description: upload file name"
     )
+    status: Union[bool, None] = Field(
+        default=False,
+        description="description: upload file status, 0 is upload failure, 1 is upload success",
+    )
 
 
 class User(BaseModel):

@@ -3,6 +3,7 @@ import uuid
 from typing import List, Tuple
 from pathlib import Path
 
+from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
@@ -160,22 +161,30 @@ async def upload(
         )
 
     # check file already saved
-    status = False
+    task_file_status = False
     if file_full_path.exists():
-        status = True
+        task_file_status = True
     # add a task file record
-    task_file = crud_task.add_file(
-        db=db,
-        task_file=TaskFile(
-            path=file_relative_path,
-            created_by=current_user.id,
-            updated_by=current_user.id,
-            task_id=task_id,
-            status=status,
-        ),
-    )
+    task_file_id = 0
+    try:
+        task_file = crud_task.add_file(
+            db=db,
+            task_file=TaskFile(
+                path=file_relative_path,
+                created_by=current_user.id,
+                updated_by=current_user.id,
+                task_id=task_id,
+                status=task_file_status,
+            ),
+        )
+        task_file_id = task_file.id
+    except Exception as e:
+        task_file_status = False
+        logger.error(e)
     # response
-    return UploadResponse(id=task_file.id, filename=file_relative_path)
+    return UploadResponse(
+        id=task_file_id, filename=file_relative_path, status=task_file_status
+    )
 
 
 async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
@@ -214,7 +223,9 @@ async def list_upload_files(
 ) -> Tuple[List[TaskFileResponse], int]:
 
     # get task file total count
-    total_task_file = crud_task.count(db=db, owner_id=current_user.id)
+    total_task_file = crud_task.count_task_file(
+        db=db, task_id=task_id, owner_id=current_user.id
+    )
 
     # get task file list
     task_files = crud_task.list_upload_files(
