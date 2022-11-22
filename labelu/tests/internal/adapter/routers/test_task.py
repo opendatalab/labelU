@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
 from labelu.internal.domain.models.task import Task
+from labelu.internal.domain.models.task import TaskFile
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
 
@@ -299,13 +300,20 @@ class TestClassTaskRouter:
         task_id = task.json()["data"]["id"]
 
         # upload file
-        with Path("labelu/tests/data/test.png").open(mode="rb") as f:
-            new_res = client.post(
-                f"{settings.API_V1_STR}/tasks/{task_id}/upload",
-                headers=testuser_token_headers,
-                files={"file": f},
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        for i in range(15):
+            crud_task.create(
+                db=db,
+                task=TaskFile(
+                    path="path",
+                    task_id=task_id,
+                    status=True,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
             )
-
         # run
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task_id}/uploads",
@@ -315,7 +323,8 @@ class TestClassTaskRouter:
 
         # check
         assert r.status_code == 200
-        assert len(r.json()["data"]) > 0
+        assert r.json()["meta_data"]["total"] == 15
+        assert len(r.json()["data"]) == 10
 
     def test_get_upload_file_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session

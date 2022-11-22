@@ -54,6 +54,7 @@ def list_upload_files(
     return (
         db.query(TaskFile)
         .filter(TaskFile.created_by == owner_id, TaskFile.task_id == task_id)
+        .order_by(TaskFile.id.asc())
         .offset(offset=page * size)
         .limit(limit=size)
         .all()
