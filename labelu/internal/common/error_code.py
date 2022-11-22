@@ -41,6 +41,7 @@ class ErrorCode(Enum):
 
     # task error code
     CODE_50000_TASK_ERROR = (TASK_INIT_CODE, "Internal Error")
+    CODE_50001_TASK_ERROR = (TASK_INIT_CODE + 1, "Task is finished")
     CODE_51000_TASK_FILE_UPLOAD_ERROR = (
         TASK_INIT_CODE + 1000,
         "Upload file error, save file failure",

@@ -133,6 +133,14 @@ async def upload(
     db: Session, task_id: int, cmd: UploadCommand, current_user: User
 ) -> UploadResponse:
 
+    # check task not finished
+    task = crud_task.get(db=db, id=task_id)
+    if task.status == TaskStatus.FINISHED:
+        raise UnicornException(
+            code=ErrorCode.CODE_50001_TASK_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
     # save file
     try:
         # file relative path

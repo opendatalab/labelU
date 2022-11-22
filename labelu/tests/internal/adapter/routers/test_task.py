@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
+from labelu.internal.domain.models.task import Task
+from labelu.internal.adapter.persistence import crud_task
 
 
 class TestClassTaskRouter:
@@ -201,6 +203,35 @@ class TestClassTaskRouter:
         assert new_res.status_code == 201
         assert f"{settings.UPLOAD_DIR}/{task_id}" in new_res.json()["data"]["filename"]
         assert "test.png" in new_res.json()["data"]["filename"]
+
+    def test_upload_file_when_task_finished(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                config="config",
+                media_type="IMAGE",
+                status="FINISHED",
+            ),
+        )
+
+        # run
+        with Path("labelu/tests/data/test.png").open(mode="rb") as f:
+            new_res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task.id}/upload",
+                headers=testuser_token_headers,
+                files={"file": f},
+            )
+
+        # check
+        assert new_res.status_code == 500
+        assert new_res.json()["err_code"] == 50001
 
     def test_update_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
