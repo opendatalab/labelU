@@ -221,3 +221,28 @@ async def get_upload_file(
 
     # response
     return data
+
+
+@router.delete(
+    "/{task_id}/uploads/{file_id}",
+    response_model=OkResp[CommonDataResp],
+    status_code=status.HTTP_200_OK,
+)
+async def delete_upload_file(
+    task_id: int,
+    file_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    delete task.
+    """
+
+    # business logic
+    data = await service.delete_upload_file(
+        db=db, task_id=task_id, file_id=file_id, current_user=current_user
+    )
+
+    # response
+    return OkResp[CommonDataResp](data=data)

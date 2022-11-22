@@ -46,7 +46,7 @@ def delete(db: Session, db_obj: Task) -> None:
     db.commit()
 
 
-def add_file(db: Session, task_file: TaskFile) -> TaskFile:
+def create_file(db: Session, task_file: TaskFile) -> TaskFile:
     db.add(task_file)
     db.commit()
     db.refresh(task_file)
@@ -68,6 +68,11 @@ def list_upload_files(
 
 def get_file(db: Session, id: str) -> TaskFile:
     return db.query(TaskFile).filter(TaskFile.id == id).first()
+
+
+def delete_file(db: Session, db_obj: TaskFile) -> None:
+    db.delete(db_obj)
+    db.commit()
 
 
 def count(db: Session, owner_id: int) -> List[Task]:

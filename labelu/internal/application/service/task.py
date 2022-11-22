@@ -1,4 +1,5 @@
 import aiofiles
+import os
 import shutil
 import uuid
 from typing import List, Tuple
@@ -177,7 +178,7 @@ async def upload(
     # add a task file record
     task_file_id = 0
     try:
-        task_file = crud_task.add_file(
+        task_file = crud_task.create_file(
             db=db,
             task_file=TaskFile(
                 path=file_relative_path,
@@ -199,7 +200,7 @@ async def upload(
 
 async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
 
-    # get old task
+    # get task
     task = crud_task.get(db=db, id=task_id)
 
     # update
@@ -226,16 +227,17 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
 
 async def delete(db: Session, task_id: int, current_user: User) -> CommonDataResp:
 
-    # get old task
+    # get task
     task = crud_task.get(db=db, id=task_id)
     if not task:
         raise UnicornException(
-            code=ErrorCode.CODE_30001_NOT_FOUND, status_code=status.HTTP_404_NOT_FOUND
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     if task.created_by != current_user.id:
         raise UnicornException(
-            code=ErrorCode.CODE_30003_NO_PERMISSION,
+            code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,
         )
 
@@ -310,3 +312,42 @@ async def get_upload_file(
 
     # response
     return Path(settings.MEDIA_ROOT, f"{task_file.path}")
+
+
+async def delete_upload_file(
+    db: Session, task_id: int, file_id: int, current_user: User
+) -> CommonDataResp:
+
+    # get task
+    task = crud_task.get(db=db, id=task_id)
+    if not task:
+        raise UnicornException(
+            code=ErrorCode.CODE_51001_TASK_FILE_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if task.created_by != current_user.id:
+        raise UnicornException(
+            code=ErrorCode.CODE_30001_NO_PERMISSION,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    task_file = crud_task.get_file(db=db, id=file_id)
+    if not task_file:
+        raise UnicornException(
+            code=ErrorCode.CODE_51001_TASK_FILE_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    # delete
+    crud_task.delete_file(db=db, db_obj=task_file)
+
+    # delete media
+    try:
+        file_full_path = Path(settings.MEDIA_ROOT).joinpath(task_file.path)
+        os.remove(file_full_path)
+    except Exception as e:
+        logger.error(e)
+
+    # response
+    return CommonDataResp(ok=True)

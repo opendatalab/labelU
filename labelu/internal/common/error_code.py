@@ -25,12 +25,8 @@ class ErrorCode(Enum):
         COMMON_INIT_CODE,
         "Excute SQL Error",
     )
-    CODE_30001_NOT_FOUND = (
+    CODE_30001_NO_PERMISSION = (
         COMMON_INIT_CODE + 1,
-        "Entity not found",
-    )
-    CODE_30003_NO_PERMISSION = (
-        COMMON_INIT_CODE + 2,
         "Forbidden, No permission",
     )
 
@@ -50,9 +46,16 @@ class ErrorCode(Enum):
     # task error code
     CODE_50000_TASK_ERROR = (TASK_INIT_CODE, "Internal Error")
     CODE_50001_TASK_ERROR = (TASK_INIT_CODE + 1, "Task is finished")
+    CODE_50002_TASK_NOT_FOUN = (TASK_INIT_CODE + 2, "Task not found")
+
+    # task file error code
     CODE_51000_TASK_FILE_UPLOAD_ERROR = (
         TASK_INIT_CODE + 1000,
         "Upload file error, save file failure",
+    )
+    CODE_51001_TASK_FILE_NOT_FOUND = (
+        TASK_INIT_CODE + 1001,
+        "Task file not found",
     )
 
 
