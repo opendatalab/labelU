@@ -2,6 +2,7 @@ from enum import Enum
 
 from fastapi.responses import JSONResponse
 from fastapi import Request, status, HTTPException
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -28,6 +29,10 @@ class ErrorCode(Enum):
     CODE_30001_NO_PERMISSION = (
         COMMON_INIT_CODE + 1,
         "Forbidden, No permission",
+    )
+    CODE_30002_VALIDATION_ERROR = (
+        COMMON_INIT_CODE + 2,
+        "validation error for request",
     )
 
     # user error code
@@ -98,7 +103,19 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     )
 
 
+# for http request
+async def validation_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "msg": str(exc),
+            "err_code": ErrorCode.CODE_30002_VALIDATION_ERROR.value[0],
+        },
+    )
+
+
 def add_exception_handler(app):
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(UnicornException, unicorn_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
