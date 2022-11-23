@@ -8,6 +8,11 @@ from pydantic.generics import GenericModel
 DataT = TypeVar("DataT", bound=BaseModel)
 
 
+class UserResp(BaseModel):
+    id: Union[int, None]
+    username: Union[str, None]
+
+
 class CommonDataResp(BaseModel):
     ok: bool
 

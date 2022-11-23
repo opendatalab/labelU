@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Union
 from pydantic import BaseModel, EmailStr, Field
 
+from labelu.internal.application.response.base import UserResp
+
 
 class TaskResponse(BaseModel):
     id: Union[int, None] = Field(default=None, description="description: task id")
@@ -22,6 +24,9 @@ class TaskResponse(BaseModel):
         description="description: task status: DRAFT, INPROGRESS, FINISHED",
     )
     created_at: Union[datetime, None] = Field(
+        default=0, description="description: task created at time"
+    )
+    created_by: Union[UserResp, None] = Field(
         default=0, description="description: task created at time"
     )
 

@@ -21,6 +21,7 @@ from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.application.command.task import UploadCommand
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
+from labelu.internal.application.response.base import UserResp
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.task import TaskResponse
 from labelu.internal.application.response.task import UploadResponse
@@ -53,6 +54,10 @@ async def create(
         tips=new_task.tips,
         status=new_task.status,
         created_at=new_task.created_at,
+        created_by=UserResp(
+            id=new_task.owner.id,
+            username=new_task.owner.username,
+        ),
     )
 
 
@@ -89,6 +94,10 @@ async def list(
             config=t.config,
             status=t.status,
             created_at=t.created_at,
+            created_by=UserResp(
+                id=t.owner.id,
+                username=t.owner.username,
+            ),
             annotated_count=count_task_file_in_progress.get(t.id, 0),
             total=total_task_file.get(t.id, 0),
         )
@@ -103,6 +112,11 @@ async def get(
 
     # get task detail
     task = crud_task.get(db=db, id=task_id)
+    if not task:
+        raise UnicornException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
 
     # get progress
     total_task_file = crud_task.count_task_file_group_by_task(
@@ -127,6 +141,10 @@ async def get(
         config=task.config,
         status=task.status,
         created_at=task.created_at,
+        created_by=UserResp(
+            id=task.owner.id,
+            username=task.owner.username,
+        ),
         annotated_count=count_task_file_in_progress.get(task.id, 0),
         total=total_task_file.get(task.id, 0),
     )
@@ -138,6 +156,11 @@ async def upload(
 
     # check task not finished
     task = crud_task.get(db=db, id=task_id)
+    if not task:
+        raise UnicornException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
     if task.status == TaskStatus.FINISHED:
         raise UnicornException(
             code=ErrorCode.CODE_50001_TASK_ERROR,
@@ -202,6 +225,11 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
 
     # get task
     task = crud_task.get(db=db, id=task_id)
+    if not task:
+        raise UnicornException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
 
     # update
     obj_in = cmd.dict(exclude_unset=True)
@@ -222,6 +250,10 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
         config=updated_task.config,
         status=updated_task.status,
         created_at=updated_task.created_at,
+        created_by=UserResp(
+            id=updated_task.owner.id,
+            username=updated_task.owner.username,
+        ),
     )
 
 
@@ -309,6 +341,11 @@ async def get_upload_file(
 
     # get file path
     task_file = crud_task.get_file(db=db, id=file_id)
+    if not task_file:
+        raise UnicornException(
+            code=ErrorCode.CODE_51001_TASK_FILE_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
 
     # response
     return Path(settings.MEDIA_ROOT, f"{task_file.path}")

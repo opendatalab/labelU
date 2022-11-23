@@ -31,6 +31,7 @@ class TestClassTaskRouter:
         json = r.json()
         assert r.status_code == 201
         assert json["data"]["id"] > 0
+        assert json["data"]["created_by"]["id"] > 0
 
     def test_create_task_no_authentication(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -115,6 +116,23 @@ class TestClassTaskRouter:
         json = r.json()["data"]
         assert r.status_code == 200
         assert json["name"] == "task name"
+        assert json["created_by"]["id"] > 0
+
+    def test_task_get_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/0",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 404
+        assert json["err_code"] == 50002
 
     def test_task_update(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -156,6 +174,31 @@ class TestClassTaskRouter:
         assert json["data"]["tips"] == "new tips"
         assert json["data"]["config"] == "new config"
         assert json["data"]["media_type"] == "IMAGE"
+
+    def test_task_update_no_found_task(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        for_updated_task_data = {
+            "name": "new name",
+            "description": "new description",
+            "tips": "new tips",
+            "config": "new config",
+            "media_type": "IMAGE",
+        }
+
+        # run
+        updated_task = client.put(
+            f"{settings.API_V1_STR}/tasks/0",
+            headers=testuser_token_headers,
+            json=for_updated_task_data,
+        )
+
+        # check
+        json = updated_task.json()
+        assert updated_task.status_code == 404
+        assert json["err_code"] == 50002
 
     def test_task_update_no_config(
         self, client: TestClient, testuser_token_headers: dict, db: Session

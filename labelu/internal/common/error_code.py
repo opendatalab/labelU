@@ -1,5 +1,6 @@
 from enum import Enum
 
+from loguru import logger
 from fastapi.responses import JSONResponse
 from fastapi import Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -74,7 +75,7 @@ class UnicornException(HTTPException):
 
 
 async def unicorn_exception_handler(request: Request, exc: UnicornException):
-
+    logger.error(exc)
     return JSONResponse(
         status_code=exc.status_code,
         content={"msg": exc.msg, "err_code": exc.code},
@@ -83,6 +84,7 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
 
 # only for HTTPAuthorizationCredentials
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    logger.error(exc)
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -94,10 +96,11 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 # only for sqlalchemy
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+    logger.error(exc)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
-            "msg": str(exc.__dict__["orig"]),
+            "msg": str(exc),
             "err_code": ErrorCode.CODE_30000_SQL_ERROR.value[0],
         },
     )
@@ -105,6 +108,7 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
 
 # for http request
 async def validation_exception_handler(request, exc):
+    logger.error(exc)
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={

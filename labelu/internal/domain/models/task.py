@@ -1,6 +1,7 @@
 from enum import Enum
 from datetime import datetime
 
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, SmallInteger, String, Text
 
 from labelu.internal.common.db import Base
@@ -39,9 +40,9 @@ class Task(Base):
         comment="task media type: image, video",
     )
     status = Column(String(32), default=TaskStatus.DRAFT.value, comment="task status")
-    created_by = Column(Integer, ForeignKey("user.id"), index=True)
+    created_by = Column(Integer, ForeignKey(column="user.id"), index=True)
     updated_by = Column(
-        Integer, ForeignKey("user.id"), comment="Last time a task was updated"
+        Integer, ForeignKey(column="user.id"), comment="Last time a task was updated"
     )
     created_at = Column(
         DateTime, default=datetime.now, comment="Time a task was created"
@@ -52,6 +53,9 @@ class Task(Base):
         onupdate=datetime.now,
         comment="Last time a task was updated",
     )
+
+    owner = relationship("User", foreign_keys=[created_by])
+    updater = relationship("User", foreign_keys=[updated_by])
 
 
 class TaskFile(Base):
