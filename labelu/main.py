@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.adapter.routers import user
 from labelu.internal.adapter.routers import task
+from labelu.internal.adapter.routers import annotation
 from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
@@ -40,7 +41,11 @@ tags_metadata = [
     },
     {
         "name": "tasks",
-        "description": "Annotation task manangement.",
+        "description": "Task manangement.",
+    },
+    {
+        "name": "annotations",
+        "description": "Task annotation manangement.",
     },
 ]
 
@@ -67,6 +72,7 @@ init_tables()
 add_exception_handler(app=app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
 app.include_router(task.router, prefix=settings.API_V1_STR)
+app.include_router(annotation.router, prefix=settings.API_V1_STR)
 
 app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
 

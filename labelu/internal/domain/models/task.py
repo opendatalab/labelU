@@ -85,4 +85,3 @@ class TaskFile(Base):
         default=0,
         comment="0 is has not start yet, 1 is completed, 2 is skipped",
     )
-    result = Column(Text, comment="task file annnotation result")

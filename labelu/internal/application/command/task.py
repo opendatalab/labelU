@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Union
 from pydantic import BaseModel, Field
 from fastapi import UploadFile, File
 
@@ -10,29 +10,29 @@ class BasicConfigCommand(BaseModel):
     description: str = Field(
         default=None, description="description: task description", max_length=500
     )
-    tips: Optional[str] = Field(
+    tips: Union[str, None] = Field(
         default=None, description="description: task tips", max_length=1000
     )
 
 
 class UploadCommand(BaseModel):
     file: UploadFile = File()
-    path: Optional[str] = Field(default="", description="description: file path")
+    path: Union[str, None] = Field(default="", description="description: file path")
 
 
 class UpdateCommand(BaseModel):
-    name: Optional[str] = Field(
+    name: Union[str, None] = Field(
         default=None, description="description: task name", max_length=50
     )
-    description: Optional[str] = Field(
+    description: Union[str, None] = Field(
         default=None, description="description: task description", max_length=500
     )
-    tips: Optional[str] = Field(
+    tips: Union[str, None] = Field(
         default=None, description="description: task tips", max_length=1000
     )
-    media_type: Optional[MediaType] = Field(
+    media_type: Union[MediaType, None] = Field(
         default=None, description="description: task config content"
     )
-    config: Optional[str] = Field(
+    config: Union[str, None] = Field(
         default=None, description="description: task config content"
     )

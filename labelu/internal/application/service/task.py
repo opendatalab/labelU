@@ -327,7 +327,6 @@ async def list_upload_files(
                 path=f.path,
                 task_id=f.task_id,
                 annotated=f.annotated,
-                result=f.result,
                 annotated_by=annotated_by,
                 annotated_at=f.updated_at,
             )

@@ -24,10 +24,10 @@ class TaskResponse(BaseModel):
         description="description: task status: DRAFT, INPROGRESS, FINISHED",
     )
     created_at: Union[datetime, None] = Field(
-        default=0, description="description: task created at time"
+        default=None, description="description: task created at time"
     )
     created_by: Union[UserResp, None] = Field(
-        default=0, description="description: task created at time"
+        default=None, description="description: task created at time"
     )
 
 
@@ -65,11 +65,4 @@ class TaskFileResponse(BaseModel):
     annotated: int = Field(
         default=0,
         description="description: 0 is has not start yet, 1 is completed, 2 is skipped",
-    )
-    result: Union[str, None] = Field(
-        default=None, description="description: task file annnotation result"
-    )
-    annotated_by: Union[User, None] = None
-    annotated_at: Union[datetime, None] = Field(
-        default=None, description="description: task file annnotated time"
     )
