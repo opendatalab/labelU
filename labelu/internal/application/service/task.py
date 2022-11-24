@@ -387,3 +387,11 @@ async def delete_upload_file(
 
     # response
     return CommonDataResp(ok=True)
+
+
+async def export(
+    db: Session, task_id: int, export_type: int, file_ids: List[int], current_user: User
+) -> str:
+
+    # response
+    return Path()

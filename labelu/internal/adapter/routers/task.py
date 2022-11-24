@@ -246,3 +246,33 @@ async def delete_upload_file(
 
     # response
     return OkResp[CommonDataResp](data=data)
+
+
+@router.get(
+    "/{task_id}/export",
+    response_class=FileResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def export(
+    task_id: int,
+    export_type: str,
+    file_ids: List[int],
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    export data.
+    """
+
+    # business logic
+    data = await service.export(
+        db=db,
+        task_id=task_id,
+        export_type=export_type,
+        file_ids=file_ids,
+        current_user=current_user,
+    )
+
+    # response
+    return data
