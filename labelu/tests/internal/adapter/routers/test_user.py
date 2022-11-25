@@ -111,7 +111,7 @@ class TestClassUserRouter:
 
         # check
         assert r.status_code == 403
-        assert r.json()["err_code"] == 40004
+        assert r.json()["err_code"] == 30003
 
     def test_user_not_found(self, client: TestClient, db: Session) -> None:
 

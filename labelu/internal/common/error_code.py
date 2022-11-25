@@ -8,6 +8,8 @@ from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from labelu.internal.common.config import settings
+
 # common init error code
 COMMON_INIT_CODE = 30000
 
@@ -90,7 +92,10 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
 # customize http exception
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     logger.error(exc)
-    if exc.status_code == status.HTTP_404_NOT_FOUND:
+    if (
+        exc.status_code == status.HTTP_404_NOT_FOUND
+        and not request.url.path.startswith(settings.API_V1_STR)
+    ):
         return RedirectResponse("/")
     elif exc.status_code == status.HTTP_403_FORBIDDEN:
         JSONResponse(
