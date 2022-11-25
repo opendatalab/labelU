@@ -2,6 +2,7 @@ from enum import Enum
 
 from loguru import logger
 from fastapi.responses import JSONResponse
+from fastapi.responses import RedirectResponse
 from fastapi import Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -34,6 +35,10 @@ class ErrorCode(Enum):
     CODE_30002_VALIDATION_ERROR = (
         COMMON_INIT_CODE + 2,
         "validation error for request",
+    )
+    CODE_30003_CLIENT_ERROR = (
+        COMMON_INIT_CODE + 3,
+        "Error request",
     )
 
     # user error code
@@ -82,14 +87,24 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 
 
-# only for HTTPAuthorizationCredentials
+# customize http exception
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     logger.error(exc)
+    if exc.status_code == status.HTTP_404_NOT_FOUND:
+        return RedirectResponse("/")
+    elif exc.status_code == status.HTTP_403_FORBIDDEN:
+        JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "msg": str(exc.detail),
+                "err_code": ErrorCode.CODE_40004_NOT_AUTHENTICATED.value[0],
+            },
+        )
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "msg": str(exc.detail),
-            "err_code": ErrorCode.CODE_40004_NOT_AUTHENTICATED.value[0],
+            "err_code": ErrorCode.CODE_30003_CLIENT_ERROR.value[0],
         },
     )
 
