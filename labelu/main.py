@@ -6,7 +6,8 @@ from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.adapter.routers import user
 from labelu.internal.adapter.routers import task
-from labelu.internal.adapter.routers import annotation
+from labelu.internal.adapter.routers import sample
+from labelu.internal.adapter.routers import attachment
 from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
@@ -28,11 +29,27 @@ You will be able to:
 
 You will be able to:
 
-* **New** (_not implemented_).
-* **Upload Files** (_not implemented_).
-* **Update** (_not implemented_).
-* **Delete** (_not implemented_).
+* **CRUD**
+
+## Task attachment
+
+You will be able to:
+
+* **upload attachment**
+* **download attachment**
+* **delete attachment**
+
+## Task sample
+
+You will be able to:
+
+* **list sample**
+* **create sample**
+* **get sample**
+* **update sample**
+* **export sample**
 """
+
 
 tags_metadata = [
     {
@@ -44,8 +61,12 @@ tags_metadata = [
         "description": "Task manangement.",
     },
     {
-        "name": "annotations",
-        "description": "Task annotation manangement.",
+        "name": "attachments",
+        "description": "Task attachment management.",
+    },
+    {
+        "name": "samples",
+        "description": "Task sample manangement.",
     },
 ]
 
@@ -72,7 +93,8 @@ init_tables()
 add_exception_handler(app=app)
 app.include_router(user.router, prefix=settings.API_V1_STR)
 app.include_router(task.router, prefix=settings.API_V1_STR)
-app.include_router(annotation.router, prefix=settings.API_V1_STR)
+app.include_router(attachment.router, prefix=settings.API_V1_STR)
+app.include_router(sample.router, prefix=settings.API_V1_STR)
 
 app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
 

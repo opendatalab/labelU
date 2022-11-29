@@ -16,9 +16,5 @@ def get(db: Session, id: int) -> User:
     return db.query(User).filter(User.id == id).first()
 
 
-def list(db: Session, user_ids: List[int]) -> List[User]:
-    return db.query(User).filter(User.id.in_(user_ids)).all()
-
-
 def get_user_by_username(db: Session, username: str) -> User:
     return db.query(User).filter(User.username == username).first()

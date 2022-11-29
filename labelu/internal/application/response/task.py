@@ -31,38 +31,22 @@ class TaskResponse(BaseModel):
     )
 
 
-class TaskResponseWithProgress(TaskResponse):
-    annotated_count: Union[int, None] = Field(
-        default=0, description="description: task file already labeled"
+class TaskStatics(BaseModel):
+    new: Union[int, None] = Field(
+        default=0, description="description: count for task data have not labeled yet"
     )
-    total: Union[int, None] = Field(
-        default=0, description="description: task files count"
+    done: Union[int, None] = Field(
+        default=0, description="description: count for task data already labeled"
+    )
+    skipped: Union[int, None] = Field(
+        default=0, description="description: count for task data skipped"
     )
 
 
-class UploadResponse(BaseModel):
-    id: Union[int, None] = Field(
-        default=None, description="description: upload file id"
-    )
-    filename: Union[str, None] = Field(
-        default=None, description="description: upload file name"
-    )
-    status: Union[bool, None] = Field(
-        default=False,
-        description="description: upload file status, 0 is upload failure, 1 is upload success",
-    )
+class TaskResponseWithStatics(TaskResponse):
+    stats: Union[TaskStatics, None] = None
 
 
 class User(BaseModel):
     id: Union[int, None] = None
     username: Union[EmailStr, None] = None
-
-
-class TaskFileResponse(BaseModel):
-    id: int
-    path: str = Field(default="", description="description: task status")
-    task_id: int = Field(default=0, description="description: task id")
-    annotated: int = Field(
-        default=0,
-        description="description: 0 is has not start yet, 1 is completed, 2 is skipped",
-    )

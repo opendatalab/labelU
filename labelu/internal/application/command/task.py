@@ -1,6 +1,5 @@
 from typing import Union
 from pydantic import BaseModel, Field
-from fastapi import UploadFile, File
 
 from labelu.internal.domain.models.task import MediaType
 
@@ -13,11 +12,6 @@ class BasicConfigCommand(BaseModel):
     tips: Union[str, None] = Field(
         default=None, description="description: task tips", max_length=1000
     )
-
-
-class UploadCommand(BaseModel):
-    file: UploadFile = File()
-    path: Union[str, None] = Field(default="", description="description: file path")
 
 
 class UpdateCommand(BaseModel):

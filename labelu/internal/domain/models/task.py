@@ -2,7 +2,7 @@ from enum import Enum
 from datetime import datetime
 
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, SmallInteger, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 
 from labelu.internal.common.db import Base
 
@@ -56,32 +56,3 @@ class Task(Base):
 
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])
-
-
-class TaskFile(Base):
-    __tablename__ = "task_file"
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    path = Column(String(256), comment="task status")
-    task_id = Column(Integer, ForeignKey("task.id"), index=True)
-    status = Column(
-        SmallInteger,
-        default=0,
-        comment="upload file status, 0 is upload failure, 1 is upload success",
-    )
-    created_by = Column(Integer, ForeignKey("user.id"), index=True)
-    updated_by = Column(Integer, ForeignKey("user.id"), index=True)
-    created_at = Column(
-        DateTime, default=datetime.now, comment="Time a task was created"
-    )
-    updated_at = Column(
-        DateTime,
-        default=datetime.now,
-        onupdate=datetime.now,
-        comment="Last time a task was updated",
-    )
-    annotated = Column(
-        SmallInteger,
-        default=0,
-        comment="0 is has not start yet, 1 is completed, 2 is skipped",
-    )

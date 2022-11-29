@@ -7,6 +7,8 @@ from labelu.internal.common.io import get_data_dir
 
 
 class Settings(BaseSettings):
+    HOST: str = "http://localhost"
+    PORT: str = "8000"
     API_V1_STR: str = "/api/v1"
 
     BASE_DATA_DIR = get_data_dir()
