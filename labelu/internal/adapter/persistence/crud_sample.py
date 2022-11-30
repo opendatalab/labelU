@@ -23,7 +23,7 @@ def list_by(
     pageSize: int,
 ) -> List[TaskSample]:
     offset = after
-    if pageNo:
+    if pageNo != None:
         offset = pageNo * pageSize
     if before:
         offset = before - pageSize
