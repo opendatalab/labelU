@@ -51,7 +51,9 @@ async def create(
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
-async def download_attachment(file_path: str):
+async def download_attachment(
+    file_path: str, authorization: HTTPAuthorizationCredentials = Security(security)
+):
     """
     download attachment.
     """
