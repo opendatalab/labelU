@@ -396,3 +396,72 @@ class TestClassTaskSampleRouter:
         json = r.json()
         assert r.status_code == 404
         assert json["err_code"] == 55001
+
+    def test_sample_delete(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+        samples = crud_sample.batch(
+            db=db,
+            samples=[
+                TaskSample(
+                    task_id=1,
+                    task_attachment_ids="[1]",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data="{}",
+                )
+            ],
+        )
+
+        # run
+        data = {"sample_ids": [samples[0].id]}
+        r = client.delete(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
+            headers=testuser_token_headers,
+            json=data,
+        )
+
+        # check
+        assert r.status_code == 200
+
+    def test_sample_delete_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+
+        # run
+        data = {"sample_ids": [1, 2]}
+        r = client.delete(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
+            headers=testuser_token_headers,
+            json=data,
+        )
+
+        # check
+        assert r.status_code == 200
