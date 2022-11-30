@@ -35,6 +35,8 @@ class TestClassTaskSampleRouter:
         )
 
         # check
+        db.commit()
+        updated_task = crud_task.get(db=db, task_id=task.id)
         json = r.json()
         assert r.status_code == 201
         assert len(json["data"]["ids"]) == 1

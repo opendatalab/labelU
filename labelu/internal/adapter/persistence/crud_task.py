@@ -24,7 +24,7 @@ def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[
     )
 
 
-def get(db: Session, task_id: str) -> Task:
+def get(db: Session, task_id: int) -> Task:
     return db.query(Task).filter(Task.id == task_id).first()
 
 

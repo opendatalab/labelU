@@ -31,6 +31,7 @@ class TestClassTaskRouter:
         assert r.status_code == 201
         assert json["data"]["id"] > 0
         assert json["data"]["created_by"]["id"] > 0
+        assert json["data"]["status"] == "DRAFT"
 
     def test_create_task_no_authentication(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -236,6 +237,46 @@ class TestClassTaskRouter:
         assert json["data"]["tips"] == "new tips"
         assert json["data"]["config"] == None
         assert json["data"]["media_type"] == None
+
+    def test_task_add_annotation_config(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        for_update_task_data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        for_update_task = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=for_update_task_data,
+        )
+        for_updated_task_data = {
+            "name": "new name",
+            "description": "new description",
+            "tips": "new tips",
+            "config": "new config",
+            "media_type": "IMAGE",
+        }
+
+        # run
+        task_id = for_update_task.json()["data"]["id"]
+        updated_task = client.patch(
+            f"{settings.API_V1_STR}/tasks/{task_id}",
+            headers=testuser_token_headers,
+            json=for_updated_task_data,
+        )
+
+        # check
+        json = updated_task.json()
+        assert json["data"]["name"] == "new name"
+        assert json["data"]["description"] == "new description"
+        assert json["data"]["tips"] == "new tips"
+        assert json["data"]["config"] == "new config"
+        assert json["data"]["media_type"] == "IMAGE"
+        assert json["data"]["status"] == "CONFIGURED"
 
     def test_task_delete(
         self, client: TestClient, testuser_token_headers: dict, db: Session

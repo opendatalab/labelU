@@ -21,7 +21,7 @@ class TaskResponse(BaseModel):
     )
     status: Union[str, None] = Field(
         default=None,
-        description="description: task status: DRAFT, INPROGRESS, FINISHED",
+        description="description: task status: DRAFT, IMPORTED, CONFIGURED, INPROGRESS, FINISHED",
     )
     created_at: Union[datetime, None] = Field(
         default=None, description="description: task created at time"
