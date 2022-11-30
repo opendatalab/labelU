@@ -11,6 +11,7 @@ from labelu.internal.common.error_code import UnicornException
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.domain.models.sample import TaskSample
+from labelu.internal.domain.models.sample import SampleState
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
 from labelu.internal.application.response.base import UserResp
@@ -130,18 +131,19 @@ async def patch(
     sample = crud_sample.get(db=db, sample_id=sample_id)
     if not sample:
         raise UnicornException(
-            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUNT,
+            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
     # update
     obj_in = cmd.dict(exclude_unset=True)
     if cmd.state:
-        obj_in[TaskSample.state.key] = cmd.state
+        obj_in[TaskSample.state.key] = SampleState.SKIPPED.value
         obj_in[TaskSample.data.key] = json.dumps(dict())
     else:
         obj_in[TaskSample.data.key] = json.dumps(cmd.data)
         obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
+        obj_in[TaskSample.state.key] = SampleState.DONE.value
     updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=obj_in)
 
     # response
