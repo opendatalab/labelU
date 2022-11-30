@@ -27,7 +27,7 @@ async def create(
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         raise UnicornException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
@@ -97,6 +97,12 @@ async def get(db: Session, sample_id: int, current_user: User) -> SampleResponse
         sample_id=sample_id,
     )
 
+    if not sample:
+        raise UnicornException(
+            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
     # response
     return SampleResponse(
         id=sample.id,
@@ -124,7 +130,7 @@ async def patch(
     sample = crud_sample.get(db=db, sample_id=sample_id)
     if not sample:
         raise UnicornException(
-            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUN,
+            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUNT,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 

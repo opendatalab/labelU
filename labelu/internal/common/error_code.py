@@ -59,7 +59,7 @@ class ErrorCode(Enum):
     # task error code
     CODE_50000_TASK_ERROR = (TASK_INIT_CODE, "Internal Error")
     CODE_50001_TASK_FINISHED_ERROR = (TASK_INIT_CODE + 1, "Task is finished")
-    CODE_50002_TASK_NOT_FOUN = (TASK_INIT_CODE + 2, "Task not found")
+    CODE_50002_TASK_NOT_FOUND = (TASK_INIT_CODE + 2, "Task not found")
 
     # task attachment error code
     CODE_51000_CREATE_ATTACHMENT_ERROR = (
@@ -76,7 +76,7 @@ class ErrorCode(Enum):
         TASK_INIT_CODE + 5000,
         "Paramenters error: 'after', 'before', 'pageNo' only one must be Ture, pageNo can be 0",
     )
-    CODE_55001_SAMPLE_NOT_FOUN = (TASK_INIT_CODE + 5001, "Sample not found")
+    CODE_55001_SAMPLE_NOT_FOUND = (TASK_INIT_CODE + 5001, "Sample not found")
 
 
 class UnicornException(HTTPException):

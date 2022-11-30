@@ -103,7 +103,7 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         raise UnicornException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
@@ -142,7 +142,7 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         raise UnicornException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
@@ -178,7 +178,7 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         raise UnicornException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 

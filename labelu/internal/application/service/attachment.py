@@ -29,7 +29,7 @@ async def create(
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         raise UnicornException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
     if task.status == TaskStatus.FINISHED:

@@ -216,3 +216,74 @@ class TestClassTaskSampleRouter:
 
         # check
         assert r.status_code == 422
+
+    def test_sample_get(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+        samples = crud_sample.batch(
+            db=db,
+            samples=[
+                TaskSample(
+                    task_id=1,
+                    task_attachment_ids="[1]",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data="{}",
+                )
+            ],
+        )
+
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/{samples[0].id}",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 200
+
+    def test_sample_get_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/0",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 404
+        assert json["err_code"] == 55001
