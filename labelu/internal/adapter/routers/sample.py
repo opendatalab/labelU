@@ -1,8 +1,7 @@
 from typing import List, Union
 
-from pydantic import Field
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, status, Depends, Security
+from fastapi import APIRouter, Depends, Query, status, Security
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
@@ -56,10 +55,10 @@ async def create(
     response_model=OkResp[List[SampleResponse]],
     status_code=status.HTTP_200_OK,
 )
-async def list(
-    after: Union[int, None] = None,
-    before: Union[int, None] = None,
-    pageNo: Union[int, None] = None,
+async def list_by(
+    after: Union[int, None] = Query(default=None, gt=0),
+    before: Union[int, None] = Query(default=None, gt=0),
+    pageNo: Union[int, None] = Query(default=None, ge=0),
     pageSize: Union[int, None] = 100,
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
@@ -68,14 +67,15 @@ async def list(
     """
     Get a annotation result.
     """
-    if [bool(i) for i in [after, before, pageNo]].count(True) != 1 and pageNo != 0:
+
+    if len([i for i in (after, before, pageNo) if i != None]) != 1:
         raise UnicornException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            code=ErrorCode.CODE_51000_SAMPLE_LIST_PARAMETERS_ERROR,
+            code=ErrorCode.CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR,
         )
 
     # business logic
-    data = await service.list(
+    data = await service.list_by(
         db=db,
         after=after,
         before=before,

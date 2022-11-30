@@ -64,19 +64,19 @@ class ErrorCode(Enum):
     # task attachment error code
     CODE_51000_CREATE_ATTACHMENT_ERROR = (
         TASK_INIT_CODE + 1000,
-        "Upload file error, save file failure",
+        "Upload attachment error, save file failure",
     )
     CODE_51001_TASK_ATTACHMENT_NOT_FOUND = (
         TASK_INIT_CODE + 1001,
-        "Task file not found",
+        "Attachment file not found",
     )
 
     # task sample error code
-    CODE_51000_SAMPLE_LIST_PARAMETERS_ERROR = (
+    CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR = (
         TASK_INIT_CODE + 5000,
         "Paramenters error: 'after', 'before', 'pageNo' only one must be Ture, pageNo can be 0",
     )
-    CODE_50002_SAMPLE_NOT_FOUN = (TASK_INIT_CODE + 5001, "Sample not found")
+    CODE_55001_SAMPLE_NOT_FOUN = (TASK_INIT_CODE + 5001, "Sample not found")
 
 
 class UnicornException(HTTPException):

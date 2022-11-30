@@ -103,7 +103,9 @@ cli = Typer()
 
 @cli.command()
 def main(port: int = 8000):
-    uvicorn.run(app=app, port=port)
+    if port:
+        settings.PORT = port
+    uvicorn.run(app=app, port=settings.PORT)
 
 
 if __name__ == "__main__":

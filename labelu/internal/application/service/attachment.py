@@ -1,8 +1,6 @@
 import aiofiles
 import os
-import shutil
 import uuid
-from typing import List, Tuple
 from pathlib import Path
 
 from loguru import logger
@@ -95,25 +93,23 @@ async def create(
     # response
     return AttachmentResponse(
         id=attachment_id,
-        url=f"{settings.HOST}:{settings.PORT}/tasks/{task_id}/attachments/{attachment_id}",
+        url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_relative_path}",
         status=attachment_status,
     )
 
 
-async def download_attachment(
-    db: Session, task_id: int, attachment_id: int, current_user: User
-) -> str:
+async def download_attachment(file_path: str) -> str:
 
-    # get file path
-    task_file = crud_attachment.get(db=db, attachment_id=attachment_id)
-    if not task_file:
+    # check file exist
+    file_full_path = settings.MEDIA_ROOT.joinpath(file_path.lstrip("/"))
+    if not file_full_path.is_file() or not file_full_path.exists():
         raise UnicornException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
     # response
-    return Path(settings.MEDIA_ROOT, f"{task_file.path}")
+    return file_full_path
 
 
 async def delete(

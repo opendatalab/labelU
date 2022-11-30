@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from labelu.internal.domain.models.user import User
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import UnicornException
+from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.application.command.sample import PatchSampleCommand
@@ -21,6 +22,15 @@ from labelu.internal.application.response.sample import SampleResponse
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
 ) -> CreateSampleResponse:
+
+    # check task exist
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        raise UnicornException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUN,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
     samples = [
         TaskSample(
             task_id=task_id,
@@ -39,11 +49,11 @@ async def create(
     return CreateSampleResponse(ids=ids)
 
 
-async def list(
+async def list_by(
     db: Session, after: int, before: int, pageNo: int, pageSize: int, current_user: User
 ) -> List[SampleResponse]:
 
-    samples = crud_sample.list(
+    samples = crud_sample.list_by(
         db=db,
         owner_id=current_user.id,
         after=after,
@@ -107,7 +117,7 @@ async def patch(
     sample = crud_sample.get(db=db, sample_id=sample_id)
     if not sample:
         raise UnicornException(
-            code=ErrorCode.CODE_50002_SAMPLE_NOT_FOUN,
+            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUN,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 

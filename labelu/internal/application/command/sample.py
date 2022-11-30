@@ -7,6 +7,7 @@ from labelu.internal.domain.models.sample import SampleState
 class CreateSampleCommand(BaseModel):
     attachement_ids: List[int] = Field(
         min_items=1,
+        gt=0,
         description="description: attachment file id",
     )
     data: Union[dict, None] = Field(
@@ -18,6 +19,7 @@ class CreateSampleCommand(BaseModel):
 class DeleteSampleCommand(BaseModel):
     sample_ids: List[int] = Field(
         min_items=1,
+        gt=0,
         description="description: attachment file id",
     )
 
@@ -31,6 +33,6 @@ class PatchSampleCommand(BaseModel):
         default=0, description="description: annotate result count"
     )
     state: Union[SampleState, None] = Field(
-        regex="SKIPPED",
+        regex=SampleState.SKIPPED.value,
         description="description: sample file state, must be 'SKIPPED' or None",
     )

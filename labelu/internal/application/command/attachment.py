@@ -13,5 +13,6 @@ class AttachmentCommand(BaseModel):
 class AttachmentDeleteCommand(BaseModel):
     attachment_ids: List[int] = Field(
         min_items=1,
+        gt=0,
         description="description: attachment file id",
     )

@@ -21,7 +21,7 @@ def create(db: Session, sample: TaskSample) -> TaskSample:
     return sample
 
 
-def list(
+def list_by(
     db: Session, owner_id: int, after: int, before: int, pageNo: int, pageSize: int
 ) -> List[TaskSample]:
     offset = pageNo * pageSize

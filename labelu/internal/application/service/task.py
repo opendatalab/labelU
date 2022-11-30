@@ -15,6 +15,7 @@ from labelu.internal.common.error_code import UnicornException
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
+from labelu.internal.domain.models.sample import SampleState
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.application.command.task import BasicConfigCommand
@@ -57,7 +58,7 @@ async def create(
     )
 
 
-async def list(
+async def list_by(
     db: Session,
     current_user: User,
     page: int,
@@ -68,13 +69,13 @@ async def list(
     total_task = crud_task.count(db=db, owner_id=current_user.id)
 
     # get task list
-    tasks = crud_task.list(db=db, owner_id=current_user.id, page=page, size=size)
+    tasks = crud_task.list_by(db=db, owner_id=current_user.id, page=page, size=size)
 
     # get progress
     statics = crud_sample.statics(db=db, owner_id=current_user.id)
 
     # response
-    list = [
+    tasks_with_statics = [
         TaskResponseWithStatics(
             id=task.id,
             name=task.name,
@@ -96,7 +97,7 @@ async def list(
         )
         for task in tasks
     ]
-    return list, total_task
+    return tasks_with_statics, total_task
 
 
 async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWithStatics:
@@ -131,9 +132,9 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
             username=task.owner.username,
         ),
         stats=TaskStatics(
-            new=statics.get(f"{task.id}_NEW", 0),
-            done=statics.get(f"{task.id}_DONE", 0),
-            skipped=statics.get(f"{task.id}_SKIPPED", 0),
+            new=statics.get(f"{task.id}_{SampleState.NEW.value}", 0),
+            done=statics.get(f"{task.id}_{SampleState.DONE.value}", 0),
+            skipped=statics.get(f"{task.id}_{SampleState.SKIPPED.value}", 0),
         ),
     )
 

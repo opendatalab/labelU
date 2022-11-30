@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
+from labelu.internal.common.config import settings
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
@@ -46,25 +47,17 @@ async def create(
 
 
 @router.get(
-    "/{task_id}/attachments/{attachment_id}",
+    "/attachment/{file_path:path}",
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
-async def download_attachment(
-    task_id: int,
-    attachment_id: int,
-    authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
-    current_user: User = Depends(get_current_user),
-):
+async def download_attachment(file_path: str):
     """
-    get task upload file detail.
+    download attachment.
     """
 
     # business logic
-    data = await service.download_attachment(
-        db=db, task_id=task_id, attachment_id=attachment_id, current_user=current_user
-    )
+    data = await service.download_attachment(file_path=file_path)
 
     # response
     return data

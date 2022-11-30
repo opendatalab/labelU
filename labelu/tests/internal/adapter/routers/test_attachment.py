@@ -68,7 +68,7 @@ class TestClassTaskAttachmentRouter:
         assert new_res.status_code == 500
         assert new_res.json()["err_code"] == 50001
 
-    def test_get_upload_file_successful(
+    def test_download_file_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
 
@@ -90,11 +90,11 @@ class TestClassTaskAttachmentRouter:
                 headers=testuser_token_headers,
                 files={"file": f},
             )
-        attachment_id = attachment.json()["data"]["id"]
+        url = attachment.json()["data"]["url"]
 
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task_id}/attachments/{attachment_id}",
+            url,
             headers=testuser_token_headers,
         )
 

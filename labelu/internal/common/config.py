@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from loguru import logger
 from pydantic import BaseSettings
@@ -12,7 +13,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     BASE_DATA_DIR = get_data_dir()
-    MEDIA_ROOT = os.path.join(BASE_DATA_DIR, "media")
+    MEDIA_ROOT = Path(BASE_DATA_DIR).joinpath("media")
     UPLOAD_DIR = "upload"
     os.makedirs(MEDIA_ROOT, exist_ok=True)
     logger.info("Database and media directory: {}", BASE_DATA_DIR)

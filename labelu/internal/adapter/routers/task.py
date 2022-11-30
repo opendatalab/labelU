@@ -2,7 +2,6 @@ from typing import List
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
-from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
@@ -50,7 +49,7 @@ async def create(
     response_model=OkRespWithMeta[List[TaskResponseWithStatics]],
     status_code=status.HTTP_200_OK,
 )
-async def list(
+async def list_by(
     page: int = 0,
     size: int = 100,
     authorization: HTTPAuthorizationCredentials = Security(security),
@@ -62,7 +61,7 @@ async def list(
     """
 
     # business logic
-    data, total = await service.list(
+    data, total = await service.list_by(
         db=db, current_user=current_user, page=page, size=size
     )
 

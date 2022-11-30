@@ -13,7 +13,7 @@ def create(db: Session, task: Task) -> Task:
     return task
 
 
-def list(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[Task]:
+def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[Task]:
     return (
         db.query(Task)
         .filter(Task.created_by == owner_id)
