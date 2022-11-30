@@ -44,5 +44,5 @@ def delete(db: Session, db_obj: Task) -> None:
     db.commit()
 
 
-def count(db: Session, owner_id: int) -> List[Task]:
+def count(db: Session, owner_id: int) -> int:
     return db.query(Task).filter(Task.created_by == owner_id).count()

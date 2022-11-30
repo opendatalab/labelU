@@ -22,7 +22,7 @@ class TaskSample(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
-    task_attachment_id = Column(Integer, ForeignKey("task_attachment.id"), index=True)
+    task_attachment_ids = Column(String(255), comment="task sample attachment ids")
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
     updated_by = Column(Integer, ForeignKey("user.id"))
     created_at = Column(
@@ -47,12 +47,5 @@ class TaskSample(Base):
     )
 
     task = relationship("Task", foreign_keys=[task_id])
-    task_file = relationship("TaskAttachment", foreign_keys=[task_attachment_id])
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])
-
-
-class TaskSampleStatics:
-    task_id: int
-    state: str
-    total: int

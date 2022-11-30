@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Tuple, Union
 from pathlib import Path
 
 from fastapi import status
@@ -34,7 +34,7 @@ async def create(
     samples = [
         TaskSample(
             task_id=task_id,
-            task_attachment_id=str(sample.attachement_ids),
+            task_attachment_ids=str(sample.attachement_ids),
             created_by=current_user.id,
             updated_by=current_user.id,
             data=json.dumps(sample.data),
@@ -50,8 +50,13 @@ async def create(
 
 
 async def list_by(
-    db: Session, after: int, before: int, pageNo: int, pageSize: int, current_user: User
-) -> List[SampleResponse]:
+    db: Session,
+    after: Union[int, None],
+    before: Union[int, None],
+    pageNo: Union[int, None],
+    pageSize: int,
+    current_user: User,
+) -> Tuple[List[SampleResponse], int]:
 
     samples = crud_sample.list_by(
         db=db,
@@ -61,6 +66,8 @@ async def list_by(
         pageNo=pageNo,
         pageSize=pageSize,
     )
+
+    total = crud_sample.count(db=db, owner_id=current_user.id)
 
     # response
     return [
@@ -81,7 +88,7 @@ async def list_by(
             ),
         )
         for sample in samples
-    ]
+    ], total
 
 
 async def get(db: Session, sample_id: int, current_user: User) -> SampleResponse:

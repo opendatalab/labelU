@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 
 from sqlalchemy import func
@@ -14,19 +14,17 @@ def batch(db: Session, samples: List[TaskSample]) -> List[TaskSample]:
     return samples
 
 
-def create(db: Session, sample: TaskSample) -> TaskSample:
-    db.add(sample)
-    db.commit()
-    db.refresh(sample)
-    return sample
-
-
 def list_by(
-    db: Session, owner_id: int, after: int, before: int, pageNo: int, pageSize: int
+    db: Session,
+    owner_id: int,
+    after: Union[int, None],
+    before: Union[int, None],
+    pageNo: Union[int, None],
+    pageSize: int,
 ) -> List[TaskSample]:
-    offset = pageNo * pageSize
-    if after:
-        offset = after
+    offset = after
+    if pageNo:
+        offset = pageNo * pageSize
     if before:
         offset = before - pageSize
 
@@ -37,7 +35,7 @@ def list_by(
     return (
         db.query(TaskSample)
         .filter(*query_filter)
-        .order_by(TaskSample.id.desc())
+        .order_by(TaskSample.id.asc())
         .offset(offset=offset)
         .limit(limit=pageSize)
         .all()
@@ -62,6 +60,10 @@ def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSampl
 def delete(db: Session, sample_ids: List[int]) -> None:
     db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).delete()
     db.commit()
+
+
+def count(db: Session, owner_id: int) -> int:
+    return db.query(TaskSample).filter(TaskSample.created_by == owner_id).count()
 
 
 def statics(

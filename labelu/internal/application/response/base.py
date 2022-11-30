@@ -19,7 +19,7 @@ class CommonDataResp(BaseModel):
 
 class MetaData(BaseModel):
     total: int
-    page: int
+    page: Union[int, None]
     size: int
 
 

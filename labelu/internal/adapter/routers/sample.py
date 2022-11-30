@@ -16,7 +16,9 @@ from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
 from labelu.internal.application.command.sample import DeleteSampleCommand
 from labelu.internal.application.response.base import OkResp
+from labelu.internal.application.response.base import MetaData
 from labelu.internal.application.response.base import CommonDataResp
+from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.sample import CreateSampleResponse
 
@@ -49,10 +51,9 @@ async def create(
     return OkResp[CreateSampleResponse](data=data)
 
 
-# TODO: meta data
 @router.get(
     "/{task_id}/samples",
-    response_model=OkResp[List[SampleResponse]],
+    response_model=OkRespWithMeta[List[SampleResponse]],
     status_code=status.HTTP_200_OK,
 )
 async def list_by(
@@ -75,7 +76,7 @@ async def list_by(
         )
 
     # business logic
-    data = await service.list_by(
+    data, total = await service.list_by(
         db=db,
         after=after,
         before=before,
@@ -85,7 +86,8 @@ async def list_by(
     )
 
     # response
-    return OkResp[List[SampleResponse]](data=data)
+    meta_data = MetaData(total=total, page=pageNo, size=len(data))
+    return OkRespWithMeta[List[SampleResponse]](meta_data=meta_data, data=data)
 
 
 @router.get(
