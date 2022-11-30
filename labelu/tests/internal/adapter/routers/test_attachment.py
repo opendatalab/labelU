@@ -68,6 +68,24 @@ class TestClassTaskAttachmentRouter:
         assert new_res.status_code == 500
         assert new_res.json()["err_code"] == 50001
 
+    def test_upload_file_when_task_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+
+        # run
+        with Path("labelu/tests/data/test.png").open(mode="rb") as f:
+            new_res = client.post(
+                f"{settings.API_V1_STR}/tasks/0/attachments",
+                headers=testuser_token_headers,
+                files={"file": f},
+            )
+
+        # check
+        assert new_res.status_code == 404
+        assert new_res.json()["err_code"] == 50002
+
     def test_download_file_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
@@ -100,6 +118,31 @@ class TestClassTaskAttachmentRouter:
 
         # check
         assert r.status_code == 200
+
+    def test_download_file_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
+        )
+        task_id = task.json()["data"]["id"]
+
+        # run
+        r = client.get(
+            url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/upload/1/0",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        assert r.status_code == 404
+        assert r.json()["err_code"] == 51001
 
     def test_task_delete_task_file(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -143,3 +186,49 @@ class TestClassTaskAttachmentRouter:
         assert r.status_code == 200
         assert not deleted
         assert not file_full_path.exists()
+
+    def test_task_delete_task_file_not_found_task(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+
+        # run
+        data = {"attachment_ids": [1]}
+        r = client.delete(
+            f"{settings.API_V1_STR}/tasks/0/attachments",
+            headers=testuser_token_headers,
+            json=data,
+        )
+
+        # check
+        assert r.status_code == 404
+        assert r.json()["err_code"] == 51001
+
+    def test_task_delete_task_file_not_owner(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+
+        # run
+        data = {"attachment_ids": [1]}
+        r = client.delete(
+            f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
+            headers=testuser_token_headers,
+            json=data,
+        )
+
+        # check
+        assert r.status_code == 403
+        assert r.json()["err_code"] == 30001
