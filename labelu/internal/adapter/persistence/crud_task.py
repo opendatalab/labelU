@@ -8,7 +8,7 @@ from labelu.internal.domain.models.task import Task
 
 def create(db: Session, task: Task) -> Task:
     db.add(task)
-    db.commit()
+    db.flush()
     db.refresh(task)
     return task
 
@@ -34,14 +34,13 @@ def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
         if field in obj_in:
             setattr(db_obj, field, obj_in[field])
     db.add(db_obj)
-    db.commit()
+    db.flush()
     db.refresh(db_obj)
     return db_obj
 
 
 def delete(db: Session, db_obj: Task) -> None:
     db.delete(db_obj)
-    db.commit()
 
 
 def count(db: Session, owner_id: int) -> int:

@@ -28,13 +28,14 @@ async def signup(db: Session, cmd: SignupCommand) -> SignupResponse:
         )
 
     # new a user
-    user = crud_user.create(
-        db,
-        User(
-            username=cmd.username,
-            hashed_password=get_password_hash(cmd.password),
-        ),
-    )
+    with db.begin():
+        user = crud_user.create(
+            db,
+            User(
+                username=cmd.username,
+                hashed_password=get_password_hash(cmd.password),
+            ),
+        )
 
     # response
     return SignupResponse(id=user.id, username=user.username)

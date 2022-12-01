@@ -19,9 +19,9 @@ TEST_USER_PASSWORD = "test@123"
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
 )
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
 
 
@@ -57,10 +57,10 @@ def run_around_tests():
     try:
         db = TestingSessionLocal()
         meta = Base.metadata
-        for table in reversed(meta.sorted_tables):
-            if table.key != "user":
-                db.execute(table.delete())
-        db.commit()
+        with db.begin():
+            for table in reversed(meta.sorted_tables):
+                if table.key != "user":
+                    db.execute(table.delete())
     finally:
         db.close()
 
@@ -90,12 +90,13 @@ def get_testuser_token_headers(client: TestClient) -> Dict[str, str]:
 def init_db() -> None:
     try:
         db = TestingSessionLocal()
-        user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
-        if not user:
-            user_in = User(
-                username=TEST_USERNAME,
-                hashed_password=get_password_hash(TEST_USER_PASSWORD),
-            )
-            user = crud_user.create(db, user=user_in)
+        with db.begin():
+            user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
+            if not user:
+                user_in = User(
+                    username=TEST_USERNAME,
+                    hashed_password=get_password_hash(TEST_USER_PASSWORD),
+                )
+                user = crud_user.create(db=db, user=user_in)
     finally:
         db.close()

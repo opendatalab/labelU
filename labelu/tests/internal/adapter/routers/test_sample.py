@@ -35,11 +35,12 @@ class TestClassTaskSampleRouter:
         )
 
         # check
-        db.commit()
-        updated_task = crud_task.get(db=db, task_id=task.id)
+        with db.begin():
+            updated_task = crud_task.get(db=db, task_id=task.id)
         json = r.json()
         assert r.status_code == 201
         assert len(json["data"]["ids"]) == 1
+        assert updated_task.status == "IMPORTED"
 
     def test_create_sample_task_not_found(
         self, client: TestClient, testuser_token_headers: dict, db: Session

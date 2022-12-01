@@ -10,7 +10,6 @@ from labelu.internal.domain.models.sample import TaskSample
 
 def batch(db: Session, samples: List[TaskSample]) -> List[TaskSample]:
     db.bulk_save_objects(samples, return_defaults=True)
-    db.commit()
     return samples
 
 
@@ -56,14 +55,13 @@ def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSampl
         if field in obj_in:
             setattr(db_obj, field, obj_in[field])
     db.add(db_obj)
-    db.commit()
+    db.flush()
     db.refresh(db_obj)
     return db_obj
 
 
 def delete(db: Session, sample_ids: List[int]) -> None:
     db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).delete()
-    db.commit()
 
 
 def count(db: Session, owner_id: int) -> int:

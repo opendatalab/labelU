@@ -7,7 +7,7 @@ from labelu.internal.domain.models.user import User
 def create(db: Session, user: User) -> User:
     db_user = User(username=user.username, hashed_password=user.hashed_password)
     db.add(db_user)
-    db.commit()
+    db.flush()
     db.refresh(db_user)
     return db_user
 

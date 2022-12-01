@@ -76,15 +76,17 @@ async def create(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     # add a task file record
-    attachment = crud_attachment.create(
-        db=db,
-        attachment=TaskAttachment(
-            path=attachment_relative_path,
-            created_by=current_user.id,
-            updated_by=current_user.id,
-            task_id=task_id,
-        ),
-    )
+    with db.begin():
+        attachment = crud_attachment.create(
+            db=db,
+            attachment=TaskAttachment(
+                path=attachment_relative_path,
+                created_by=current_user.id,
+                updated_by=current_user.id,
+                task_id=task_id,
+            ),
+        )
+
     # response
     return AttachmentResponse(
         id=attachment.id,
@@ -136,7 +138,8 @@ async def delete(
         logger.error(e)
 
     # delete
-    crud_attachment.delete(db=db, attachment_ids=cmd.attachment_ids)
+    with db.begin():
+        crud_attachment.delete(db=db, attachment_ids=cmd.attachment_ids)
 
     # response
     return CommonDataResp(ok=True)

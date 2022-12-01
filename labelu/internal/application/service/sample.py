@@ -49,9 +49,10 @@ async def create(
         for sample in cmd
     ]
 
-    obj_in = {Task.status.key: TaskStatus.IMPORTED}
-    crud_task.update(db=db, db_obj=task, obj_in=obj_in)
-    new_samples = crud_sample.batch(db=db, samples=samples)
+    with db.begin():
+        obj_in = {Task.status.key: TaskStatus.IMPORTED}
+        crud_task.update(db=db, db_obj=task, obj_in=obj_in)
+        new_samples = crud_sample.batch(db=db, samples=samples)
 
     # response
     ids = [s.id for s in new_samples]
@@ -152,7 +153,8 @@ async def patch(
         obj_in[TaskSample.data.key] = json.dumps(cmd.data)
         obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
         obj_in[TaskSample.state.key] = SampleState.DONE.value
-    updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=obj_in)
+    with db.begin():
+        updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=obj_in)
 
     # response
     return SampleResponse(
@@ -177,7 +179,8 @@ async def delete(
     db: Session, sample_ids: List[int], current_user: User
 ) -> CommonDataResp:
 
-    crud_sample.delete(db=db, sample_ids=sample_ids)
+    with db.begin():
+        crud_sample.delete(db=db, sample_ids=sample_ids)
     # response
     return CommonDataResp(ok=True)
 

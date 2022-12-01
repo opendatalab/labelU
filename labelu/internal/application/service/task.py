@@ -28,17 +28,19 @@ async def create(
     db: Session, cmd: BasicConfigCommand, current_user: User
 ) -> TaskResponse:
     # new a task
-    new_task = crud_task.create(
-        db=db,
-        task=Task(
-            status=TaskStatus.DRAFT.value,
-            name=cmd.name,
-            description=cmd.description,
-            tips=cmd.tips,
-            created_by=current_user.id,
-            updated_by=current_user.id,
-        ),
-    )
+
+    with db.begin():
+        new_task = crud_task.create(
+            db=db,
+            task=Task(
+                status=TaskStatus.DRAFT.value,
+                name=cmd.name,
+                description=cmd.description,
+                tips=cmd.tips,
+                created_by=current_user.id,
+                updated_by=current_user.id,
+            ),
+        )
 
     # response
     return TaskResponse(
@@ -153,7 +155,8 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     else:
         obj_in[Task.media_type.key] = None
         obj_in[Task.config.key] = None
-    updated_task = crud_task.update(db=db, db_obj=task, obj_in=obj_in)
+    with db.begin():
+        updated_task = crud_task.update(db=db, db_obj=task, obj_in=obj_in)
 
     # response
     return TaskResponse(
@@ -189,7 +192,8 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
         )
 
     # delete
-    crud_task.delete(db=db, db_obj=task)
+    with db.begin():
+        crud_task.delete(db=db, db_obj=task)
 
     # delete media
     try:
