@@ -70,31 +70,25 @@ async def create(
         )
 
     # check file already saved
-    attachment_status = False
-    if attachment_full_path.exists():
-        attachment_status = True
-    # add a task file record
-    attachment_id = 0
-    try:
-        attachment = crud_attachment.create(
-            db=db,
-            attachment=TaskAttachment(
-                path=attachment_relative_path,
-                created_by=current_user.id,
-                updated_by=current_user.id,
-                task_id=task_id,
-                status=attachment_status,
-            ),
+    if not attachment_full_path.exists():
+        raise UnicornException(
+            code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-        attachment_id = attachment.id
-    except Exception as e:
-        attachment_status = False
-        logger.error(e)
+    # add a task file record
+    attachment = crud_attachment.create(
+        db=db,
+        attachment=TaskAttachment(
+            path=attachment_relative_path,
+            created_by=current_user.id,
+            updated_by=current_user.id,
+            task_id=task_id,
+        ),
+    )
     # response
     return AttachmentResponse(
-        id=attachment_id,
+        id=attachment.id,
         url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_relative_path}",
-        status=attachment_status,
     )
 
 

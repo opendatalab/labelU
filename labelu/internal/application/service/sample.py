@@ -10,6 +10,8 @@ from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import UnicornException
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
+from labelu.internal.domain.models.task import Task
+from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.domain.models.sample import SampleState
 from labelu.internal.application.command.sample import PatchSampleCommand
@@ -43,6 +45,8 @@ async def create(
         for sample in cmd
     ]
 
+    obj_in = {Task.status.key: TaskStatus.IMPORTED}
+    crud_task.update(db=db, db_obj=task, obj_in=obj_in)
     new_samples = crud_sample.batch(db=db, samples=samples)
 
     # response
