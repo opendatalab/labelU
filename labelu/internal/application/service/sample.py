@@ -192,7 +192,7 @@ async def export(
 
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
 
-    results = [sample.data for sample in samples]
+    results = [json.loads(sample.data) for sample in samples]
 
     # Serializing json
     json_object = json.dumps(results)
