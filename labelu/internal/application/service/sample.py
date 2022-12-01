@@ -1,15 +1,19 @@
 import json
+import uuid
+from datetime import datetime
 from typing import List, Tuple, Union
 from pathlib import Path
 
 from fastapi import status
 from sqlalchemy.orm import Session
 
-from labelu.internal.domain.models.user import User
+
+from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import UnicornException
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
+from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import TaskSample
@@ -186,5 +190,21 @@ async def export(
     current_user: User,
 ) -> str:
 
+    samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
+
+    results = [sample.data for sample in samples]
+
+    # Serializing json
+    json_object = json.dumps(results)
+
+    # Writing to json
+    file_relative_path = f"task-{task_id}-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}-{str(uuid.uuid4())[0:8]}.json"
+    file_full_dir = Path(settings.BASE_DATA_DIR).joinpath(settings.EXOIRT_DIR)
+    file_full_dir.mkdir(parents=True, exist_ok=True)
+
+    file_full_path = file_full_dir.joinpath(file_relative_path)
+    with open(file_full_path, "w") as outfile:
+        outfile.write(json_object)
+
     # response
-    return Path()
+    return file_full_path

@@ -12,9 +12,11 @@ from labelu.internal.common.error_code import UnicornException
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.service import sample as service
+from labelu.internal.application.command.sample import ExportType
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
 from labelu.internal.application.command.sample import DeleteSampleCommand
+from labelu.internal.application.command.sample import ExportSampleCommand
 from labelu.internal.application.response.base import OkResp
 from labelu.internal.application.response.base import MetaData
 from labelu.internal.application.response.base import CommonDataResp
@@ -161,15 +163,15 @@ async def delete(
     return OkResp[CommonDataResp](data=data)
 
 
-@router.get(
+@router.post(
     "/{task_id}/samples/export",
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
 async def export(
     task_id: int,
-    export_type: str,
-    sample_ids: List[int],
+    export_type: ExportType,
+    cmd: ExportSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -183,7 +185,7 @@ async def export(
         db=db,
         task_id=task_id,
         export_type=export_type,
-        sample_ids=sample_ids,
+        sample_ids=cmd.sample_ids,
         current_user=current_user,
     )
 

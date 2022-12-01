@@ -46,6 +46,10 @@ def get(db: Session, sample_id: int) -> TaskSample:
     return db.query(TaskSample).filter(TaskSample.id == sample_id).first()
 
 
+def get_by_ids(db: Session, sample_ids: List[int]) -> List[TaskSample]:
+    return db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).all()
+
+
 def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSample:
     obj_data = jsonable_encoder(obj_in)
     for field in obj_data:

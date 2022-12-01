@@ -1,7 +1,18 @@
+from enum import Enum
 from typing import List, Union
 from pydantic import BaseModel, Field
 
 from labelu.internal.domain.models.sample import SampleState
+
+
+class ExportType(str, Enum):
+    """
+    export samle result file type
+    """
+
+    JSON = "JSON"
+    MASK = "MASK"
+    COCO = "COCO"
 
 
 class CreateSampleCommand(BaseModel):
@@ -35,4 +46,12 @@ class PatchSampleCommand(BaseModel):
     state: Union[SampleState, None] = Field(
         regex=SampleState.SKIPPED.value,
         description="description: sample file state, must be 'SKIPPED' or None",
+    )
+
+
+class ExportSampleCommand(BaseModel):
+    sample_ids: Union[List[int], None] = Field(
+        min_items=1,
+        gt=0,
+        description="description: sample id",
     )
