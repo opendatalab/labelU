@@ -42,6 +42,39 @@ class TestClassTaskSampleRouter:
         assert len(json["data"]["ids"]) == 1
         assert updated_task.status == "IMPORTED"
 
+    def test_create_sample_task_status_not_draft(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+                status="CONFIGURED",
+            ),
+        )
+        data = [{"attachement_ids": [1], "data": {}}]
+
+        # run
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
+            headers=testuser_token_headers,
+            json=data,
+        )
+
+        # check
+        with db.begin():
+            updated_task = crud_task.get(db=db, task_id=task.id)
+        json = r.json()
+        assert r.status_code == 201
+        assert len(json["data"]["ids"]) == 1
+        assert updated_task.status == "CONFIGURED"
+
     def test_create_sample_task_not_found(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
