@@ -1,14 +1,14 @@
 import json
-import uuid
-from datetime import datetime
 from typing import List, Tuple, Union
 from pathlib import Path
+from tempfile import gettempdir
 
 from fastapi import status
 from sqlalchemy.orm import Session
 
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import UnicornException
 from labelu.internal.adapter.persistence import crud_task
@@ -18,6 +18,7 @@ from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.domain.models.sample import SampleState
+from labelu.internal.application.command.sample import ExportType
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
 from labelu.internal.application.response.base import UserResp
@@ -189,26 +190,38 @@ async def delete(
 async def export(
     db: Session,
     task_id: int,
-    export_type: int,
+    export_type: ExportType,
     sample_ids: List[int],
     current_user: User,
 ) -> str:
 
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
 
-    results = [json.loads(sample.data) for sample in samples]
+    data = [
+        SampleResponse(
+            id=sample.id,
+            state=sample.state,
+            data=json.loads(sample.data),
+            annotated_count=sample.annotated_count,
+            created_at=sample.created_at,
+            created_by=UserResp(
+                id=sample.owner.id,
+                username=sample.owner.username,
+            ),
+            updated_at=sample.updated_at,
+            updated_by=UserResp(
+                id=sample.updater.id,
+                username=sample.updater.username,
+            ),
+        ).dict()
+        for sample in samples
+    ]
 
-    # Serializing json
-    json_object = json.dumps(results)
+    # output data path
+    file_full_dir = Path(gettempdir())
 
-    # Writing to json
-    file_relative_path = f"task-{task_id}-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}-{str(uuid.uuid4())[0:8]}.json"
-    file_full_dir = Path(settings.BASE_DATA_DIR).joinpath(settings.EXOIRT_DIR)
-    file_full_dir.mkdir(parents=True, exist_ok=True)
-
-    file_full_path = file_full_dir.joinpath(file_relative_path)
-    with open(file_full_path, "w") as outfile:
-        outfile.write(json_object)
+    # converter to export_type
+    file_full_path = converter.convert(data, file_full_dir, task_id, export_type.value)
 
     # response
     return file_full_path
