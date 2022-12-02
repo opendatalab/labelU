@@ -31,13 +31,18 @@ class TestClassTaskAttachmentRouter:
             new_res = client.post(
                 f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
                 headers=testuser_token_headers,
-                files={"file": f},
+                files={"file": ("test.png", f, "image/png")},
             )
 
         # check
         json = new_res.json()
         assert new_res.status_code == 201
         assert settings.HOST in json["data"]["url"]
+
+        parts = json["data"]["url"].split("/")[-3:]
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+        parts[-1] = parts[-1][:8] + "-test-thumbnail.png"
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
 
     def test_upload_file_when_task_finished(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -67,6 +72,39 @@ class TestClassTaskAttachmentRouter:
         # check
         assert new_res.status_code == 500
         assert new_res.json()["err_code"] == 50001
+
+    def test_upload_file_not_image(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
+        )
+        task_id = task.json()["data"]["id"]
+
+        # run
+        with Path("labelu/tests/data/test.txt").open(mode="rb") as f:
+            new_res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": ("test.txt", f, "plain/text")},
+            )
+
+        # check
+        json = new_res.json()
+        assert new_res.status_code == 201
+        assert settings.HOST in json["data"]["url"]
+
+        parts = json["data"]["url"].split("/")[-3:]
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+        parts[-1] = parts[-1][:8] + "-test-thumbnail.txt"
+        assert not Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
 
     def test_upload_file_when_task_not_found(
         self, client: TestClient, testuser_token_headers: dict, db: Session

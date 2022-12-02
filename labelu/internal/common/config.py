@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     os.makedirs(MEDIA_ROOT, exist_ok=True)
     logger.info("Database and media directory: {}", BASE_DATA_DIR)
     UPLOAD_FILE_MAX_SIZE = 200_000_000  # ~200MB
-    THUMBNAIL_HEIGH_PIXEL = 128
+    THUMBNAIL_HEIGH_PIXEL = 120
 
     DATABASE_URL: str = f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite"
 
