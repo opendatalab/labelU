@@ -25,6 +25,7 @@ python-multipart = "^0.0.5"
 python-dotenv = "^0.21.0"
 appdirs = "^1.4.4"
 aiofiles = "^22.1.0"
+pillow = "^9.3.0"
 
 
 

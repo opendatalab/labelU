@@ -1,6 +1,7 @@
 import aiofiles
 import os
 import uuid
+from PIL import Image
 from pathlib import Path
 
 from loguru import logger
@@ -60,9 +61,27 @@ async def create(
 
         # create dicreatory
         attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
+
+        # save image
+        logger.info(attachment_full_path)
         async with aiofiles.open(attachment_full_path, "wb") as out_file:
             content = await cmd.file.read()  # async read
             await out_file.write(content)  # async write
+
+        # create thumbnail for image
+        if cmd.file.content_type.startswith("image/"):
+            tumbnail_full_path = Path(
+                f"{attachment_full_path.parent}/{attachment_full_path.stem}-thumbnail{attachment_full_path.suffix}"
+            )
+            logger.info(tumbnail_full_path)
+            image = Image.open(attachment_full_path)
+            image.thumbnail(
+                (
+                    round(image.width / image.height * settings.THUMBNAIL_HEIGH_PIXEL),
+                    settings.THUMBNAIL_HEIGH_PIXEL,
+                ),
+            )
+            image.save(tumbnail_full_path)
     except:
         raise UnicornException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
@@ -70,11 +89,14 @@ async def create(
         )
 
     # check file already saved
-    if not attachment_full_path.exists():
+    if not attachment_full_path.exists() or (
+        cmd.file.content_type.startswith("image/") and not tumbnail_full_path.exists()
+    ):
         raise UnicornException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
     # add a task file record
     with db.begin():
         attachment = crud_attachment.create(
