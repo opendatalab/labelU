@@ -4,8 +4,7 @@ from enum import Enum
 from datetime import datetime
 
 from typing import List
-
-from labelu.internal.common.config import settings
+from loguru import logger
 
 
 class Format(str, Enum):
@@ -56,6 +55,8 @@ class Converter:
         json_object = json.dumps(data, default=str)
         with file_full_path.open("w") as outfile:
             outfile.write(json_object)
+
+        logger.info("Export file path: {}", file_full_path)
         return file_full_path
 
 

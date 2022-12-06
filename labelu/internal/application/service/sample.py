@@ -7,7 +7,6 @@ from fastapi import status
 from sqlalchemy.orm import Session
 
 
-from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import UnicornException

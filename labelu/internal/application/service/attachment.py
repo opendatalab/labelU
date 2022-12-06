@@ -42,14 +42,13 @@ async def create(
     # save file
     try:
         # file relative path
+        path_filename = cmd.file.filename.split("/")
+        filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1]
+        path = "/".join(path_filename[:-1])
         attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
-            str(task_id), cmd.path.strip()
+            str(task_id), path
         )
-        attachment_relative_path = str(
-            attachment_relative_base_dir.joinpath(
-                str(uuid.uuid4())[0:8] + "-" + cmd.file.filename
-            )
-        )
+        attachment_relative_path = str(attachment_relative_base_dir.joinpath(filename))
 
         # file full path
         attachment_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(
@@ -82,7 +81,8 @@ async def create(
                 ),
             )
             image.save(tumbnail_full_path)
-    except:
+    except Exception as e:
+        logger.error(e)
         raise UnicornException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
