@@ -97,12 +97,13 @@ async def create(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+    attachment_url_path = attachment_relative_path.replace("\\", "/")
     # add a task file record
     with db.begin():
         attachment = crud_attachment.create(
             db=db,
             attachment=TaskAttachment(
-                path=attachment_relative_path,
+                path=attachment_url_path,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 task_id=task_id,
@@ -112,7 +113,7 @@ async def create(
     # response
     return AttachmentResponse(
         id=attachment.id,
-        url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_relative_path}",
+        url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}",
     )
 
 
