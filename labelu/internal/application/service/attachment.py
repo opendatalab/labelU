@@ -92,6 +92,7 @@ async def create(
     if not attachment_full_path.exists() or (
         cmd.file.content_type.startswith("image/") and not tumbnail_full_path.exists()
     ):
+        logger.error("cannot find saved images")
         raise UnicornException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -113,7 +114,7 @@ async def create(
     # response
     return AttachmentResponse(
         id=attachment.id,
-        url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}",
+        url=f"{settings.SCHEME}://{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}",
     )
 
 

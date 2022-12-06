@@ -15,6 +15,7 @@ def batch(db: Session, samples: List[TaskSample]) -> List[TaskSample]:
 
 def list_by(
     db: Session,
+    task_id: Union[int, None],
     owner_id: int,
     after: Union[int, None],
     before: Union[int, None],
@@ -30,7 +31,8 @@ def list_by(
     query_filter = [TaskSample.created_by == owner_id]
     if before:
         query_filter.append(TaskSample.id < before)
-
+    if task_id:
+        query_filter.append(TaskSample.task_id == task_id)
     return (
         db.query(TaskSample)
         .filter(*query_filter)
@@ -64,18 +66,21 @@ def delete(db: Session, sample_ids: List[int]) -> None:
     db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).delete()
 
 
-def count(db: Session, owner_id: int) -> int:
-    return db.query(TaskSample).filter(TaskSample.created_by == owner_id).count()
+def count(db: Session, task_id: int, owner_id: int) -> int:
+    query_filter = [TaskSample.created_by == owner_id]
+    if task_id:
+        query_filter.append(TaskSample.task_id == task_id)
+    return db.query(TaskSample).filter(*query_filter).count()
 
 
 def statics(
     db: Session,
     owner_id: int,
-    task_id: int = None,
+    task_ids: List[int],
 ) -> dict:
     query_filter = [TaskSample.created_by == owner_id]
-    if task_id:
-        query_filter.append(TaskSample.task_id == task_id)
+    if task_ids:
+        query_filter.append(TaskSample.task_id.in_(task_ids))
 
     statics = (
         db.query(

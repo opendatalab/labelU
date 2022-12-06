@@ -59,6 +59,7 @@ async def create(
     status_code=status.HTTP_200_OK,
 )
 async def list_by(
+    task_id: int,
     after: Union[int, None] = Query(default=None, gt=0),
     before: Union[int, None] = Query(default=None, gt=0),
     pageNo: Union[int, None] = Query(default=None, ge=0),
@@ -80,6 +81,7 @@ async def list_by(
     # business logic
     data, total = await service.list_by(
         db=db,
+        task_id=task_id,
         after=after,
         before=before,
         pageNo=pageNo,

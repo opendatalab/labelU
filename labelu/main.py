@@ -102,10 +102,12 @@ cli = Typer()
 
 
 @cli.command()
-def main(port: int = 8000):
+def main(host: str = "localhost", port: int = 8000):
     if port:
         settings.PORT = port
-    uvicorn.run(app=app, port=settings.PORT)
+    if host:
+        settings.HOST = host
+    uvicorn.run(app=app, host=settings.HOST, port=settings.PORT)
 
 
 if __name__ == "__main__":

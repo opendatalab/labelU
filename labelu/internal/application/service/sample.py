@@ -62,6 +62,7 @@ async def create(
 
 async def list_by(
     db: Session,
+    task_id: Union[int, None],
     after: Union[int, None],
     before: Union[int, None],
     pageNo: Union[int, None],
@@ -71,6 +72,7 @@ async def list_by(
 
     samples = crud_sample.list_by(
         db=db,
+        task_id=task_id,
         owner_id=current_user.id,
         after=after,
         before=before,
@@ -78,7 +80,7 @@ async def list_by(
         pageSize=pageSize,
     )
 
-    total = crud_sample.count(db=db, owner_id=current_user.id)
+    total = crud_sample.count(db=db, task_id=task_id, owner_id=current_user.id)
 
     # response
     return [

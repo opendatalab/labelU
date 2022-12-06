@@ -174,7 +174,7 @@ class TestClassTaskAttachmentRouter:
 
         # run
         r = client.get(
-            url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/upload/1/0",
+            url=f"{settings.SCHEME}://{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/upload/1/0",
             headers=testuser_token_headers,
         )
 

@@ -71,7 +71,8 @@ async def list_by(
     tasks = crud_task.list_by(db=db, owner_id=current_user.id, page=page, size=size)
 
     # get progress
-    statics = crud_sample.statics(db=db, owner_id=current_user.id)
+    task_ids = [task.id for task in tasks]
+    statics = crud_sample.statics(db=db, owner_id=current_user.id, task_ids=task_ids)
 
     # response
     tasks_with_statics = [
@@ -113,7 +114,7 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     statics = crud_sample.statics(
         db=db,
         owner_id=current_user.id,
-        task_id=task.id,
+        task_ids=[task.id],
     )
 
     # response
