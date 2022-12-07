@@ -192,5 +192,4 @@ async def export(
     )
 
     # response
-    filename = Path(data).name
-    return FileResponse(path=data, filename=filename, media_type="application/.json")
+    return FileResponse(path=data, filename=data.name, media_type="application/.json")

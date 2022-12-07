@@ -198,19 +198,16 @@ async def export(
 ) -> str:
 
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
-
     data = [
         SampleResponse(
             id=sample.id,
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
-            created_at=sample.created_at,
             created_by=UserResp(
                 id=sample.owner.id,
                 username=sample.owner.username,
             ),
-            updated_at=sample.updated_at,
             updated_by=UserResp(
                 id=sample.updater.id,
                 username=sample.updater.username,
