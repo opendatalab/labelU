@@ -41,8 +41,8 @@ class Converter:
             {
                 "id": item.get("id"),
                 "result": item.get("data").get("result"),
-                "url": item.get("data").get("urls"),
-                "fileName": item.get("data").get("fileNames"),
+                "urls": item.get("data").get("urls"),
+                "fileNames": item.get("data").get("fileNames"),
             }
             for item in input_data
         ]
