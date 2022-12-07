@@ -80,6 +80,8 @@ async def create(
                     settings.THUMBNAIL_HEIGH_PIXEL,
                 ),
             )
+            if image.mode != "RGB":
+                image = image.convert("RGB")
             image.save(tumbnail_full_path)
     except Exception as e:
         logger.error(e)
