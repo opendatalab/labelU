@@ -1,8 +1,9 @@
 import json
 from typing import List, Tuple, Union
-from pathlib import Path
-from tempfile import gettempdir
 
+from pathlib import Path
+from loguru import logger
+from tempfile import gettempdir
 from fastapi import status
 from sqlalchemy.orm import Session
 
@@ -222,7 +223,16 @@ async def export(
     file_full_dir = Path(gettempdir())
 
     # converter to export_type
-    file_full_path = converter.convert(data, file_full_dir, task_id, export_type.value)
+    try:
+        file_full_path = converter.convert(
+            data, file_full_dir, task_id, export_type.value
+        )
+    except Exception as e:
+        logger.error(e)
+        raise UnicornException(
+            code=ErrorCode.CODE_55002_SAMPLE_FORMAT_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     # response
     return file_full_path

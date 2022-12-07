@@ -1,5 +1,6 @@
 from typing import List, Union
 
+from pathlib import Path
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
 from fastapi.responses import FileResponse
@@ -167,7 +168,6 @@ async def delete(
 
 @router.post(
     "/{task_id}/samples/export",
-    response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
 async def export(
@@ -192,4 +192,5 @@ async def export(
     )
 
     # response
-    return data
+    filename = Path(data).name
+    return FileResponse(path=data, filename=filename, media_type="application/.json")

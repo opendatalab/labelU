@@ -77,6 +77,10 @@ class ErrorCode(Enum):
         "Paramenters error: 'after', 'before', 'pageNo' only one must be Ture, pageNo can be 0",
     )
     CODE_55001_SAMPLE_NOT_FOUND = (TASK_INIT_CODE + 5001, "Sample not found")
+    CODE_55002_SAMPLE_FORMAT_ERROR = (
+        TASK_INIT_CODE + 5002,
+        "Sample result format error",
+    )
 
 
 class UnicornException(HTTPException):

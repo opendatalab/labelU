@@ -40,12 +40,12 @@ class Converter:
         data = [
             {
                 "id": item.get("id"),
-                "result": item.get("data"),
-                "url": item.get("data").get("urls", [])[0]
-                if item.get("data").get("urls", [])
+                "result": item.get("data").get("result"),
+                "url": item.get("data").get("urls")[0]
+                if item.get("data").get("urls", "")
                 else "",
-                "fileName": item.get("data").get("fileNames", [])[0]
-                if item.get("data").get("fileNames", [])
+                "fileName": item.get("data").get("fileNames")[0]
+                if item.get("data").get("fileNames")
                 else "",
             }
             for item in input_data
