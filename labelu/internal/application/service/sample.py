@@ -228,6 +228,7 @@ async def export(
             data, file_full_dir, task_id, export_type.value
         )
     except Exception as e:
+        logger.error(data)
         logger.error(e)
         raise UnicornException(
             code=ErrorCode.CODE_55002_SAMPLE_FORMAT_ERROR,
