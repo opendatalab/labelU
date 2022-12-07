@@ -22,22 +22,19 @@ def list_by(
     pageNo: Union[int, None],
     pageSize: int,
 ) -> List[TaskSample]:
-    offset = after
-    if pageNo != None:
-        offset = pageNo * pageSize
-    if before:
-        offset = before - pageSize
 
     query_filter = [TaskSample.created_by == owner_id]
     if before:
         query_filter.append(TaskSample.id < before)
+    if after:
+        query_filter.append(TaskSample.id > after)
     if task_id:
         query_filter.append(TaskSample.task_id == task_id)
     return (
         db.query(TaskSample)
         .filter(*query_filter)
         .order_by(TaskSample.id.asc())
-        .offset(offset=offset)
+        .offset(offset=pageNo * pageSize if pageNo else 0)
         .limit(limit=pageSize)
         .all()
     )
