@@ -3,7 +3,7 @@ from enum import Enum
 from loguru import logger
 from fastapi.responses import JSONResponse
 from fastapi.responses import RedirectResponse
-from fastapi import Request, status, HTTPException
+from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -149,7 +149,7 @@ async def validation_exception_handler(request, exc):
     )
 
 
-def add_exception_handler(app):
+def add_exception_handler(app: FastAPI):
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(UnicornException, unicorn_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)

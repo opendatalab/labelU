@@ -3,11 +3,7 @@ from typer import Typer
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-
-from labelu.internal.adapter.routers import user
-from labelu.internal.adapter.routers import task
-from labelu.internal.adapter.routers import sample
-from labelu.internal.adapter.routers import attachment
+from labelu.internal.adapter.routers import add_router
 from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
@@ -91,10 +87,7 @@ app = FastAPI(
 init_logging()
 init_tables()
 add_exception_handler(app=app)
-app.include_router(user.router, prefix=settings.API_V1_STR)
-app.include_router(task.router, prefix=settings.API_V1_STR)
-app.include_router(attachment.router, prefix=settings.API_V1_STR)
-app.include_router(sample.router, prefix=settings.API_V1_STR)
+add_router(app=app)
 
 app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
 
