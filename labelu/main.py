@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.adapter.routers import add_router
+from labelu.internal.middleware import add_middleware
 from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
@@ -88,6 +89,7 @@ init_logging()
 init_tables()
 add_exception_handler(app=app)
 add_router(app=app)
+add_middleware(app=app)
 
 app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
 
