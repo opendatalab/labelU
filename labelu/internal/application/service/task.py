@@ -105,6 +105,7 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     # get task detail
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -144,6 +145,7 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     # get task
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -181,12 +183,18 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
     # get task
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
     if task.created_by != current_user.id:
+        logger.error(
+            "cannot delete task, the task owner is:{}, the delete operator is:{}",
+            task.created_by,
+            current_user.id,
+        )
         raise UnicornException(
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,

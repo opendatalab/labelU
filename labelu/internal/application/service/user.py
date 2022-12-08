@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
@@ -22,6 +23,7 @@ async def signup(db: Session, cmd: SignupCommand) -> SignupResponse:
     # check user alredy exists
     user = crud_user.get_user_by_username(db, username=cmd.username)
     if user:
+        logger.error("user already exist:{}", cmd.username)
         raise UnicornException(
             code=ErrorCode.CODE_40001_USERNAME_ALREADY_EXISTS,
             status_code=status.HTTP_400_BAD_REQUEST,
