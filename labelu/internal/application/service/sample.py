@@ -151,8 +151,8 @@ async def patch(
     # update
     obj_in = cmd.dict(exclude_unset=True)
     if cmd.state:
+        obj_in[TaskSample.data.key] = json.dumps(cmd.data)
         obj_in[TaskSample.state.key] = SampleState.SKIPPED.value
-        obj_in[TaskSample.data.key] = json.dumps(dict())
     else:
         obj_in[TaskSample.data.key] = json.dumps(cmd.data)
         obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
