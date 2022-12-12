@@ -69,6 +69,7 @@ async def list_by(
     before: Union[int, None],
     pageNo: Union[int, None],
     pageSize: int,
+    sorting: Union[str, None],
     current_user: User,
 ) -> Tuple[List[SampleResponse], int]:
 
@@ -80,6 +81,7 @@ async def list_by(
         before=before,
         pageNo=pageNo,
         pageSize=pageSize,
+        sorting=sorting,
     )
 
     total = crud_sample.count(db=db, task_id=task_id, owner_id=current_user.id)

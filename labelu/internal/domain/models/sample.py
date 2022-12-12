@@ -14,8 +14,8 @@ class SampleState(str, Enum):
     """
 
     NEW = "NEW"
-    DONE = "DONE"
     SKIPPED = "SKIPPED"
+    DONE = "DONE"
 
 
 class TaskSample(Base):

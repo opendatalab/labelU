@@ -2,10 +2,11 @@ from datetime import datetime
 from typing import Any, Dict, List, Union
 
 
-from sqlalchemy import func
+from sqlalchemy import case, func, text
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
+from labelu.internal.domain.models.sample import SampleState
 from labelu.internal.domain.models.sample import TaskSample
 
 
@@ -22,8 +23,10 @@ def list_by(
     before: Union[int, None],
     pageNo: Union[int, None],
     pageSize: int,
+    sorting: Union[str, None],
 ) -> List[TaskSample]:
 
+    # query filter
     query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
     if before:
         query_filter.append(TaskSample.id < before)
@@ -31,11 +34,25 @@ def list_by(
         query_filter.append(TaskSample.id > after)
     if task_id:
         query_filter.append(TaskSample.task_id == task_id)
+    query = db.query(TaskSample).filter(*query_filter)
+
+    # case when for state enum
+    whens = {state: index for index, state in enumerate(SampleState)}
+    sort_logic = case(value=TaskSample.state, whens=whens).label(TaskSample.state.key)
+
+    if sorting:
+        sort_strings = sorting.split(",")
+        for item in sort_strings:
+            sort_key = item.split(":")
+            if sort_key[0] == TaskSample.state.key:
+                query = query.order_by(sort_logic)
+            else:
+                query = query.order_by(text(f"{sort_key[0]} {sort_key[1]}"))
+
+    # default order by id
+    query = query.order_by(TaskSample.id.asc())
     return (
-        db.query(TaskSample)
-        .filter(*query_filter)
-        .order_by(TaskSample.id.asc())
-        .offset(offset=pageNo * pageSize if pageNo else 0)
+        query.offset(offset=pageNo * pageSize if pageNo else 0)
         .limit(limit=pageSize)
         .all()
     )

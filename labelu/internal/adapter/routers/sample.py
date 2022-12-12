@@ -65,6 +65,9 @@ async def list_by(
     before: Union[int, None] = Query(default=None, gt=0),
     pageNo: Union[int, None] = Query(default=None, ge=0),
     pageSize: Union[int, None] = 100,
+    sort: Union[str, None] = Query(
+        default=None, regex="(annotated_count|state):(desc|asc)"
+    ),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -87,6 +90,7 @@ async def list_by(
         before=before,
         pageNo=pageNo,
         pageSize=pageSize,
+        sorting=sort,
         current_user=current_user,
     )
 
