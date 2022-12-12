@@ -3,11 +3,10 @@ from typing import List, Tuple, Union
 
 from pathlib import Path
 from loguru import logger
-from tempfile import gettempdir
 from fastapi import status
 from sqlalchemy.orm import Session
 
-
+from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import UnicornException
@@ -201,32 +200,21 @@ async def export(
     current_user: User,
 ) -> str:
 
+    task = crud_task.get(db=db, task_id=task_id)
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
-    data = [
-        SampleResponse(
-            id=sample.id,
-            state=sample.state,
-            data=json.loads(sample.data),
-            annotated_count=sample.annotated_count,
-            created_by=UserResp(
-                id=sample.owner.id,
-                username=sample.owner.username,
-            ),
-            updated_by=UserResp(
-                id=sample.updater.id,
-                username=sample.updater.username,
-            ),
-        ).dict()
-        for sample in samples
-    ]
+    data = [sample.__dict__ for sample in samples]
 
     # output data path
-    file_full_dir = Path(gettempdir())
+    out_data_dir = Path(settings.MEDIA_ROOT).joinpath(settings.EXOIRT_DIR)
 
     # converter to export_type
     try:
         file_full_path = converter.convert(
-            data, file_full_dir, task_id, export_type.value
+            config=json.loads(task.config),
+            input_data=data,
+            out_data_dir=out_data_dir,
+            out_data_file_name_prefix=task_id,
+            format=export_type.value,
         )
     except Exception as e:
         logger.error(data)
