@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, List, Union
 
 
@@ -23,7 +24,7 @@ def list_by(
     pageSize: int,
 ) -> List[TaskSample]:
 
-    query_filter = [TaskSample.created_by == owner_id]
+    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
     if before:
         query_filter.append(TaskSample.id < before)
     if after:
@@ -41,11 +42,19 @@ def list_by(
 
 
 def get(db: Session, sample_id: int) -> TaskSample:
-    return db.query(TaskSample).filter(TaskSample.id == sample_id).first()
+    return (
+        db.query(TaskSample)
+        .filter(TaskSample.id == sample_id, TaskSample.deleted_at == None)
+        .first()
+    )
 
 
 def get_by_ids(db: Session, sample_ids: List[int]) -> List[TaskSample]:
-    return db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).all()
+    return (
+        db.query(TaskSample)
+        .filter(TaskSample.id.in_(sample_ids), TaskSample.deleted_at == None)
+        .all()
+    )
 
 
 def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSample:
@@ -60,11 +69,13 @@ def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSampl
 
 
 def delete(db: Session, sample_ids: List[int]) -> None:
-    db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).delete()
+    db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).update(
+        {TaskSample.deleted_at: datetime.now()}
+    )
 
 
 def count(db: Session, task_id: int, owner_id: int) -> int:
-    query_filter = [TaskSample.created_by == owner_id]
+    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
     if task_id:
         query_filter.append(TaskSample.task_id == task_id)
     return db.query(TaskSample).filter(*query_filter).count()
@@ -75,7 +86,7 @@ def statics(
     owner_id: int,
     task_ids: List[int],
 ) -> dict:
-    query_filter = [TaskSample.created_by == owner_id]
+    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
     if task_ids:
         query_filter.append(TaskSample.task_id.in_(task_ids))
 

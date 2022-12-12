@@ -1,6 +1,7 @@
 from enum import Enum
 from datetime import datetime
 
+from sqlalchemy.schema import Index
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 
@@ -45,7 +46,10 @@ class TaskSample(Base):
         default=SampleState.NEW.value,
         comment="NEW is has not start yet, DONE is completed, SKIPPED is skipped",
     )
+    deleted_at = Column(DateTime, index=True, comment="Task delete time")
 
     task = relationship("Task", foreign_keys=[task_id])
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])
+
+    Index("idx_sample_id_deleted_at", id, deleted_at)

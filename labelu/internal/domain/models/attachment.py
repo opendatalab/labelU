@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sqlalchemy.schema import Index
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, SmallInteger, String
 
 from labelu.internal.common.db import Base
@@ -22,3 +23,6 @@ class TaskAttachment(Base):
         onupdate=datetime.now,
         comment="Last time a task was updated",
     )
+    deleted_at = Column(DateTime, index=True, comment="Task delete time")
+
+    Index("idx_attachment_id_deleted_at", id, deleted_at)

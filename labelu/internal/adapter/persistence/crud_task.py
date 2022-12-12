@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, List
 
 from sqlalchemy.orm import Session
@@ -16,7 +17,7 @@ def create(db: Session, task: Task) -> Task:
 def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[Task]:
     return (
         db.query(Task)
-        .filter(Task.created_by == owner_id)
+        .filter(Task.created_by == owner_id, Task.deleted_at == None)
         .order_by(Task.id.desc())
         .offset(offset=page * size)
         .limit(limit=size)
@@ -25,7 +26,7 @@ def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[
 
 
 def get(db: Session, task_id: int) -> Task:
-    return db.query(Task).filter(Task.id == task_id).first()
+    return db.query(Task).filter(Task.id == task_id, Task.deleted_at == None).first()
 
 
 def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
@@ -39,9 +40,17 @@ def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
     return db_obj
 
 
-def delete(db: Session, db_obj: Task) -> None:
-    db.delete(db_obj)
+def delete(db: Session, db_obj: Task) -> Task:
+    db_obj.deleted_at = datetime.now()
+    db.add(db_obj)
+    db.flush()
+    db.refresh(db_obj)
+    return db_obj
 
 
 def count(db: Session, owner_id: int) -> int:
-    return db.query(Task).filter(Task.created_by == owner_id).count()
+    return (
+        db.query(Task)
+        .filter(Task.created_by == owner_id, Task.deleted_at == None)
+        .count()
+    )
