@@ -178,15 +178,15 @@ class TestClassTaskSampleRouter:
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
-            params={"before": 5, "pageSize": 10},
+            params={"before": 13, "pageSize": 10},
         )
 
         # check
         json = r.json()
         assert r.status_code == 200
-        assert len(json["data"]) == 4
-        assert json["data"][0]["id"] == 1
-        assert json["data"][3]["id"] == 4
+        assert len(json["data"]) == 10
+        assert json["data"][0]["id"] == 3
+        assert json["data"][-1]["id"] == 12
         assert json["meta_data"]["total"] == 14
 
     def test_sample_list_by_after(

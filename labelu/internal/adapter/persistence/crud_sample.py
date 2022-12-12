@@ -49,13 +49,19 @@ def list_by(
             else:
                 query = query.order_by(text(f"{sort_key[0]} {sort_key[1]}"))
 
-    # default order by id
-    query = query.order_by(TaskSample.id.asc())
-    return (
+    # default order by id, before need select last items
+    if before:
+        query = query.order_by(TaskSample.id.desc())
+    else:
+        query = query.order_by(TaskSample.id.asc())
+    results = (
         query.offset(offset=pageNo * pageSize if pageNo else 0)
         .limit(limit=pageSize)
         .all()
     )
+    if before:
+        results.reverse()
+    return results
 
 
 def get(db: Session, sample_id: int) -> TaskSample:
