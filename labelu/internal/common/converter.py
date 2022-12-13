@@ -87,6 +87,7 @@ class Converter:
 
         # result catetory
         category_id = 0
+        logger.info("get categories")
         for attr in config.get("attribute", []):
             category = {
                 "id": category_id,
@@ -106,6 +107,7 @@ class Converter:
                 result["categories"].append(category)
                 category_id += 1
 
+        logger.info("get categories map with id")
         category_name_map_id = {}
         for category in result["categories"]:
             category_name_map_id[category.get("name")] = category.get("id")
@@ -116,9 +118,12 @@ class Converter:
         # for every annotation media
         for element in input_data:
             data = json.loads(element.get("data"))
+            logger.info("data is: {}", element)
 
             # annotation result
-            annotation_info = json.loads(data.get("result"))
+            annotation_info = json.loads(data.get("result", {}))
+            if not annotation_info:
+                continue
 
             # coco image
             image = {
@@ -137,14 +142,6 @@ class Converter:
                 tools.append(annotation_info.get("polygonTool"))
             if annotation_info.get("rectTool", {}):
                 tools.append(annotation_info.get("rectTool"))
-            if annotation_info.get("pointTool", {}):
-                tools.append(annotation_info.get("pointTool"))
-            if annotation_info.get("lineTool", {}):
-                tools.append(annotation_info.get("lineTool"))
-            if annotation_info.get("tagTool", {}):
-                tools.append(annotation_info.get("tagTool"))
-            # if annotation_info.get("textTool", {}):
-            #     tools.append(annotation_info.get("textTool"))
 
             for tool in tools:
                 for tool_result in tool.get("result"):
