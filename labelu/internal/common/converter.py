@@ -1,9 +1,9 @@
+import os
 import json
-import uuid
+from pathlib import Path
 from zipfile import ZipFile
 from PIL import Image, ImageDraw
 from enum import Enum
-from datetime import datetime
 
 from typing import List
 from loguru import logger
@@ -212,12 +212,13 @@ class Converter:
         out_data_dir.mkdir(parents=True, exist_ok=True)
 
         polygon = []
+        export_files = []
         for sample in input_data:
             annotation_data = json.loads(sample.get("data"))
             logger.info("data is: {}", sample)
-            filenames = list(annotation_data.get("fileNames", {}).values())
-            if filenames and filenames[0].split(".")[0]:
-                file_relative_path_base_name = filenames[0].split(".")[0]
+            filenames = list(annotation_data.get("urls", {}).values())
+            if filenames and filenames[0].split("/")[-1]:
+                file_relative_path_base_name = filenames[0].split("/")[-1].split(".")[0]
             else:
                 file_relative_path_base_name = "result"
 
@@ -249,6 +250,7 @@ class Converter:
             for p in polygons:
                 ImageDraw.Draw(img_model_l).polygon(p, fill=colors[15].get("hexString"))
             img_model_l.save(file_full_path_model_l, "PNG")
+            export_files.append(file_full_path_model_l)
 
             # generate RGB
             color_list = []
@@ -273,26 +275,20 @@ class Converter:
                     }
                 )
             img_model_rgb.save(file_full_path_model_rgb, "PNG")
+            export_files.append(file_full_path_model_rgb)
 
         # color list
-        file_relative_path_colors = f"{file_relative_path_base_name}-colors.json"
-        file_full_path_colors = out_data_dir.joinpath(file_relative_path_colors)
+        file_full_path_colors = out_data_dir.joinpath("colors.json")
         json_object = json.dumps(color_list, default=str)
         with file_full_path_colors.open("w") as outfile:
             outfile.write(json_object)
+        export_files.append(file_full_path_colors)
 
         file_relative_path_zip = f"{file_relative_path_base_name}.zip"
         file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
         with ZipFile(file_full_path_zip, "w") as zipf:
-            zipf.write(
-                filename=file_full_path_model_l, arcname=file_full_path_model_l.name
-            )
-            zipf.write(
-                filename=file_full_path_model_rgb, arcname=file_full_path_model_rgb.name
-            )
-            zipf.write(
-                filename=file_full_path_colors, arcname=file_full_path_colors.name
-            )
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
         logger.info("Export file path: {}", file_full_path_zip)
         return file_full_path_zip
 
