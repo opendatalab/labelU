@@ -153,8 +153,8 @@ async def patch(
         )
 
     # update
-    obj_in = cmd.dict(exclude_unset=True)
-    if cmd.state:
+    obj_in = {}
+    if cmd.state == SampleState.SKIPPED.value:
         obj_in[TaskSample.state.key] = SampleState.SKIPPED.value
     else:
         obj_in[TaskSample.data.key] = json.dumps(cmd.data)
@@ -202,7 +202,7 @@ async def export(
 
     task = crud_task.get(db=db, task_id=task_id)
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
-    data = [sample.__dict__ for sample in samples]
+    data = [sample.__dict__ for sample in samples if sample.state == SampleState.DONE]
 
     # output data path
     out_data_dir = Path(settings.MEDIA_ROOT).joinpath(settings.EXOIRT_DIR)
