@@ -1,4 +1,6 @@
 import json
+import uuid
+from datetime import datetime
 from typing import List, Tuple, Union
 
 from pathlib import Path
@@ -205,7 +207,10 @@ async def export(
     data = [sample.__dict__ for sample in samples if sample.state == SampleState.DONE]
 
     # output data path
-    out_data_dir = Path(settings.MEDIA_ROOT).joinpath(settings.EXOIRT_DIR)
+    out_data_dir = Path(settings.MEDIA_ROOT).joinpath(
+        settings.EXOIRT_DIR,
+        f"task-{task_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}-{str(uuid.uuid4())[0:8]}",
+    )
 
     # converter to export_type
     try:

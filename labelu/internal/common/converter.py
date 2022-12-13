@@ -1,10 +1,14 @@
 import json
 import uuid
+from zipfile import ZipFile
+from PIL import Image, ImageDraw
 from enum import Enum
 from datetime import datetime
 
 from typing import List
 from loguru import logger
+
+from labelu.internal.common.color import colors
 
 
 class Format(str, Enum):
@@ -35,6 +39,12 @@ class Converter:
                 out_data_dir=out_data_dir,
                 out_data_file_name_prefix=out_data_file_name_prefix,
             )
+        elif format == Format.MASK.value:
+            return self.convert_to_mask(
+                input_data=input_data,
+                out_data_dir=out_data_dir,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+            )
 
     def convert_to_json(
         self,
@@ -43,14 +53,13 @@ class Converter:
         out_data_file_name_prefix: str,
     ) -> str:
         out_data_dir.mkdir(parents=True, exist_ok=True)
-        file_relative_path = f"task-{out_data_file_name_prefix}-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}-{str(uuid.uuid4())[0:8]}.json"
-        file_full_path = out_data_dir.joinpath(file_relative_path)
+        file_full_path = out_data_dir.joinpath("result.json")
         results = []
-        for item in input_data:
-            data = json.loads(item.get("data"))
+        for sample in input_data:
+            data = json.loads(sample.get("data"))
             results.append(
                 {
-                    "id": item.get("id"),
+                    "id": sample.get("id"),
                     "result": data.get("result"),
                     "urls": data.get("urls"),
                     "fileNames": data.get("fileNames"),
@@ -75,8 +84,7 @@ class Converter:
 
         # result output file
         out_data_dir.mkdir(parents=True, exist_ok=True)
-        file_relative_path = f"task-{out_data_file_name_prefix}-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}-{str(uuid.uuid4())[0:8]}.json"
-        file_full_path = out_data_dir.joinpath(file_relative_path)
+        file_full_path = out_data_dir.joinpath("result.json")
 
         # result struct
         result = {
@@ -116,39 +124,41 @@ class Converter:
         annotation_id = 0
 
         # for every annotation media
-        for element in input_data:
-            data = json.loads(element.get("data"))
-            logger.info("data is: {}", element)
+        for sample in input_data:
+            annotation_data = json.loads(sample.get("data"))
+            logger.info("data is: {}", sample)
 
             # annotation result
-            annotation_info = json.loads(data.get("result", {}))
-            if not annotation_info:
+            annotation_result = json.loads(annotation_data.get("result", {}))
+            if not annotation_result:
                 continue
 
             # coco image
             image = {
-                "id": element.get("id"),
-                "fileNames": ",".join(data.get("fileNames", []).values()).rstrip(","),
-                "width": annotation_info.get("width"),
-                "height": annotation_info.get("height"),
-                "valid": annotation_info.get("valid"),
-                "rotate": annotation_info.get("rotate"),
+                "id": sample.get("id"),
+                "fileNames": ",".join(
+                    annotation_data.get("fileNames", []).values()
+                ).rstrip(","),
+                "width": annotation_result.get("width"),
+                "height": annotation_result.get("height"),
+                "valid": annotation_result.get("valid"),
+                "rotate": annotation_result.get("rotate"),
             }
             result["images"].append(image)
 
             # every image may have multi tools
             tools = []
-            if annotation_info.get("polygonTool", {}):
-                tools.append(annotation_info.get("polygonTool"))
-            if annotation_info.get("rectTool", {}):
-                tools.append(annotation_info.get("rectTool"))
+            if annotation_result.get("polygonTool", {}):
+                tools.append(annotation_result.get("polygonTool"))
+            if annotation_result.get("rectTool", {}):
+                tools.append(annotation_result.get("rectTool"))
 
             for tool in tools:
                 for tool_result in tool.get("result"):
 
                     # polygon tool
                     segmentation = []
-                    if annotation_info.get("polygonTool", {}):
+                    if annotation_result.get("polygonTool", {}):
                         for point in tool_result.get("pointList", []):
                             segmentation.append(point.get("x"))
                             segmentation.append(point.get("y"))
@@ -167,7 +177,7 @@ class Converter:
                         bbox.append(tool_result.get("height"))
 
                     annotation = {
-                        "image_id": element.get("id"),
+                        "image_id": sample.get("id"),
                         "id": annotation_id,
                         "bbox": bbox,
                         "iscrowd": tool_result.get("iscrowd", 0),
@@ -190,6 +200,101 @@ class Converter:
             outfile.write(json_object)
         logger.info("Export file path: {}", file_full_path)
         return file_full_path
+
+    def convert_to_mask(
+        self,
+        input_data: List[dict],
+        out_data_dir: str,
+        out_data_file_name_prefix: str,
+    ) -> str:
+
+        # result output file
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+
+        polygon = []
+        for sample in input_data:
+            annotation_data = json.loads(sample.get("data"))
+            logger.info("data is: {}", sample)
+            filenames = list(annotation_data.get("fileNames", {}).values())
+            if filenames and filenames[0].split(".")[0]:
+                file_relative_path_base_name = filenames[0].split(".")[0]
+            else:
+                file_relative_path_base_name = "result"
+
+            # annotation result
+            annotation_result = json.loads(annotation_data.get("result", {}))
+            if not annotation_result or not annotation_result.get("polygonTool", {}):
+                continue
+
+            # polygon tool
+            polygons = []
+            polygon_attribute = []
+            for tool_result in annotation_result.get("polygonTool", {}).get(
+                "result", []
+            ):
+                polygon = []
+                for point in tool_result.get("pointList", []):
+                    polygon.append(point.get("x"))
+                    polygon.append(point.get("y"))
+                polygons.append(polygon)
+                polygon_attribute.append(tool_result.get("attribute", ""))
+
+            width = annotation_result.get("width")
+            height = annotation_result.get("height")
+
+            # generate single change
+            file_relative_path_model_l = f"{file_relative_path_base_name}-trainIds.png"
+            file_full_path_model_l = out_data_dir.joinpath(file_relative_path_model_l)
+            img_model_l = Image.new("L", (width, height), 0)
+            for p in polygons:
+                ImageDraw.Draw(img_model_l).polygon(p, fill=colors[15].get("hexString"))
+            img_model_l.save(file_full_path_model_l, "PNG")
+
+            # generate RGB
+            color_list = []
+            file_relative_path_model_rgb = (
+                f"{file_relative_path_base_name}-segmentation.png"
+            )
+            file_full_path_model_rgb = out_data_dir.joinpath(
+                file_relative_path_model_rgb
+            )
+            img_model_rgb = Image.new("RGB", (width, height), 0)
+            for index, p in enumerate(polygons):
+                color = colors[index % 255 + 1]
+                ImageDraw.Draw(img_model_rgb).polygon(p, fill=color.get("hexString"))
+
+                rgb = color.get("rgb")
+                color_list.append(
+                    {
+                        "color": f'rgb({rgb.get("r")},{rgb.get("g")},{rgb.get("b")})',
+                        "colorList": [rgb.get("r"), rgb.get("g"), rgb.get("b"), 255],
+                        "trainIds": index + 1,
+                        "attribute": polygon_attribute[index],
+                    }
+                )
+            img_model_rgb.save(file_full_path_model_rgb, "PNG")
+
+        # color list
+        file_relative_path_colors = f"{file_relative_path_base_name}-colors.json"
+        file_full_path_colors = out_data_dir.joinpath(file_relative_path_colors)
+        json_object = json.dumps(color_list, default=str)
+        with file_full_path_colors.open("w") as outfile:
+            outfile.write(json_object)
+
+        file_relative_path_zip = f"{file_relative_path_base_name}.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            zipf.write(
+                filename=file_full_path_model_l, arcname=file_full_path_model_l.name
+            )
+            zipf.write(
+                filename=file_full_path_model_rgb, arcname=file_full_path_model_rgb.name
+            )
+            zipf.write(
+                filename=file_full_path_colors, arcname=file_full_path_colors.name
+            )
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
 
 
 converter = Converter()
