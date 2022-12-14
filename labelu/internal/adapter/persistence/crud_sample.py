@@ -45,7 +45,10 @@ def list_by(
         for item in sort_strings:
             sort_key = item.split(":")
             if sort_key[0] == TaskSample.state.key:
-                query = query.order_by(sort_logic)
+                if sort_key[1] == "asc":
+                    query = query.order_by(sort_logic.asc())
+                else:
+                    query = query.order_by(sort_logic.desc())
             else:
                 query = query.order_by(text(f"{sort_key[0]} {sort_key[1]}"))
 
