@@ -158,7 +158,11 @@ async def patch(
     obj_in = {}
     if cmd.state == SampleState.SKIPPED.value:
         obj_in[TaskSample.state.key] = SampleState.SKIPPED.value
-    else:
+    elif cmd.state == SampleState.NEW.value:
+        obj_in[TaskSample.data.key] = json.dumps(cmd.data)
+        obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
+        obj_in[TaskSample.state.key] = SampleState.NEW.value
+    else:  # can be None, or DONE
         obj_in[TaskSample.data.key] = json.dumps(cmd.data)
         obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
         obj_in[TaskSample.state.key] = SampleState.DONE.value
