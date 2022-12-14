@@ -213,6 +213,7 @@ class Converter:
 
         polygon = []
         export_files = []
+        color_list = []
         for sample in input_data:
             annotation_data = json.loads(sample.get("data"))
             logger.info("data is: {}", sample)
@@ -253,7 +254,6 @@ class Converter:
             export_files.append(file_full_path_model_l)
 
             # generate RGB
-            color_list = []
             file_relative_path_model_rgb = (
                 f"{file_relative_path_base_name}-segmentation.png"
             )
