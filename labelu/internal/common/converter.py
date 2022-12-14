@@ -248,7 +248,7 @@ class Converter:
             file_full_path_model_l = out_data_dir.joinpath(file_relative_path_model_l)
             img_model_l = Image.new("L", (width, height), 0)
             for p in polygons:
-                ImageDraw.Draw(img_model_l).polygon(p, fill=colors[15].get("hexString"))
+                ImageDraw.Draw(img_model_l).polygon(p, outline=1, fill=1)
             img_model_l.save(file_full_path_model_l, "PNG")
             export_files.append(file_full_path_model_l)
 
