@@ -196,6 +196,7 @@ async def export(
     )
 
     # response
+    media_type = ".json" if data.suffix == ".json" else data.suffix.strip(".")
     return FileResponse(
-        path=data, filename=data.name, media_type=f"application/{data.suffix}"
+        path=data, filename=data.name, media_type=f"application/{media_type}"
     )

@@ -284,7 +284,7 @@ class Converter:
             outfile.write(json_object)
         export_files.append(file_full_path_colors)
 
-        file_relative_path_zip = f"{file_relative_path_base_name}.zip"
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-mask.zip"
         file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
         with ZipFile(file_full_path_zip, "w") as zipf:
             for f in export_files:
