@@ -1,0 +1,29 @@
+# 目标检测(rectTool)
+
+## 格式说明
+
+```json
+{
+  "width": 4368,
+  "height": 2912,
+  "valid": true,
+  "rotate": 0,
+  "rectTool": {
+    "toolName": "rectTool",
+    "result": [
+      {
+        "x": 530.7826086956522,
+        "y": 1149.217391304348,
+        "width": 1314.7826086956522,
+        "height": 1655.6521739130435,
+        "attribute": "",
+        "valid": true,
+        "id": "Rp1x6bZs",
+        "textAttribute": "",
+        "order": 1
+      }
+    ]
+  }
+```
+
+<table class=""><colgroup><col style="width: 200px; min-width: 200px;"><col style="width: 100px; min-width: 100px;"><col style="width: 80px; min-width: 80px;"><col style="width: 80px; min-width: 80px;"><col><col style="width: 180px; min-width: 180px;"></colgroup><thead class="ant-table-thead"><tr><th class=""><span>名称</span></th><th class=""><span>类型</span></th><th class=""><span>是否必须</span></th><th class=""><span>默认值</span></th><th class=""><span>备注</span></th><th class=""><span>其他信息</span></th></tr></thead><tbody class="ant-table-tbody"><tr class="ant-table-row  ant-table-row-level-0"><td class=""><span class="ant-table-row-indent indent-level-0" style="padding-left: 0px;"></span><span class="ant-table-row-expand-icon ant-table-row-expanded"></span>result</td><td class=""><span>object []</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc"></span></td><td class=""><p><span style="font-weight: 700;">item 类型: </span><span>object</span></p></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>id</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框 id</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>sourceID</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">依赖图形的 id</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>x</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框起始点横坐标（左上角）</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>y</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框起始点纵坐标（左上角）</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>width</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框宽度</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>height</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框高度</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>valid</td><td class=""><span>boolean</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">有无效性</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>order</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框顺序</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>textAttribute</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">文本属性</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>attribute</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">配置属性</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>disableDelete</td><td class=""><span>boolean</span></td><td class=""><div>非必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">是否可以被删除（预标注载入数据使用）</span></td><td class=""></td></tr></tbody></table>
