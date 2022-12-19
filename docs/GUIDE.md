@@ -1,3 +1,169 @@
+<a href="./GUIDE_zh-CN.md" >简体中文</a> | English
+
+# 名词术语
+
+<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=500
+ style='width:375.0pt;border-collapse:collapse;mso-yfti-tbllook:1184'>
+ <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=center style='text-align:center;mso-pagination:widow-orphan'><b><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>术语<span lang=EN-US> / </span>缩略词</span></b><span lang=EN-US
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'><o:p></o:p></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=center style='text-align:center;mso-pagination:widow-orphan'><b><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>说明</span></b><span lang=EN-US style='font-size:10.0pt;font-family:宋体;
+  mso-bidi-font-family:宋体;mso-font-kerning:0pt'><o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:1;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>任务（<span lang=EN-US>task</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>为了对某个数据集进行标注而建立的任务<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:2;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>数据（<span lang=EN-US>data</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>任务空间下需要进行标注的单个数据，比如一张图片、一段视频<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:3;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>标签（<span lang=EN-US>label</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>标注时需要添加的分类标识，比如猫、狗、行人、车辆<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:4;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>标记（<span lang=EN-US>annotation</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>对任务进行一次标注后生成的对象，比如图像标注任务中的一个矩形框、一个点<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:5;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>属性（<span lang=EN-US>attribute</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>对标记或标签的进一步描述，比如将某个物体标为车辆后，添加属性<span lang=EN-US>“</span>车辆遮挡率为<span
+  lang=EN-US>20%”<o:p></o:p></span></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:6;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>标注结果（<span lang=EN-US>result</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>标记<span lang=EN-US>+</span>标签<span lang=EN-US>+</span>属性，一条完整的标注记录<span
+  lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:7;height:29.25pt'>
+  <td style='border-top:solid #DEE0E3 1.0pt;border-left:solid #DEE0E3 1.0pt;
+  border-bottom:none;border-right:none;mso-border-top-alt:solid #DEE0E3 .75pt;
+  mso-border-left-alt:solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;
+  height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>标注结果文件（<span lang=EN-US>result file</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;border-bottom:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-right-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>标注任务或任务完成后导出的记录了所有标注结果的文件，通常为<span lang=EN-US>JSON</span>文件<span
+  lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:8;mso-yfti-lastrow:yes;height:29.25pt'>
+  <td style='border:solid #DEE0E3 1.0pt;border-right:none;mso-border-top-alt:
+  solid #DEE0E3 .75pt;mso-border-left-alt:solid #DEE0E3 .75pt;mso-border-bottom-alt:
+  solid #DEE0E3 .75pt;padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>模板（<span lang=EN-US>template</span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+  <td style='border:solid #DEE0E3 1.0pt;mso-border-alt:solid #DEE0E3 .75pt;
+  padding:.75pt .75pt .75pt .75pt;height:29.25pt'>
+  <p class=MsoNormal align=left style='text-align:left;mso-pagination:widow-orphan'><span
+  style='font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;mso-font-kerning:
+  0pt'>对标注任务进行配置时，可参照的配置文件（<span lang=EN-US>XML</span>、<span lang=EN-US>JSON</span>、<span
+  class=SpellE><span lang=EN-US>Yaml</span></span>）<span lang=EN-US><o:p></o:p></span></span></p>
+  </td>
+ </tr>
+</table>
+
 # 注册登录
 
 1. 通过邮箱密码创建账号
