@@ -59,10 +59,6 @@ labelu
 
  [使用说明](./docs/GUIDE.md) 
 
-## 标注格式说明
-
-[LabelU 标注格式](./docs/annotation/README.md)
-
 ## 技术交流
 
 欢迎加入Opendatalab官方微信群！
