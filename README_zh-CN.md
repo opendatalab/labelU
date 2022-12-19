@@ -58,6 +58,10 @@ labelu
 ## 快速上手
 
  [使用说明](./docs/GUIDE.md) 
+ 
+## 标注格式
+
+[格式说明](./docs/annotation/README.md)
 
 ## 技术交流
 
