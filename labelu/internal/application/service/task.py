@@ -90,9 +90,9 @@ async def list_by(
                 username=task.owner.username,
             ),
             stats=TaskStatics(
-                new=statics.get(f"{task.id}_NEW", 0),
-                done=statics.get(f"{task.id}_DONE", 0),
-                skipped=statics.get(f"{task.id}_SKIPPED", 0),
+                new=statics.get(f"{task.id}_{SampleState.NEW.value}", 0),
+                done=statics.get(f"{task.id}_{SampleState.DONE.value}", 0),
+                skipped=statics.get(f"{task.id}_{SampleState.SKIPPED.value}", 0),
             ),
         )
         for task in tasks

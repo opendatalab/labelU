@@ -142,8 +142,17 @@ async def get(db: Session, sample_id: int, current_user: User) -> SampleResponse
 
 
 async def patch(
-    db: Session, sample_id: int, cmd: PatchSampleCommand, current_user: User
+    db: Session, task_id:int, sample_id: int, cmd: PatchSampleCommand, current_user: User
 ) -> SampleResponse:
+
+    # check task exist
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        logger.error("cannot find task:{}", task_id)
+        raise UnicornException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
 
     # get sample
     sample = crud_sample.get(db=db, sample_id=sample_id)
@@ -155,19 +164,29 @@ async def patch(
         )
 
     # update
-    obj_in = {}
+    sample_obj_in = {}
     if cmd.state == SampleState.SKIPPED.value:
-        obj_in[TaskSample.state.key] = SampleState.SKIPPED.value
+        sample_obj_in[TaskSample.state.key] = SampleState.SKIPPED.value
     elif cmd.state == SampleState.NEW.value:
-        obj_in[TaskSample.data.key] = json.dumps(cmd.data)
-        obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
-        obj_in[TaskSample.state.key] = SampleState.NEW.value
+        sample_obj_in[TaskSample.data.key] = json.dumps(cmd.data)
+        sample_obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
+        sample_obj_in[TaskSample.state.key] = SampleState.NEW.value
     else:  # can be None, or DONE
-        obj_in[TaskSample.data.key] = json.dumps(cmd.data)
-        obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
-        obj_in[TaskSample.state.key] = SampleState.DONE.value
+        sample_obj_in[TaskSample.data.key] = json.dumps(cmd.data)
+        sample_obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
+        sample_obj_in[TaskSample.state.key] = SampleState.DONE.value
+
     with db.begin():
-        updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=obj_in)
+        # update task status
+        if task.status != TaskStatus.FINISHED.value:
+            statics = crud_sample.statics(db=db, owner_id=current_user.id, task_ids=[task_id])
+            task_obj_in = {Task.status.key:TaskStatus.INPROGRESS.value}
+            if statics.get(f"{task.id}_{SampleState.NEW.value}", 0) <= 1:
+                task_obj_in[Task.status.key] = TaskStatus.FINISHED.value
+            if task.status != task_obj_in[Task.status.key]:
+                crud_task.update(db=db, db_obj=task, obj_in=task_obj_in)
+        # update task sample result
+        updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=sample_obj_in)
 
     # response
     return SampleResponse(

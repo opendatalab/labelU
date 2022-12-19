@@ -491,7 +491,7 @@ class TestClassTaskSampleRouter:
         assert r.status_code == 200
         assert json["data"]["state"] == "SKIPPED"
 
-    def test_sample_patch_not_found(
+    def test_sample_patch_task_not_found(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
 
@@ -501,6 +501,34 @@ class TestClassTaskSampleRouter:
         data = {"state": "SKIPPED"}
         r = client.patch(
             f"{settings.API_V1_STR}/tasks/0/samples/0",
+            headers=testuser_token_headers,
+            json=data,
+        )
+        # check
+        json = r.json()
+        assert r.status_code == 404
+        assert json["err_code"] == 50002
+
+    def test_sample_patch_task_sample_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+
+        # run
+        data = {"state": "SKIPPED"}
+        r = client.patch(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/0",
             headers=testuser_token_headers,
             json=data,
         )
