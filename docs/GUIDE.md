@@ -183,7 +183,7 @@ If valid, when there are label descriptions and classification tasks
 
 For specific labeling operations of each tool, see:
 
- [label_image](./labeling/label_image.md) 
+ [Image Labeling](./labeling/label_image.md) 
 
 # Export results
 
