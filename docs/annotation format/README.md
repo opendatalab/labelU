@@ -19,7 +19,6 @@
         "attribute": "",
         "valid": true,
         "id": "Rp1x6bZs",
-        "sourceID": "",
         "textAttribute": "",
         "order": 1
       }
@@ -32,15 +31,11 @@
 
 - [目标检测](./rectTool.md)
 - [目标分类](./tagTool.md)
-- [实例分割](./polygonTool.md)
+- [物体分割](./polygonTool.md)
 - [文本转写](./textTool.md)
 - [轮廓线检测](./lineTool.md)
 - [关键点检测](./pointTool.md)
 
-## COCO 数据格式说明
- 
-COCO(Common Object in Context) 是一个大规模的对象检测、分割和字幕数据集。具体定义请前往[官网](https://cocodataset.org/#home)查看
-仅物体检测（拉框）、实例分割（多边形）支持导出COCO
 
 ## Mask 格式导出说明
 
@@ -49,11 +44,10 @@ COCO(Common Object in Context) 是一个大规模的对象检测、分割和字�
 - 背景色默认为黑色：  0 `（rgb(0,0,0))`
 - 语义的唯一性：语义分割的属性标注配置
 - 导出内容:
-  - JSON 文件： 表示当前语义与颜色的索引关系
   - Mask
     - 彩色图（xx_segmentation.png)：用于结果校验
-    - 灰度图（xx_labelTrainIds.png)
- 
+    - 灰度图（xx_labelTrainIds.png)：用于训练
+  - JSON 文件： 表示当前语义与颜色的索引关系
 
 ```json
 [
