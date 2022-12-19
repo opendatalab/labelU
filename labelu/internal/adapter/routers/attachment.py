@@ -28,7 +28,6 @@ router = APIRouter(prefix="/tasks", tags=["attachments"])
 async def create(
     task_id: int,
     file: UploadFile = File(...),
-    path: str = Form(default=""),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -37,7 +36,7 @@ async def create(
     Create attechment as annnotation sample.
     """
     # business logic
-    cmd = AttachmentCommand(file=file, path=path)
+    cmd = AttachmentCommand(file=file)
     data = await service.create(
         db=db, task_id=task_id, cmd=cmd, current_user=current_user
     )
@@ -51,9 +50,7 @@ async def create(
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
-async def download_attachment(
-    file_path: str, authorization: HTTPAuthorizationCredentials = Security(security)
-):
+async def download_attachment(file_path: str):
     """
     download attachment.
     """

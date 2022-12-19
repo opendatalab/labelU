@@ -1,10 +1,12 @@
+from datetime import datetime
 from typing import Any, Dict, List, Union
 
 
-from sqlalchemy import func
+from sqlalchemy import case, func, text
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
+from labelu.internal.domain.models.sample import SampleState
 from labelu.internal.domain.models.sample import TaskSample
 
 
@@ -15,38 +17,70 @@ def batch(db: Session, samples: List[TaskSample]) -> List[TaskSample]:
 
 def list_by(
     db: Session,
+    task_id: Union[int, None],
     owner_id: int,
     after: Union[int, None],
     before: Union[int, None],
     pageNo: Union[int, None],
     pageSize: int,
+    sorting: Union[str, None],
 ) -> List[TaskSample]:
-    offset = after
-    if pageNo != None:
-        offset = pageNo * pageSize
-    if before:
-        offset = before - pageSize
 
-    query_filter = [TaskSample.created_by == owner_id]
+    # query filter
+    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
     if before:
         query_filter.append(TaskSample.id < before)
+    if after:
+        query_filter.append(TaskSample.id > after)
+    if task_id:
+        query_filter.append(TaskSample.task_id == task_id)
+    query = db.query(TaskSample).filter(*query_filter)
 
-    return (
-        db.query(TaskSample)
-        .filter(*query_filter)
-        .order_by(TaskSample.id.asc())
-        .offset(offset=offset)
+    # case when for state enum
+    whens = {state: index for index, state in enumerate(SampleState)}
+    sort_logic = case(value=TaskSample.state, whens=whens).label(TaskSample.state.key)
+
+    if sorting:
+        sort_strings = sorting.split(",")
+        for item in sort_strings:
+            sort_key = item.split(":")
+            if sort_key[0] == TaskSample.state.key:
+                if sort_key[1] == "asc":
+                    query = query.order_by(sort_logic.asc())
+                else:
+                    query = query.order_by(sort_logic.desc())
+            else:
+                query = query.order_by(text(f"{sort_key[0]} {sort_key[1]}"))
+
+    # default order by id, before need select last items
+    if before:
+        query = query.order_by(TaskSample.id.desc())
+    else:
+        query = query.order_by(TaskSample.id.asc())
+    results = (
+        query.offset(offset=pageNo * pageSize if pageNo else 0)
         .limit(limit=pageSize)
         .all()
     )
+    if before:
+        results.reverse()
+    return results
 
 
 def get(db: Session, sample_id: int) -> TaskSample:
-    return db.query(TaskSample).filter(TaskSample.id == sample_id).first()
+    return (
+        db.query(TaskSample)
+        .filter(TaskSample.id == sample_id, TaskSample.deleted_at == None)
+        .first()
+    )
 
 
 def get_by_ids(db: Session, sample_ids: List[int]) -> List[TaskSample]:
-    return db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).all()
+    return (
+        db.query(TaskSample)
+        .filter(TaskSample.id.in_(sample_ids), TaskSample.deleted_at == None)
+        .all()
+    )
 
 
 def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSample:
@@ -61,21 +95,26 @@ def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSampl
 
 
 def delete(db: Session, sample_ids: List[int]) -> None:
-    db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).delete()
+    db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).update(
+        {TaskSample.deleted_at: datetime.now()}
+    )
 
 
-def count(db: Session, owner_id: int) -> int:
-    return db.query(TaskSample).filter(TaskSample.created_by == owner_id).count()
+def count(db: Session, task_id: int, owner_id: int) -> int:
+    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
+    if task_id:
+        query_filter.append(TaskSample.task_id == task_id)
+    return db.query(TaskSample).filter(*query_filter).count()
 
 
 def statics(
     db: Session,
     owner_id: int,
-    task_id: int = None,
+    task_ids: List[int],
 ) -> dict:
-    query_filter = [TaskSample.created_by == owner_id]
-    if task_id:
-        query_filter.append(TaskSample.task_id == task_id)
+    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
+    if task_ids:
+        query_filter.append(TaskSample.task_id.in_(task_ids))
 
     statics = (
         db.query(

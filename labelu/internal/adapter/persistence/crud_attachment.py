@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -13,12 +14,24 @@ def create(db: Session, attachment: TaskAttachment) -> TaskAttachment:
 
 
 def get(db: Session, attachment_id: int) -> TaskAttachment:
-    return db.query(TaskAttachment).filter(TaskAttachment.id == attachment_id).first()
+    return (
+        db.query(TaskAttachment)
+        .filter(TaskAttachment.id == attachment_id, TaskAttachment.deleted_at == None)
+        .first()
+    )
 
 
 def get_by_ids(db: Session, attachment_ids: List[int]) -> List[TaskAttachment]:
-    return db.query(TaskAttachment).filter(TaskAttachment.id.in_(attachment_ids)).all()
+    return (
+        db.query(TaskAttachment)
+        .filter(
+            TaskAttachment.id.in_(attachment_ids), TaskAttachment.deleted_at == None
+        )
+        .all()
+    )
 
 
 def delete(db: Session, attachment_ids: List[int]) -> None:
-    db.query(TaskAttachment).filter(TaskAttachment.id.in_(attachment_ids)).delete()
+    db.query(TaskAttachment).filter(TaskAttachment.id.in_(attachment_ids)).update(
+        {TaskAttachment.deleted_at: datetime.now()}
+    )

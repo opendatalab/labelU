@@ -1,11 +1,12 @@
 import json
+import uuid
+from datetime import datetime
 from typing import List, Tuple, Union
-from pathlib import Path
-from tempfile import gettempdir
 
+from pathlib import Path
+from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
-
 
 from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
@@ -34,6 +35,7 @@ async def create(
     # check task exist
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -63,23 +65,27 @@ async def create(
 
 async def list_by(
     db: Session,
+    task_id: Union[int, None],
     after: Union[int, None],
     before: Union[int, None],
     pageNo: Union[int, None],
     pageSize: int,
+    sorting: Union[str, None],
     current_user: User,
 ) -> Tuple[List[SampleResponse], int]:
 
     samples = crud_sample.list_by(
         db=db,
+        task_id=task_id,
         owner_id=current_user.id,
         after=after,
         before=before,
         pageNo=pageNo,
         pageSize=pageSize,
+        sorting=sorting,
     )
 
-    total = crud_sample.count(db=db, owner_id=current_user.id)
+    total = crud_sample.count(db=db, task_id=task_id, owner_id=current_user.id)
 
     # response
     return [
@@ -110,6 +116,7 @@ async def get(db: Session, sample_id: int, current_user: User) -> SampleResponse
     )
 
     if not sample:
+        logger.error("cannot find sample:{}", sample_id)
         raise UnicornException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -141,17 +148,21 @@ async def patch(
     # get sample
     sample = crud_sample.get(db=db, sample_id=sample_id)
     if not sample:
+        logger.error("cannot find sample:{}", sample_id)
         raise UnicornException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
     # update
-    obj_in = cmd.dict(exclude_unset=True)
-    if cmd.state:
+    obj_in = {}
+    if cmd.state == SampleState.SKIPPED.value:
         obj_in[TaskSample.state.key] = SampleState.SKIPPED.value
-        obj_in[TaskSample.data.key] = json.dumps(dict())
-    else:
+    elif cmd.state == SampleState.NEW.value:
+        obj_in[TaskSample.data.key] = json.dumps(cmd.data)
+        obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
+        obj_in[TaskSample.state.key] = SampleState.NEW.value
+    else:  # can be None, or DONE
         obj_in[TaskSample.data.key] = json.dumps(cmd.data)
         obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
         obj_in[TaskSample.state.key] = SampleState.DONE.value
@@ -195,33 +206,32 @@ async def export(
     current_user: User,
 ) -> str:
 
+    task = crud_task.get(db=db, task_id=task_id)
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
-
-    data = [
-        SampleResponse(
-            id=sample.id,
-            state=sample.state,
-            data=json.loads(sample.data),
-            annotated_count=sample.annotated_count,
-            created_at=sample.created_at,
-            created_by=UserResp(
-                id=sample.owner.id,
-                username=sample.owner.username,
-            ),
-            updated_at=sample.updated_at,
-            updated_by=UserResp(
-                id=sample.updater.id,
-                username=sample.updater.username,
-            ),
-        ).dict()
-        for sample in samples
-    ]
+    data = [sample.__dict__ for sample in samples if sample.state == SampleState.DONE]
 
     # output data path
-    file_full_dir = Path(gettempdir())
+    out_data_dir = Path(settings.MEDIA_ROOT).joinpath(
+        settings.EXOIRT_DIR,
+        f"task-{task_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}-{str(uuid.uuid4())[0:8]}",
+    )
 
     # converter to export_type
-    file_full_path = converter.convert(data, file_full_dir, task_id, export_type.value)
+    try:
+        file_full_path = converter.convert(
+            config=json.loads(task.config),
+            input_data=data,
+            out_data_dir=out_data_dir,
+            out_data_file_name_prefix=task_id,
+            format=export_type.value,
+        )
+    except Exception as e:
+        logger.error(data)
+        logger.error(e)
+        raise UnicornException(
+            code=ErrorCode.CODE_55002_SAMPLE_FORMAT_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     # response
     return file_full_path

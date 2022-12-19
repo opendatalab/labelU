@@ -29,11 +29,13 @@ async def create(
     # check task not finished
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task: {}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
     if task.status == TaskStatus.FINISHED:
+        logger.error("task status is finieshed, so cannot upload new files")
         raise UnicornException(
             code=ErrorCode.CODE_50001_TASK_FINISHED_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -42,14 +44,13 @@ async def create(
     # save file
     try:
         # file relative path
+        path_filename = cmd.file.filename.split("/")
+        filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1]
+        path = "/".join(path_filename[:-1])
         attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
-            str(task_id), cmd.path.strip()
+            str(task_id), path
         )
-        attachment_relative_path = str(
-            attachment_relative_base_dir.joinpath(
-                str(uuid.uuid4())[0:8] + "-" + cmd.file.filename
-            )
-        )
+        attachment_relative_path = str(attachment_relative_base_dir.joinpath(filename))
 
         # file full path
         attachment_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(
@@ -81,8 +82,11 @@ async def create(
                     settings.THUMBNAIL_HEIGH_PIXEL,
                 ),
             )
+            if image.mode != "RGB":
+                image = image.convert("RGB")
             image.save(tumbnail_full_path)
-    except:
+    except Exception as e:
+        logger.error(e)
         raise UnicornException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -92,17 +96,24 @@ async def create(
     if not attachment_full_path.exists() or (
         cmd.file.content_type.startswith("image/") and not tumbnail_full_path.exists()
     ):
+        logger.error(
+            "cannot find saved images, path is:{}, image content-type is:{}, thumbnail path is:{}",
+            attachment_full_path,
+            cmd.file.content_type,
+            tumbnail_full_path,
+        )
         raise UnicornException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+    attachment_url_path = attachment_relative_path.replace("\\", "/")
     # add a task file record
     with db.begin():
         attachment = crud_attachment.create(
             db=db,
             attachment=TaskAttachment(
-                path=attachment_relative_path,
+                path=attachment_url_path,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 task_id=task_id,
@@ -112,7 +123,7 @@ async def create(
     # response
     return AttachmentResponse(
         id=attachment.id,
-        url=f"{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_relative_path}",
+        url=f"{settings.SCHEME}://{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}",
     )
 
 
@@ -121,6 +132,7 @@ async def download_attachment(file_path: str) -> str:
     # check file exist
     file_full_path = settings.MEDIA_ROOT.joinpath(file_path.lstrip("/"))
     if not file_full_path.is_file() or not file_full_path.exists():
+        logger.error("attachment not found:{}", file_full_path)
         raise UnicornException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -137,12 +149,18 @@ async def delete(
     # get task
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
     if task.created_by != current_user.id:
+        logger.error(
+            "cannot delete attachment, the task owner is:{}, the delete operator is:{}",
+            task.created_by,
+            current_user.id,
+        )
         raise UnicornException(
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,

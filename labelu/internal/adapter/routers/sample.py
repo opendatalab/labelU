@@ -1,5 +1,6 @@
 from typing import List, Union
 
+from pathlib import Path
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
 from fastapi.responses import FileResponse
@@ -59,10 +60,14 @@ async def create(
     status_code=status.HTTP_200_OK,
 )
 async def list_by(
+    task_id: int,
     after: Union[int, None] = Query(default=None, gt=0),
     before: Union[int, None] = Query(default=None, gt=0),
     pageNo: Union[int, None] = Query(default=None, ge=0),
     pageSize: Union[int, None] = 100,
+    sort: Union[str, None] = Query(
+        default=None, regex="(annotated_count|state):(desc|asc)"
+    ),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -80,10 +85,12 @@ async def list_by(
     # business logic
     data, total = await service.list_by(
         db=db,
+        task_id=task_id,
         after=after,
         before=before,
         pageNo=pageNo,
         pageSize=pageSize,
+        sorting=sort,
         current_user=current_user,
     )
 
@@ -165,7 +172,6 @@ async def delete(
 
 @router.post(
     "/{task_id}/samples/export",
-    response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
 async def export(
@@ -190,4 +196,7 @@ async def export(
     )
 
     # response
-    return data
+    media_type = ".json" if data.suffix == ".json" else data.suffix.strip(".")
+    return FileResponse(
+        path=data, filename=data.name, media_type=f"application/{media_type}"
+    )

@@ -44,8 +44,7 @@ class PatchSampleCommand(BaseModel):
         default=0, description="description: annotate result count"
     )
     state: Union[SampleState, None] = Field(
-        regex=SampleState.SKIPPED.value,
-        description="description: sample file state, must be 'SKIPPED' or None",
+        description="description: sample file state, must be 'SKIPPED', 'NEW', or None",
     )
 
 

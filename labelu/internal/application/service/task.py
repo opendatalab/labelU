@@ -71,7 +71,8 @@ async def list_by(
     tasks = crud_task.list_by(db=db, owner_id=current_user.id, page=page, size=size)
 
     # get progress
-    statics = crud_sample.statics(db=db, owner_id=current_user.id)
+    task_ids = [task.id for task in tasks]
+    statics = crud_sample.statics(db=db, owner_id=current_user.id, task_ids=task_ids)
 
     # response
     tasks_with_statics = [
@@ -104,6 +105,7 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     # get task detail
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -113,7 +115,7 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     statics = crud_sample.statics(
         db=db,
         owner_id=current_user.id,
-        task_id=task.id,
+        task_ids=[task.id],
     )
 
     # response
@@ -143,6 +145,7 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     # get task
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -180,12 +183,18 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
     # get task
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
+        logger.error("cannot find task:{}", task_id)
         raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
     if task.created_by != current_user.id:
+        logger.error(
+            "cannot delete task, the task owner is:{}, the delete operator is:{}",
+            task.created_by,
+            current_user.id,
+        )
         raise UnicornException(
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,

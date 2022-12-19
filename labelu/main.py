@@ -3,11 +3,8 @@ from typer import Typer
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-
-from labelu.internal.adapter.routers import user
-from labelu.internal.adapter.routers import task
-from labelu.internal.adapter.routers import sample
-from labelu.internal.adapter.routers import attachment
+from labelu.internal.adapter.routers import add_router
+from labelu.internal.middleware import add_middleware
 from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
@@ -91,10 +88,8 @@ app = FastAPI(
 init_logging()
 init_tables()
 add_exception_handler(app=app)
-app.include_router(user.router, prefix=settings.API_V1_STR)
-app.include_router(task.router, prefix=settings.API_V1_STR)
-app.include_router(attachment.router, prefix=settings.API_V1_STR)
-app.include_router(sample.router, prefix=settings.API_V1_STR)
+add_router(app=app)
+add_middleware(app=app)
 
 app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
 
@@ -102,10 +97,12 @@ cli = Typer()
 
 
 @cli.command()
-def main(port: int = 8000):
+def main(host: str = "localhost", port: int = 8000):
     if port:
         settings.PORT = port
-    uvicorn.run(app=app, port=settings.PORT)
+    if host:
+        settings.HOST = host
+    uvicorn.run(app=app, host=settings.HOST, port=settings.PORT)
 
 
 if __name__ == "__main__":
