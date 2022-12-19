@@ -7,9 +7,6 @@
 
 <a href="./README_zh-CN.md" >简体中文</a> | English
 
-<p align="center">
-<img style="width: 700px" src="./docs/assets/main.png">
-</p>
 
 </div>
 
