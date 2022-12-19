@@ -85,4 +85,4 @@
 
 完成标注后，可将标注结果文件以Json形式导出，标注格式说明如下：
 
-[LabelU 标注格式](./annotation/README.md)
+[LabelU 标注格式](./annotation%20format/README.md)
