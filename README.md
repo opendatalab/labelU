@@ -69,7 +69,13 @@ labelu
 
 ## Communication
 
-![8faa20cf-6898-4b16-b4cc-174795159f2c](https://user-images.githubusercontent.com/25022954/208056526-bc2de8b9-f5c5-4095-9e97-a2bf1b08bd1b.jpg)
+Welcome to the Opendatalab Wechat group！
+
+<p align="center">
+<img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
+</p>
+
+
 
 ## Links
 
