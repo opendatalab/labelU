@@ -62,7 +62,7 @@ labelu
 
 ## Annotation Format
 
-[LabelU Annotation Format](./docs/annotation%20format/README.md)
+-  [LabelU Annotation Format](./docs/annotation%20format/README.md)
 
 ## Communication
 
