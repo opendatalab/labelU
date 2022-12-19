@@ -1,6 +1,6 @@
 <a href="./GUIDE_zh-CN.md" >简体中文</a> | English
 
-# 名词术语
+# Concept
 
 <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=500
  style='width:375.0pt;border-collapse:collapse;mso-yfti-tbllook:1184'>
