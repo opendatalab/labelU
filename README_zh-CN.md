@@ -7,9 +7,6 @@
     </p>
 </article>
     
-<p align="center">
-<img src="./docs/assets/main.png">
-</p>
    
 </div>
 
