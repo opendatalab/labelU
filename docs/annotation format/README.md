@@ -4,15 +4,15 @@
 
 ```json
 {
-  "width": 4368, //图像宽度
-  "height": 2912, //图像高度
-  "valid": true, //是否有效
-  "rotate": 0, //旋转角度
+  "width": 4368, 
+  "height": 2912, 
+  "valid": true, 
+  "rotate": 0, 
   "rectTool": {
-    "toolName": "rectTool", // 工具名称
+    "toolName": "rectTool", 
     "result": [ 
       {
-        "x": 530.7826086956522,
+        "x": 530.7826086956522, 
         "y": 1149.217391304348,
         "width": 1314.7826086956522,
         "height": 1655.6521739130435,
@@ -28,9 +28,8 @@
 }
 ```
 
-## 工具类型
+## 各工具导出格式说明
 
-- [通用配置](./common.md)
 - [目标检测](./rectTool.md)
 - [目标分类](./tagTool.md)
 - [实例分割](./polygonTool.md)
@@ -38,7 +37,7 @@
 - [轮廓线检测](./lineTool.md)
 - [关键点检测](./pointTool.md)
 
-## COCO 数据类型
+## COCO 数据格式说明
  
 COCO(Common Object in Context) 是一个大规模的对象检测、分割和字幕数据集。具体定义请前往[官网](https://cocodataset.org/#home)查看
 仅物体检测（拉框）、实例分割（多边形）支持导出COCO
