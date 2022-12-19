@@ -1,4 +1,4 @@
-# 实例分割(polygonTool)
+# 物体分割(polygonTool)
 
 ## 格式说明
 
