@@ -102,91 +102,91 @@
  </tr>
 </table>
 
-# 注册登录
+# Register && log in
 
-1. 通过邮箱密码创建账号
-2. 登录进入LabelU
+1. Create an account with email and password
+2. Log in to LabelU
 
-# 新建任务
+# Create a new task
 
 ![image](https://user-images.githubusercontent.com/25022954/208387913-9a4a8205-8dfc-423f-997d-5c6f277ec0eb.png)
 
-1. 点击“新建任务”
-2. 输入任务名称、任务描述、任务提示，其中任务提示会在标注过程中为标注人员提供提示帮助
-3. 点击“下一步”保存基础配置信息，并进入“数据导入”页面
+1. Click "New Task"
+2. Enter the task name, task description, and task hints, among which the task hints will provide hints and help for the labelers during the labeling process
+3. Click "Next" to save the basic configuration information and enter the "Data Import" page
 
-# 数据导入
+# Data import
 
 ![image](https://user-images.githubusercontent.com/25022954/208388040-79b49127-adc0-4468-81d6-f78dc6a80a46.png)
 
-目前数据导入仅支持本地数据导入，支持文件或文件夹导入两种方式。
-1. 点击上传文件或上传文件夹，上传本地数据
-2. 点击“下一步”保存并进入标注配置
-3. 若想再次导入数据，可通过点击任务主页中的“数据导入”进入数据导入页面进行导入，导入的数据可在任务主页中进行查看
+Currently, data import only supports local data import, and supports file or folder import in two ways.
+1. Click Upload File or Upload Folder to upload local data
+2. Click "Next" to save and enter the label configuration
+3. If you want to import data again, you can click "Data Import" on the task home page to enter the data import page to import, and the imported data can be viewed on the task home page
 
-# 任务配置
+# Task configuration
 
-在完成基础配置和数据导入配置后，进行标注配置，主要根据任务场景进行工具和标签的配置编辑，以及其他一些参数配置。目前支持Yaml和可视化两种配置方式，两种方式支持联动，并可通过右边页面进行标注主页的预览
+After completing the basic configuration and data import configuration, perform labeling configuration, mainly according to the task scenario to edit the configuration of tools and labels, and configure some other parameters. Currently supports Yaml and visualization two configuration methods, the two methods support linkage, and can preview the home page through the right page
 
-## Yaml配置（待完善）
+## Yaml configuration (to be perfected)
 
-1. 根据任务需求选择模板
-2. 自定义修改Yaml配置，包括工具配置修改、标签配置修改、其他配置修改等
-3. 点击完成
+1. Select a template according to the task requirements
+2. Customize and modify the Yaml configuration, including tool configuration modification, label configuration modification, other configuration modification, etc.
+3. Click Finish
 
-## 可视化配置
+## Visual configuration
 
 ![image](https://user-images.githubusercontent.com/25022954/208390163-e6b34056-a618-485a-8875-38f99741ee68.png)
 
-除采用Yaml方式配置外，也可选择采用可视化方式进行标注配置，配置流程如下：
-1. 选择标注类型，目前仅支持图片，后续将支持音视频、点云、文本等类型
-2. 选择标注工具，支持同时配置多种工具（拉框、多边形、标点、标线、分类、描述）
-3. 各工具所需配置包括工具属性和标签配置
+In addition to using the Yaml configuration, you can also choose to use the visual method to configure the annotations. The configuration process is as follows:
+1. Select the annotation type, currently only supports pictures, and will support audio and video, point cloud, text and other types in the future
+2. Select the annotation tool, which supports simultaneous configuration of multiple tools (drawing box, polygon, punctuation, marking, classification, description)
+3. The configuration required for each tool includes tool properties and label configuration
 
-各工具配置说明：
-|工具|配置说明|
+Configuration instructions for each tool:
+|Tool|Instruction|
 |---|---|
-|拉框|最小尺寸：拉框最小宽度（W）和高度（H），标签配置：标注对象分类，包括中英文|
-|多边形|线条类型：包括直线和曲线，闭合点数：包括最小闭合点数和最大闭合点数，边缘吸附：开启后自动贴合物体边缘，标签配置：标注对象分类，包括中英文|
-|标点|上限点数：规定点数上限，超过不可画，标签配置：标注对象分类，包括中英文|
-|标线|线条类型：包括直线和曲线，闭合点数：包括最小闭合点数和最大闭合点数，边缘吸附：开启后自动贴合物体边缘，标签配置：标注对象分类，包括中英文|
-|文本|文本列表：包括文本描述名称中英文，文本设置：包括最大字数和默认文本|
-|分类|类别：分类描述中英文，选项：分类的具体选项中英文|
+|rectangle|Minimum size: the minimum width (W) and height (H) of the pull-up box, label configuration: label object classification, including Chinese and English|
+|polygon|Line type: including straight lines and curves, number of closing points: including the minimum number of closing points and the maximum number of closing points, edge adsorption: automatically fit the edge of the object after opening, label configuration: label object classification, including Chinese and English|
+|point|Upper limit of points: the upper limit of specified points, exceeding the limit cannot be drawn, label configuration: label object classification, including Chinese and English|
+|line|Line type: including straight lines and curves, number of closing points: including the minimum number of closing points and the maximum number of closing points, edge adsorption: automatically fit the edge of the object after opening, label configuration: label object classification, including Chinese and English|
+|text|Text list: include text description name in Chinese and English, text setting: include maximum number of words and default text|
+|classification|Category: Category description in Chinese and English, Options: Category specific options in Chinese and English|
 
-4. 选择是否支持目标外标注、进行属性配置（目前仅支持文本类型）
-5. 设置通用标签（当多工具共用一套标签体系时，可通过设置通用标签简化配置）
-6. 预览查看效果
-7. 点击保存，进入任务主页
+4. Choose whether to support out-of-target annotations, and configure attributes (currently only text types are supported)
+5. Set common labels (when multiple tools share a label system, configuration can be simplified by setting common labels)
+6. Preview to view the effect
+7. Click Save to enter the task home page
 
-# 开始标注
+# Start labeling
 
 ![image](https://user-images.githubusercontent.com/25022954/208390649-cc0bccb1-c509-4623-aeef-44f6649adc4c.png)
 
-根据任务配置情况开始标注任务，各功能区域介绍如下：
-工具栏：进行工具选择、工具样式切换、撤回重做、显示顺序等操作
-标签栏：选择工具后单击选择标签进行标注
-标注结果栏：对标注的结果进行查看和编辑
-标注主体：包括绘图区域、图片操作
+Start labeling tasks according to the task configuration. Each functional area is introduced as follows:
+Toolbar: perform operations such as tool selection, tool style switching, undo and redo, display order, etc.
+Label bar: After selecting the tool, click to select the label to label
+Marking result bar: View and edit the marked results
+Annotation subject: including drawing area, picture operation
 
-标注流程说明：
-1. 判断任务是否为无效，若无效点击跳过，进入下一任务
-若有效，有绘图任务时（目标检测、语意分割、线标注、点标注），绘图任务时工具和配置的一致
-2. 选择工具
-3. 选择标签
-4. 绘图做标记
-5. 弹出属性信息弹窗，编辑属性信息，若无属性信息可不填，点击弹窗外任意处关闭。
-6. 在右侧标签结果管理栏单击标签结果可选中图片中对应标记，工具栏中选中工具切换为标签结果的工具。点击标签结果的【编辑】【显示/隐藏】【删除】按钮来管理。
-若有效，有标签描述、分类任务时
-7. 在右侧结果管理栏填写描述和分类结果
-8. 选择[下一页]，进入下一个任务
-9. 重复1~8，直到标注完成
+Labeling process description:
+1. Determine whether the task is invalid. If it is invalid, click Skip to enter the next task
+If it is valid, when there are drawing tasks (object detection, semantic segmentation, line labeling, point labeling), the tools and configurations of the drawing tasks are consistent
+2. Select Tool
+3. Select tab
+4. Mark the drawing
+5. The attribute information pop-up window will pop up, edit the attribute information, if there is no attribute information, you can leave it blank, click anywhere outside the pop-up window to close.
+6. Click the tag result in the tag result management bar on the right to select the corresponding mark in the picture, and switch the tool selected in the toolbar to the tag result tool. Click the [Edit] [Show/Hide] [Delete] button of the tag result to manage it.
+If valid, when there are label descriptions and classification tasks
+7. Fill in the description and classification results in the result management column on the right
+8. Select [Next] to enter the next task
+9. Repeat 1~8 until the marking is completed
 
-各工具具体标注操作详见：
+For specific labeling operations of each tool, see:
 
- [图像标注](./labeling/label_image.md) 
+ [label_image](./labeling/label_image.md) 
 
-# 导出结果
+# Export results
 
-完成标注后，可将标注结果文件以Json形式导出，标注格式说明如下：
+After the annotation is completed, the annotation result file can be exported in the form of Json. The annotation format is described as follows:
 
-[LabelU 标注格式](./annotation%20format/README.md)
+[LabelU annotation format](./annotation%20format/README.md)
