@@ -79,10 +79,10 @@
 
 各工具具体标注操作详见：
 
- [图像标注](./docs/labeling/label_image.md) 
+ [图像标注](./labeling/label_image.md) 
 
 # 导出结果
 
 完成标注后，可将标注结果文件以Json形式导出，标注格式说明如下：
 
-[LabelU 标注格式](./docs/annotation/README.md)
+[LabelU 标注格式](./annotation/README.md)
