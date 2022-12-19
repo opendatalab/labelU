@@ -57,7 +57,7 @@ labelu
 
 ## 快速上手
 
- [使用说明](./docs/README.md) 
+ [使用说明](./docs/GUIDE.md) 
 
 ## 标注格式说明
 
