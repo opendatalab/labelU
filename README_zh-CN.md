@@ -61,7 +61,7 @@ labelu
  
 ## 标注格式
 
-[格式说明](./docs/annotation/README.md)
+[格式说明](./docs/annotation%20format/README.md)
 
 ## 技术交流
 
