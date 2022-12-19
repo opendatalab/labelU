@@ -1,4 +1,4 @@
- 简体中文  |  <a href="./GUIDE_zh-CN.md" >English</a>
+ 简体中文 | <a href="./GUIDE.md" >English</a>
 
 # 名词术语
 
