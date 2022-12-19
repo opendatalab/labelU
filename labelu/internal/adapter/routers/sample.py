@@ -127,6 +127,7 @@ async def get(
     status_code=status.HTTP_200_OK,
 )
 async def update(
+    task_id: int,
     sample_id: int,
     cmd: PatchSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
@@ -139,7 +140,7 @@ async def update(
 
     # business logic
     data = await service.patch(
-        db=db, sample_id=sample_id, cmd=cmd, current_user=current_user
+        db=db, task_id=task_id,sample_id=sample_id, cmd=cmd, current_user=current_user
     )
 
     # response
