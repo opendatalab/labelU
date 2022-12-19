@@ -84,4 +84,5 @@
 # 导出结果
 
 完成标注后，可将标注结果文件以Json形式导出，标注格式说明如下：
+
 [LabelU 标注格式](./docs/annotation/README.md)
