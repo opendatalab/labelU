@@ -58,7 +58,7 @@ labelu
 
 ## Usage
 
--  [Guide](./docs/Guide.md) 
+-  [Guide](./docs/GUIDE.md) 
 
 ## Annotation Format
 
