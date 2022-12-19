@@ -68,7 +68,11 @@ labelu
 
 ## 技术交流
 
-![8faa20cf-6898-4b16-b4cc-174795159f2c](https://user-images.githubusercontent.com/25022954/208056502-d752ecf3-783a-48ab-9742-bb30e42cbc85.jpg)
+欢迎加入Opendatalab官方微信群！
+
+<p align="center">
+<img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
+</p>
 
 ## 友情链接
 
