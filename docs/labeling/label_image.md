@@ -33,8 +33,14 @@
 
 ## 快捷键
 
-![image](https://user-images.githubusercontent.com/25022954/208392901-799c3dcd-f84a-43d3-83b1-fdaa02d8a02b.png)
+<p align="center">
+<img style="width: 500px" src="https://user-images.githubusercontent.com/25022954/208392901-799c3dcd-f84a-43d3-83b1-fdaa02d8a02b.png">
+</p>
 
-![image](https://user-images.githubusercontent.com/25022954/208393134-d66b2427-07bb-48c2-9870-5badd008589f.png)
+<p align="center">
+<img style="width: 500px" src="https://user-images.githubusercontent.com/25022954/208393134-d66b2427-07bb-48c2-9870-5badd008589f.png">
+</p>
 
-![image](https://user-images.githubusercontent.com/25022954/208393165-f95ba277-a1b5-419d-8980-3badd796fd54.png)
+<p align="center">
+<img style="width: 500px" src="https://user-images.githubusercontent.com/25022954/208393165-f95ba277-a1b5-419d-8980-3badd796fd54.png">
+</p>
