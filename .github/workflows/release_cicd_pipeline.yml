@@ -1,9 +1,9 @@
-name: "main CI/CD Pipeline"
+name: "release CI/CD Pipeline"
 
 on:
   push:
     branches:
-      - main
+      - release/v0.5.0
   workflow_dispatch:
 jobs:
   test:
@@ -59,14 +59,9 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: ./coverage.xml
           verbose: true
-      - name: Manage version
-        env:
-          PROVIDED_VERSION: 0.1.${{ github.run_number }}
-        run: |
-          sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
       - name: Publish
         env:
-          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
-          poetry publish --build --skip-existing -r testpypi
+          poetry config pypi-token.pypi $PYPI_TOKEN
+          poetry publish --build --skip-existing -r pypi
