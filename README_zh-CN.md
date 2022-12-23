@@ -43,6 +43,11 @@ labelu
 
 - 统一，提供6种图像标注工具，通过简单可视化或Yaml配置即可标注
 - 灵活，多种工具可自由组合使用，满足大部分图像标注需求
+
+<p align="center">
+<img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
+</p>
+
 - 通用，支持导出多种数据格式，包括Labelbee、COCO、Mask
 
 ## 支持场景
