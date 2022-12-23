@@ -64,4 +64,4 @@ jobs:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
           poetry config pypi-token.pypi $PYPI_TOKEN
-          poetry publish --build --skip-existing -r pypi
+          poetry publish --build --skip-existing
