@@ -43,6 +43,11 @@ labelu
 
 - Uniform，Six image annotation tools are provided, which can be configured through simple visualization or Yaml
 - Unlimited，Multiple tools can be freely combined to meet most image annotation requirements
+
+<p align="center">
+<img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
+</p>
+
 - Universal，Support multiple data export formats, including LabelU, COCO, Mask
 
 ## Scenes
