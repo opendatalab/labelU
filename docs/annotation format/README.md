@@ -49,7 +49,7 @@
           }
         ],
         "valid": true,
-        "attribute": "cat",
+        "label": "cat",
         "order": 1,
         "textAttribute": "",
       }
