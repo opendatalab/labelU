@@ -1,9 +1,9 @@
-name: "main CI/CD Pipeline"
+name: "DEV CI/CD Pipeline"
 
 on:
   push:
     branches:
-      - main
+      - dev
   workflow_dispatch:
 jobs:
   test:
@@ -38,6 +38,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+            
       - name: Build frontend
         run: |
           git submodule status
@@ -68,4 +69,4 @@ jobs:
           TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
           poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
-          poetry publish --build --skip-existing -r testpypi
+          poetry publish --build --skip-existing -r testpypi 
