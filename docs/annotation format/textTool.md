@@ -8,19 +8,207 @@
   "height": 681,
   "rotate": 0,
   "valid": true,
-  "textTool": {
+  "annotations": [
+  {
     "toolName": "textTool",
     "result": [
       {
-        "id": "ULNah0Wf",
-        "text": "textValue",
         "value": {
           "text": "textValue"
+        "id": "ULNah0Wf",
         }
       }
     ]
   }
+ ]
 }
 ```
-
-<table class=""><colgroup><col style="width: 200px; min-width: 200px;"><col style="width: 100px; min-width: 100px;"><col style="width: 80px; min-width: 80px;"><col style="width: 80px; min-width: 80px;"><col><col style="width: 180px; min-width: 180px;"></colgroup><thead class="ant-table-thead"><tr><th class=""><span>名称</span></th><th class=""><span>类型</span></th><th class=""><span>是否必须</span></th><th class=""><span>默认值</span></th><th class=""><span>备注</span></th><th class=""><span>其他信息</span></th></tr></thead><tbody class="ant-table-tbody"><tr class="ant-table-row  ant-table-row-level-0"><td class=""><span class="ant-table-row-indent indent-level-0" style="padding-left: 0px;"></span><span class="ant-table-row-expand-icon ant-table-row-expanded"></span>result</td><td class=""><span>object []</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">图片上的结果列表，数量应与标注对象一致</span></td><td class=""><p><span style="font-weight: 700;">item 类型: </span><span>object</span></p></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>id</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">文本内容的id</span></td><td class=""><p><span style="font-weight: 700;">mock: </span><span>@string</span></p></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>sourceID</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">文本标注依赖对象的id</span></td><td class=""><p><span style="font-weight: 700;">mock: </span><span>@string</span></p></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>text</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">文本内容</span></td><td class=""><p><span style="font-weight: 700;">mock: </span><span>@string</span></p></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-collapsed"></span>value</td><td class=""><span>object</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">文本内容（sincev2.4，支持多行文本，默认以这个结果为准）</span></td><td class=""><p><span style="font-weight: 700;">备注: </span><span>文本内容（sincev2.4，支持多行文本，默认以这个结果为准）</span></p></td></tr></tbody></table>
+<table class="MsoNormalTable" border="1" cellspacing="0" cellpadding="0" style="background:white;border-collapse:collapse;border:none;mso-border-alt:
+ solid windowtext .5pt;mso-yfti-tbllook:1184;mso-border-insideh:.5pt solid windowtext;
+ mso-border-insidev:.5pt solid windowtext">
+ <thead>
+  <tr style="mso-yfti-irow:0;mso-yfti-firstrow:yes">
+   <td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext .5pt;
+   padding:4.5pt 9.75pt 4.5pt 9.75pt">
+   <p class="MsoNormal" align="center" style="text-align:center;mso-pagination:
+   widow-orphan"><b><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:
+   &quot;Segoe UI&quot;;mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;
+   color:#24292F;mso-font-kerning:0pt">名称</span></b><b><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:
+   宋体;color:#24292F;mso-font-kerning:0pt"><o:p></o:p></span></b></p>
+   </td>
+   <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+   solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+   <p class="MsoNormal" align="center" style="text-align:center;mso-pagination:
+   widow-orphan"><b><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:
+   &quot;Segoe UI&quot;;mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;
+   color:#24292F;mso-font-kerning:0pt">类型</span></b><b><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:
+   宋体;color:#24292F;mso-font-kerning:0pt"><o:p></o:p></span></b></p>
+   </td>
+   <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+   solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+   <p class="MsoNormal" align="center" style="text-align:center;mso-pagination:
+   widow-orphan"><b><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:
+   &quot;Segoe UI&quot;;mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;
+   color:#24292F;mso-font-kerning:0pt">是否必须</span></b><b><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:
+   宋体;color:#24292F;mso-font-kerning:0pt"><o:p></o:p></span></b></p>
+   </td>
+   <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+   solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+   <p class="MsoNormal" align="center" style="text-align:center;mso-pagination:
+   widow-orphan"><b><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:
+   &quot;Segoe UI&quot;;mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;
+   color:#24292F;mso-font-kerning:0pt">默认值</span></b><b><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:
+   宋体;color:#24292F;mso-font-kerning:0pt"><o:p></o:p></span></b></p>
+   </td>
+   <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+   solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+   <p class="MsoNormal" align="center" style="text-align:center;mso-pagination:
+   widow-orphan"><b><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:
+   &quot;Segoe UI&quot;;mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;
+   color:#24292F;mso-font-kerning:0pt">备注</span></b><b><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:
+   宋体;color:#24292F;mso-font-kerning:0pt"><o:p></o:p></span></b></p>
+   </td>
+   <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+   solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+   <p class="MsoNormal" align="center" style="text-align:center;mso-pagination:
+   widow-orphan"><b><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:
+   &quot;Segoe UI&quot;;mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;
+   color:#24292F;mso-font-kerning:0pt">其他信息</span></b><b><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:
+   宋体;color:#24292F;mso-font-kerning:0pt"><o:p></o:p></span></b></p>
+   </td>
+  </tr>
+ </thead>
+ <tbody><tr style="mso-yfti-irow:1">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;
+  mso-fareast-font-family:宋体;color:#24292F;mso-font-kerning:0pt">result<o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;
+  mso-fareast-font-family:宋体;color:#24292F;mso-font-kerning:0pt">object []<o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:&quot;Segoe UI&quot;;
+  mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;color:#24292F;
+  mso-font-kerning:0pt">必须</span><span lang="EN-US" style="font-size:12.0pt;
+  font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:宋体;color:#24292F;
+  mso-font-kerning:0pt"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:&quot;Segoe UI&quot;;
+  mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;color:#24292F;
+  mso-font-kerning:0pt">图片上的结果列表，数量应与标注对象一致</span><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:
+  宋体;color:#24292F;mso-font-kerning:0pt"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="margin-bottom:12.0pt;text-align:left;
+  mso-pagination:widow-orphan"><span lang="EN-US" style="font-size:12.0pt;
+  font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:宋体;color:#24292F;
+  mso-font-kerning:0pt">item </span><span style="font-size:12.0pt;font-family:
+  宋体;mso-ascii-font-family:&quot;Segoe UI&quot;;mso-hansi-font-family:&quot;Segoe UI&quot;;
+  mso-bidi-font-family:&quot;Segoe UI&quot;;color:#24292F;mso-font-kerning:0pt">类型</span><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;
+  mso-fareast-font-family:宋体;color:#24292F;mso-font-kerning:0pt">:&nbsp;object<o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr style="mso-yfti-irow:2">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;
+  mso-fareast-font-family:宋体;color:#24292F;mso-font-kerning:0pt">id<o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;
+  mso-fareast-font-family:宋体;color:#24292F;mso-font-kerning:0pt">string<o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:&quot;Segoe UI&quot;;
+  mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;color:#24292F;
+  mso-font-kerning:0pt">必须</span><span lang="EN-US" style="font-size:12.0pt;
+  font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:宋体;color:#24292F;
+  mso-font-kerning:0pt"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:&quot;Segoe UI&quot;;
+  mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;color:#24292F;
+  mso-font-kerning:0pt">文本内容的</span><span lang="EN-US" style="font-size:12.0pt;
+  font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:宋体;color:#24292F;
+  mso-font-kerning:0pt">id<o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:3;mso-yfti-lastrow:yes">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;
+  mso-fareast-font-family:宋体;color:#24292F;mso-font-kerning:0pt">value<o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span lang="EN-US" style="font-size:12.0pt;font-family:&quot;Segoe UI&quot;,sans-serif;
+  mso-fareast-font-family:宋体;color:#24292F;mso-font-kerning:0pt">object<o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:&quot;Segoe UI&quot;;
+  mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;color:#24292F;
+  mso-font-kerning:0pt">必须</span><span lang="EN-US" style="font-size:12.0pt;
+  font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:宋体;color:#24292F;
+  mso-font-kerning:0pt"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal" align="left" style="text-align:left;mso-pagination:widow-orphan"><span style="font-size:12.0pt;font-family:宋体;mso-ascii-font-family:&quot;Segoe UI&quot;;
+  mso-hansi-font-family:&quot;Segoe UI&quot;;mso-bidi-font-family:&quot;Segoe UI&quot;;color:#24292F;
+  mso-font-kerning:0pt">文本内容</span><span lang="EN-US" style="font-size:12.0pt;
+  font-family:&quot;Segoe UI&quot;,sans-serif;mso-fareast-font-family:宋体;color:#24292F;
+  mso-font-kerning:0pt"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+</tbody></table>
