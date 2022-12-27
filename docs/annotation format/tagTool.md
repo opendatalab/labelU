@@ -10,7 +10,8 @@
   "height": 576,
   "rotate": 0,
   "valid": true,
-  "annotations": {
+  "annotations": [
+  {
     "toolName": "tagTool",
     "result": [
       {
@@ -22,6 +23,7 @@
       }
     ]
   }
+ ]
 }
 ```
 
