@@ -8,7 +8,8 @@
   "height": 2912,
   "valid": true,
   "rotate": 0,
-  "rectTool": {
+  "annotations": [
+  {
     "toolName": "rectTool",
     "result": [
       {
@@ -24,6 +25,360 @@
       }
     ]
   }
+ ]
+} 
 ```
-
-<table class=""><colgroup><col style="width: 200px; min-width: 200px;"><col style="width: 100px; min-width: 100px;"><col style="width: 80px; min-width: 80px;"><col style="width: 80px; min-width: 80px;"><col><col style="width: 180px; min-width: 180px;"></colgroup><thead class="ant-table-thead"><tr><th class=""><span>名称</span></th><th class=""><span>类型</span></th><th class=""><span>是否必须</span></th><th class=""><span>默认值</span></th><th class=""><span>备注</span></th><th class=""><span>其他信息</span></th></tr></thead><tbody class="ant-table-tbody"><tr class="ant-table-row  ant-table-row-level-0"><td class=""><span class="ant-table-row-indent indent-level-0" style="padding-left: 0px;"></span><span class="ant-table-row-expand-icon ant-table-row-expanded"></span>result</td><td class=""><span>object []</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc"></span></td><td class=""><p><span style="font-weight: 700;">item 类型: </span><span>object</span></p></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>id</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框 id</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>sourceID</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">依赖图形的 id</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>x</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框起始点横坐标（左上角）</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>y</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框起始点纵坐标（左上角）</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>width</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框宽度</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>height</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框高度</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>valid</td><td class=""><span>boolean</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">有无效性</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>order</td><td class=""><span>number</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">矩形框顺序</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>textAttribute</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">文本属性</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>attribute</td><td class=""><span>string</span></td><td class=""><div>必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">配置属性</span></td><td class=""></td></tr><tr class="ant-table-row  ant-table-row-level-1"><td class=""><span class="ant-table-row-indent indent-level-1" style="padding-left: 20px;"></span><span class="ant-table-row-expand-icon ant-table-row-spaced"></span>disableDelete</td><td class=""><span>boolean</span></td><td class=""><div>非必须</div></td><td class=""><div></div></td><td class=""><span class="table-desc">是否可以被删除（预标注载入数据使用）</span></td><td class=""></td></tr></tbody></table>
+<table class="MsoNormalTable" border="1" cellspacing="0" cellpadding="0" style="background:white;border-collapse:collapse;border:none;mso-border-alt:
+ solid windowtext .5pt;mso-yfti-tbllook:1184;mso-border-insideh:.5pt solid windowtext;
+ mso-border-insidev:.5pt solid windowtext">
+ <tbody><tr style="mso-yfti-irow:0;mso-yfti-firstrow:yes">
+  <td style="border:solid windowtext 1.0pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><b>名称<span lang="EN-US"><o:p></o:p></span></b></p>
+  </td>
+  <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><b><span style="color:black;mso-color-alt:windowtext">类型</span><span lang="EN-US"><o:p></o:p></span></b></p>
+  </td>
+  <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><b><span style="color:black;mso-color-alt:windowtext">是否必须</span><span lang="EN-US"><o:p></o:p></span></b></p>
+  </td>
+  <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><b><span style="color:black;mso-color-alt:windowtext">默认值</span><span lang="EN-US"><o:p></o:p></span></b></p>
+  </td>
+  <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><b><span style="color:black;mso-color-alt:windowtext">备注</span><span lang="EN-US"><o:p></o:p></span></b></p>
+  </td>
+  <td style="border:solid windowtext 1.0pt;border-left:none;mso-border-left-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><b><span style="color:black;mso-color-alt:windowtext">其他信息</span><span lang="EN-US"><o:p></o:p></span></b></p>
+  </td>
+ </tr>
+ <tr style="mso-yfti-irow:1">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">result</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">object
+  []</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">item
+  </span><span style="color:black;mso-color-alt:windowtext">类型<span lang="EN-US">:&nbsp;object</span></span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr style="mso-yfti-irow:2">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">id</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">string</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">矩形框<span lang="EN-US"> id</span></span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:3">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">x</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">number</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">矩形框起始点横坐标（左上角）</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:4">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">y</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">number</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">矩形框起始点纵坐标（左上角）</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:5">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">width</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">number</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">矩形框宽度</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:6">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">height</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">number</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">矩形框高度</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:7">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">valid</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span class="SpellE"><span lang="EN-US" style="color:black;
+  mso-color-alt:windowtext">boolean</span></span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">有无效性</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:8">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">order</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">number</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">矩形框顺序</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:9">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span class="SpellE"><span lang="EN-US" style="color:black;
+  mso-color-alt:windowtext">textAttribute</span></span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">string</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">文本属性</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+ <tr style="mso-yfti-irow:10;mso-yfti-lastrow:yes">
+  <td style="border:solid windowtext 1.0pt;border-top:none;mso-border-top-alt:
+  solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">label</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span lang="EN-US" style="color:black;mso-color-alt:windowtext">string</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">必须</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt">
+  <p class="MsoNormal"><span style="color:black;mso-color-alt:windowtext">标签</span><span lang="EN-US"><o:p></o:p></span></p>
+  </td>
+  <td style="border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;
+  border-right:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .5pt;
+  mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
+  padding:4.5pt 9.75pt 4.5pt 9.75pt"></td>
+ </tr>
+</tbody></table>
