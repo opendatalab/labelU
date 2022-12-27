@@ -8,7 +8,8 @@
   "height": 2912, 
   "valid": true, 
   "rotate": 0, 
-  "rectTool": {
+  "annotations": [
+  {
     "toolName": "rectTool", 
     "result": [ 
       {
@@ -16,14 +17,43 @@
         "y": 1149.217391304348,
         "width": 1314.7826086956522,
         "height": 1655.6521739130435,
-        "attribute": "",
+        "label": "cat",
         "valid": true,
         "id": "Rp1x6bZs",
         "textAttribute": "",
         "order": 1
       }
     ]
-  }
+  },
+   {
+    "toolName": "polygonTool",
+    "result": [
+      {
+        "id": "j91grNMP",
+        "pointList": [
+          {
+            "x": 298.4319526627219,
+            "y": 155.54201183431957
+          },
+          {
+            "x": 246.85325443786985,
+            "y": 203.09112426035506
+          },
+          {
+            "x": 248.46508875739647,
+            "y": 289.3242603550296
+          },
+          {
+            "x": 320.9976331360947,
+            "y": 345.73846153846154
+          }
+        ],
+        "valid": true,
+        "attribute": "cat",
+        "order": 1,
+        "textAttribute": "",
+      }
+    ]
 }
 ```
 
