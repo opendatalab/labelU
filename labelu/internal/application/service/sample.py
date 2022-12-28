@@ -142,7 +142,11 @@ async def get(db: Session, sample_id: int, current_user: User) -> SampleResponse
 
 
 async def patch(
-    db: Session, task_id:int, sample_id: int, cmd: PatchSampleCommand, current_user: User
+    db: Session,
+    task_id: int,
+    sample_id: int,
+    cmd: PatchSampleCommand,
+    current_user: User,
 ) -> SampleResponse:
 
     # check task exist
@@ -179,8 +183,10 @@ async def patch(
     with db.begin():
         # update task status
         if task.status != TaskStatus.FINISHED.value:
-            statics = crud_sample.statics(db=db, owner_id=current_user.id, task_ids=[task_id])
-            task_obj_in = {Task.status.key:TaskStatus.INPROGRESS.value}
+            statics = crud_sample.statics(
+                db=db, owner_id=current_user.id, task_ids=[task_id]
+            )
+            task_obj_in = {Task.status.key: TaskStatus.INPROGRESS.value}
             if statics.get(f"{task.id}_{SampleState.NEW.value}", 0) <= 1:
                 task_obj_in[Task.status.key] = TaskStatus.FINISHED.value
             if task.status != task_obj_in[Task.status.key]:
@@ -227,7 +233,7 @@ async def export(
 
     task = crud_task.get(db=db, task_id=task_id)
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
-    data = [sample.__dict__ for sample in samples if sample.state == SampleState.DONE]
+    data = [sample.__dict__ for sample in samples]
 
     # output data path
     out_data_dir = Path(settings.MEDIA_ROOT).joinpath(

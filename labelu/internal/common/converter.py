@@ -1,6 +1,4 @@
-import os
 import json
-from pathlib import Path
 from zipfile import ZipFile
 from PIL import Image, ImageDraw
 from enum import Enum
@@ -54,15 +52,43 @@ class Converter:
     ) -> str:
         out_data_dir.mkdir(parents=True, exist_ok=True)
         file_full_path = out_data_dir.joinpath("result.json")
+
+        # every file result
         results = []
         for sample in input_data:
             data = json.loads(sample.get("data"))
+
+            # change skipped result is invalid
+            annotated_result = json.loads(data.get("result"))
+            if annotated_result and sample.get("state") == "SKIPPED":
+                annotated_result["valid"] = False
+
+            # change result struct
+            if annotated_result:
+                annotations = []
+                for tool in annotated_result.copy().keys():
+                    if tool.endswith("Tool"):
+                        tool_results = annotated_result.pop(tool)
+                        for tool_result in tool_results.get("result", []):
+                            tool_result["label"] = tool_result.pop("attribute", "")
+                            tool_result.pop("sourceID", None)
+                        annotations.append(tool_results)
+
+                annotated_result["annotations"] = annotations
+
+            annotated_result_str = json.dumps(annotated_result)
             results.append(
                 {
                     "id": sample.get("id"),
-                    "result": data.get("result"),
+                    "result": annotated_result_str,
                     "urls": data.get("urls"),
-                    "fileNames": data.get("fileNames"),
+                    "fileNames": next(
+                        (
+                            url.split("/")[-1] if url.split("/") else ""
+                            for url in data.get("urls", {}).values()
+                        ),
+                        "",
+                    ),
                 }
             )
 
@@ -130,19 +156,21 @@ class Converter:
 
             # annotation result
             annotation_result = json.loads(annotation_data.get("result", {}))
-            if not annotation_result:
-                continue
 
             # coco image
             image = {
                 "id": sample.get("id"),
-                "fileNames": ",".join(
-                    annotation_data.get("fileNames", []).values()
-                ).rstrip(","),
-                "width": annotation_result.get("width"),
-                "height": annotation_result.get("height"),
-                "valid": annotation_result.get("valid"),
-                "rotate": annotation_result.get("rotate"),
+                "fileNames": next(
+                    (
+                        url.split("/")[-1] if url.split("/") else ""
+                        for url in annotation_data.get("urls", {}).values()
+                    ),
+                    "",
+                ),
+                "width": annotation_result.get("width", 0),
+                "height": annotation_result.get("height", 0),
+                "valid": annotation_result.get("valid", False),
+                "rotate": annotation_result.get("rotate", 0),
             }
             result["images"].append(image)
 
@@ -215,6 +243,8 @@ class Converter:
         export_files = []
         color_list = []
         for sample in input_data:
+            if sample.get("state") != "DONE":
+                continue
             annotation_data = json.loads(sample.get("data"))
             logger.info("data is: {}", sample)
             filenames = list(annotation_data.get("urls", {}).values())
