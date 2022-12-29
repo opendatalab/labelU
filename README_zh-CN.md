@@ -23,7 +23,7 @@ https://docs.conda.io/en/latest/miniconda.html
 ### 安装并激活python = 3.10
 
 ```bash
-conda create -n labelu --python=3.10
+conda create -n labelu python=3.10
 conda activate labelu
 ```
 
