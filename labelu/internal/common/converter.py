@@ -186,38 +186,52 @@ class Converter:
             for tool in tools:
                 for tool_result in tool.get("result"):
 
-                    # polygon tool
+                    bbox = []
                     segmentation = []
-                    if annotation_result.get("polygonTool", {}):
+                    polygon_area = 0.0
+                    # polygon tool
+                    if tool.get("toolName") == "polygonTool":
+                        x_coordinates = []
+                        y_coordinates = []
                         for point in tool_result.get("pointList", []):
                             segmentation.append(point.get("x"))
                             segmentation.append(point.get("y"))
-
-                    # polygon or rect
-                    bbox = []
-                    if (
-                        tool_result.get("x")
-                        and tool_result.get("y")
-                        and tool_result.get("width")
-                        and tool_result.get("height")
-                    ):
-                        bbox.append(tool_result.get("x"))
-                        bbox.append(tool_result.get("y"))
-                        bbox.append(tool_result.get("width"))
-                        bbox.append(tool_result.get("height"))
+                            x_coordinates.append(point.get("x"))
+                            y_coordinates.append(point.get("y"))
+                        logger.info("fffffe")
+                        bbox = [
+                            min(x_coordinates),
+                            max(y_coordinates),
+                            max(x_coordinates) - min(x_coordinates),
+                            max(y_coordinates) - min(y_coordinates),
+                        ]
+                        polygon_area = _polygonArea(x_coordinates, y_coordinates)
+                    elif tool.get("toolName") == "rectTool":
+                        # rect
+                        if (
+                            tool_result.get("x")
+                            and tool_result.get("y")
+                            and tool_result.get("width")
+                            and tool_result.get("height")
+                        ):
+                            bbox.append(tool_result.get("x"))
+                            bbox.append(tool_result.get("y"))
+                            bbox.append(tool_result.get("width"))
+                            bbox.append(tool_result.get("height"))
+                        polygon_area = tool_result.get("width", 0) * tool_result.get(
+                            "height", 0
+                        )
 
                     annotation = {
                         "image_id": sample.get("id"),
                         "id": annotation_id,
-                        "bbox": bbox,
                         "iscrowd": tool_result.get("iscrowd", 0),
                         "segmentation": segmentation,
+                        "area": polygon_area,
+                        "bbox": bbox,
                         "category_id": category_name_map_id.get(
                             tool_result.get("attribute", ""), -1
                         ),
-                        "area": tool_result.get("width", 0)
-                        * tool_result.get("height", 0),
-                        "textAttribute": tool_result.get("textAttribute", ""),
                         "order": tool_result.get("order", 0),
                     }
 
@@ -323,6 +337,22 @@ class Converter:
                 zipf.write(str(f), arcname=f.name)
         logger.info("Export file path: {}", file_full_path_zip)
         return file_full_path_zip
+
+
+def _polygonArea(X, Y):
+
+    # Initialize area
+    area = 0.0
+    n = len(X)
+
+    # Calculate value of shoelace formula
+    j = n - 1
+    for i in range(0, n):
+        area += (X[j] + X[i]) * (Y[j] - Y[i])
+        j = i  # j is previous vertex to i
+
+    # Return absolute value
+    return abs(area) / 2.0
 
 
 converter = Converter()
