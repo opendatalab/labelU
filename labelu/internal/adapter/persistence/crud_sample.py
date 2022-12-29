@@ -75,6 +75,18 @@ def get(db: Session, sample_id: int) -> TaskSample:
     )
 
 
+def get_pre(db: Session, task_id: int, sample_id: int) -> TaskSample:
+    return (
+        db.query(TaskSample)
+        .filter(
+            TaskSample.task_id == task_id,
+            TaskSample.id < sample_id,
+            TaskSample.deleted_at == None,
+        )
+        .first()
+    )
+
+
 def get_by_ids(db: Session, sample_ids: List[int]) -> List[TaskSample]:
     return (
         db.query(TaskSample)

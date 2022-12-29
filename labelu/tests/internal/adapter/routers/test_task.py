@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
