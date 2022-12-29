@@ -400,6 +400,97 @@ class TestClassTaskSampleRouter:
         assert r.status_code == 404
         assert json["err_code"] == 55001
 
+    def test_sample_get_pre(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+        samples = crud_sample.batch(
+            db=db,
+            samples=[
+                TaskSample(
+                    task_id=1,
+                    task_attachment_ids="[1]",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data="{}",
+                ),
+                TaskSample(
+                    task_id=1,
+                    task_attachment_ids="[2]",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data="{}",
+                ),
+            ],
+        )
+
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/{samples[1].id}/pre",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 200
+        assert json["data"]["id"] == 1
+
+    def test_sample_get_pre_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+        samples = crud_sample.batch(
+            db=db,
+            samples=[
+                TaskSample(
+                    task_id=1,
+                    task_attachment_ids="[1]",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data="{}",
+                )
+            ],
+        )
+
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/{samples[0].id}/pre",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 404
+        assert json["err_code"] == 55001
+
     def test_sample_patch(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:

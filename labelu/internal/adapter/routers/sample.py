@@ -1,6 +1,5 @@
 from typing import List, Union
 
-from pathlib import Path
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
 from fastapi.responses import FileResponse
@@ -105,6 +104,7 @@ async def list_by(
     status_code=status.HTTP_200_OK,
 )
 async def get(
+    task_id: int,
     sample_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
@@ -115,7 +115,34 @@ async def get(
     """
 
     # business logic
-    data = await service.get(db=db, sample_id=sample_id, current_user=current_user)
+    data = await service.get(
+        db=db, task_id=task_id, sample_id=sample_id, current_user=current_user
+    )
+
+    # response
+    return OkResp[SampleResponse](data=data)
+
+
+@router.get(
+    "/{task_id}/samples/{sample_id}/pre",
+    response_model=OkResp[SampleResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_pre(
+    task_id: int,
+    sample_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get a annotation result.
+    """
+
+    # business logic
+    data = await service.get_pre(
+        db=db, task_id=task_id, sample_id=sample_id, current_user=current_user
+    )
 
     # response
     return OkResp[SampleResponse](data=data)
@@ -140,7 +167,7 @@ async def update(
 
     # business logic
     data = await service.patch(
-        db=db, task_id=task_id,sample_id=sample_id, cmd=cmd, current_user=current_user
+        db=db, task_id=task_id, sample_id=sample_id, cmd=cmd, current_user=current_user
     )
 
     # response
