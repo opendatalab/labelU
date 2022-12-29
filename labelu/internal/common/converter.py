@@ -169,7 +169,9 @@ class Converter:
                 ),
                 "width": annotation_result.get("width", 0),
                 "height": annotation_result.get("height", 0),
-                "valid": annotation_result.get("valid", False),
+                "valid": False
+                if sample.get("state", "") == "SKIPPED"
+                else annotation_result.get("valid", False),
                 "rotate": annotation_result.get("rotate", 0),
             }
             result["images"].append(image)
