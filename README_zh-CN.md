@@ -20,10 +20,17 @@ LabelU 是一款中文的开源数据标注工具。目前具备拉框、多边�
 
 https://docs.conda.io/en/latest/miniconda.html
 
-### 安装并激活python = 3.10
+### 创建虚拟环境（python = 3.10）
 
 ```bash
 conda create -n labelu python=3.10
+conda activate labelu
+```
+
+
+### 激活虚拟环境
+
+```bash
 conda activate labelu
 ```
 
