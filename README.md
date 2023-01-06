@@ -26,7 +26,7 @@ https://docs.conda.io/en/latest/miniconda.html
 conda create -n labelu python=3.10
 ```
 
-### activate virtual environment
+### Activate virtual environment
 
 ```bash
 conda activate labelu
