@@ -20,10 +20,15 @@ LabelU is an open source data annotation tool that supports Chinese. At present,
 
 https://docs.conda.io/en/latest/miniconda.html
 
-### Create and activate virtual environment(python = 3.10)
+### Create virtual environment(python = 3.10)
 
 ```bash
 conda create -n labelu python=3.10
+```
+
+### activate virtual environment
+
+```bash
 conda activate labelu
 ```
 
