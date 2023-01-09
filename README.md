@@ -12,7 +12,7 @@
 
 ## Introduction
 
-LabelU is an open source data annotation tool that supports Chinese. At present, it has image annotation capabilities such as rectangle, polygon, point, line, classification, description. It can support detection, classification, segmentation, text transcription, Line detection, key point detection and other computer vision task scenarios. You can customize the annotation task by freely combining tools, and support COCO and MASK format data export.
+LabelU is an open source data annotation tool that supports Chinese. At present, it has image annotation capabilities such as rectangle, polygon, point, line, classification, and caption. It can support detection, classification, segmentation, text transcription, Line detection, key point detection and other computer vision task scenarios. You can customize the annotation task by freely combining tools, and support COCO and MASK format data export.
 
 ## Getting started
 
@@ -38,7 +38,7 @@ conda activate labelu
 pip install labelu
 ```
 
-### Start labelu，server：http://localhost:8000
+### Start labelu, server: http://localhost:8000
 
 ```bash
 labelu
@@ -46,14 +46,14 @@ labelu
 
 ## feature
 
-- Uniform，Six image annotation tools are provided, which can be configured through simple visualization or Yaml
-- Unlimited，Multiple tools can be freely combined to meet most image annotation requirements
+- Uniform, Six image annotation tools are provided, which can be configured through simple visualization or Yaml
+- Unlimited, Multiple tools can be freely combined to meet most image annotation requirements
 
 <p align="center">
 <img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
 </p>
 
-- Universal，Support multiple data export formats, including LabelU, COCO, Mask
+- Universal, Support multiple data export formats, including LabelU, COCO, Mask
 
 ## Scenes
 
@@ -76,7 +76,7 @@ labelu
 
 ## Communication
 
-Welcome to the Opendatalab Wechat group！
+Welcome to the Opendatalab Wechat group!
 
 <p align="center">
 <img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
@@ -86,7 +86,7 @@ Welcome to the Opendatalab Wechat group！
 
 ## Links
 
-- [labelU-Kit](https://github.com/opendatalab/labelU-Kit)（Powered by labelU-Kit）
+- [labelU-Kit](https://github.com/opendatalab/labelU-Kit)(Powered by labelU-Kit)
 
 ## LICENSE
 
