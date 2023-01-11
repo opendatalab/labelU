@@ -83,6 +83,7 @@ def get_pre(db: Session, task_id: int, sample_id: int) -> TaskSample:
             TaskSample.id < sample_id,
             TaskSample.deleted_at == None,
         )
+        .order_by(TaskSample.id.desc())
         .first()
     )
 
