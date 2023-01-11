@@ -123,7 +123,7 @@ async def create(
     # response
     return AttachmentResponse(
         id=attachment.id,
-        url=f"{settings.SCHEME}://{settings.HOST}:{settings.PORT}{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}",
+        url=f"{settings.SCHEME}://{settings.MEDEIA_HOST}{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}",
     )
 
 
