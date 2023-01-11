@@ -83,4 +83,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/opendatalab/labelu:0.5.${{ github.run_number }}-dev
+          tags: opendatalab/labelu:0.5.${{ github.run_number }}-dev
