@@ -105,7 +105,7 @@ def main(
     if host:
         settings.HOST = host
     if media_host:
-        settings.MEDEIA_HOST = media_host
+        settings.MEDIA_HOST = media_host
     uvicorn.run(app=app, host=settings.HOST, port=settings.PORT)
 
 
