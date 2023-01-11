@@ -82,4 +82,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: opendatalab/labelu:latest
+          tags: ghcr.io/opendatalab/labelu:latest
