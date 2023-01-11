@@ -7,4 +7,4 @@ ENV HOME=/labelu
 
 EXPOSE 8000
 
-CMD ["labelu"]
+CMD ["labelu", "--host=0.0.0.0"]
