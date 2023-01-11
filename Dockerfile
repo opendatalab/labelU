@@ -7,4 +7,4 @@ ENV MEDIA_HOST http://labelu.shlab.tech
 
 EXPOSE 8000
 
-CMD ["labelu", "--host=0.0.0.0", "--media-host=$MEDIA_HOST"]
+CMD ["sh", "-c", "labelu --host=0.0.0.0 --media-host=$MEDIA_HOST"]
