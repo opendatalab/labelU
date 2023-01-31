@@ -15,6 +15,7 @@
       {
         "value": {
           "text": "textValue"
+        },
         "id": "ULNah0Wf",
         }
       }
