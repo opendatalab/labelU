@@ -16,33 +16,43 @@ LabelU 是一款中文的开源数据标注工具。目前具备拉框、多边�
 
 ## 快速开始
 
-### 下载并安装miniconda
-
-https://docs.conda.io/en/latest/miniconda.html
-
-### 创建虚拟环境（python = 3.10）
-
-```bash
-conda create -n labelu python=3.10
+### 使用miniconda安装
 ```
+# 安装miniconda
+# https://docs.conda.io/en/latest/miniconda.html
 
+# 创建虚拟环境(python = 3.7)
+conda create -n labelu python=3.7
 
-### 激活虚拟环境
-
-```bash
+# 激活虚拟环境
 conda activate labelu
-```
 
-### 安装labelu
-
-```bash
+# 安装 labelu
 pip install labelu
+
+# 启动labelu, 默认访问地址: http://localhost:8000
+labelu
 ```
 
-### 启动labelu，默认访问地址：http://localhost:8000
+### 本地开发
+```
+# 安装miniconda
+# https://docs.conda.io/en/latest/miniconda.html
 
-```bash
-labelu
+# 创建虚拟环境(python = 3.7)
+conda create -n labelu python=3.7
+
+# 激活虚拟环境
+conda activate labelu
+
+# 安装 peotry
+# https://python-poetry.org/docs/#installing-with-the-official-installer
+
+# 安装所有依赖包
+poetry install
+
+# 启动labelu, 默认访问地址: http://localhost:8000
+uvicorn labelu.main:app --reload
 ```
 
 ## 特性

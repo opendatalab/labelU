@@ -16,32 +16,43 @@ LabelU is an open source data annotation tool that supports Chinese. At present,
 
 ## Getting started
 
-### Download and Install miniconda
-
-https://docs.conda.io/en/latest/miniconda.html
-
-### Create virtual environment(python = 3.10)
-
-```bash
-conda create -n labelu python=3.10
+### Install locally with miniconda
 ```
+# Download and Install miniconda
+# https://docs.conda.io/en/latest/miniconda.html
 
-### Activate virtual environment
+# Create virtual environment(python = 3.7)
+conda create -n labelu python=3.7
 
-```bash
+# Activate virtual environment
 conda activate labelu
-```
 
-### Install labelu
-
-```bash
+# Install labelu
 pip install labelu
+
+# Start labelu, server: http://localhost:8000
+labelu
 ```
 
-### Start labelu, server: http://localhost:8000
+### Install for local development
+```
+# Download and Install miniconda
+# https://docs.conda.io/en/latest/miniconda.html
 
-```bash
-labelu
+# Create virtual environment(python = 3.7)
+conda create -n labelu python=3.7
+
+# Activate virtual environment
+conda activate labelu
+
+# Install peotry
+# https://python-poetry.org/docs/#installing-with-the-official-installer
+
+# Install all package dependencies
+poetry install
+
+# Start labelu, server: http://localhost:8000
+uvicorn labelu.main:app --reload --port 8000
 ```
 
 ## feature
