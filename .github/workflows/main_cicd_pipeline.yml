@@ -42,7 +42,7 @@ jobs:
         run: |
           git submodule status
           npm cache clean --force --prefix=./frontend
-          npm install --prefix=./frontend --registry=https://npm.shlab.tech/
+          npm install --prefix=./frontend --legacy-peer-deps --registry=https://npm.shlab.tech/
           CI=false npm run build --prefix=./frontend --if-present
           mv frontend/dist/* labelu/internal/statics
       - uses: abatilo/actions-poetry@v2
