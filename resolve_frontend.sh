@@ -8,13 +8,15 @@ release_version=$(grep "release_version: " .VERSION | awk -F " " '{print $2}')
 release_assets_url=$(grep "release_assets_url: " .VERSION | awk -F " " '{print $2}')
 alpha_assets_url=$(grep "alpha_assets_url: " .VERSION | awk -F " " '{print $2}')
 
-echo "1: $alpha_assets_url"
-echo "2: $release_assets_url"
-echo "3: $release_version"
-echo "4: $alpha_version"
+echo "alpha_version: $alpha_version"
+echo "alpha_assets_url: $alpha_assets_url"
+echo "release_version: $release_version"
+echo "release_assets_url: $release_assets_url"
 
 url=""
 version=""
+
+echo "branch: $CURRENT_BRANCH"
 
 if [ $# -ne 0 ]; then
   url=$3
@@ -26,6 +28,8 @@ else
     url=$alpha_assets_url
   fi
 fi
+
+echo "url: $url"
 
 # 生成版本信息
 # 下次labelu迭代可使用对应分支上次下载的版本
