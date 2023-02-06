@@ -53,6 +53,9 @@ poetry install
 
 # 启动labelu, 默认访问地址: http://localhost:8000
 uvicorn labelu.main:app --reload
+
+# 更新submodule
+git submodule update --remote --merge
 ```
 
 ## 特性
