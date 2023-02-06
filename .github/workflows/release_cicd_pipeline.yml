@@ -76,3 +76,10 @@ jobs:
         with:
           commit_message: "Update .VERSION [skip ci]"
           file_pattern: .VERSION
+      - name: Webhook message
+        uses: joelwmale/webhook-action@master
+        with:
+          url: ${{ secrets.WEBHOOK_URL }}
+          headers: '{"Content-Type": "application/json"}'
+          body: '{"msgtype":"markdown","markdown":{"content":"labelU **0.5.${{ github.run_number }}** release \ud83c\udf89! \nCheck it out now \ud83d\udc49\ud83c\udffb  [v0.5.${{ github.run_number }}](https://test.pypi.org/project/labelu/#files)"}}'
+
