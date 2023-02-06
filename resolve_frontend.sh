@@ -18,9 +18,26 @@ version=""
 
 echo "branch: $CURRENT_BRANCH"
 
-if [ $# -ne 0 ]; then
+echo "args: $@"
+echo "args len: $#"
+
+if [ $# -gt 1 ]; then
   url=$3
   version=$2
+
+  # 生成版本信息
+  # 下次labelu迭代可使用对应分支上次下载的版本
+  if [ "$1" = "alpha" ]; then
+    echo "alpha_assets_url: $url" > .VERSION
+    echo "alpha_version: $version" >> .VERSION
+    echo "release_assets_url: $release_assets_url" >> .VERSION
+    echo "release_version: $release_version" >> .VERSION
+  elif [ "$1" = "release" ]; then
+    echo "release_assets_url: $url" > .VERSION
+    echo "release_version: $version" >> .VERSION
+    echo "alpha_assets_url: $alpha_assets_url" >> .VERSION
+    echo "alpha_version: $alpha_version" >> .VERSION
+  fi
 else
   if [ "$CURRENT_BRANCH" = "main" ]; then
     url=$release_assets_url
@@ -31,33 +48,19 @@ fi
 
 echo "url: $url"
 
-# 生成版本信息
-# 下次labelu迭代可使用对应分支上次下载的版本
-if [ "$1" = "alpha" ]; then
-  echo "alpha_assets_url: $url" > .VERSION
-  echo "alpha_version: $version" >> .VERSION
-  echo "release_assets_url: $release_assets_url" >> .VERSION
-  echo "release_version: $release_version" >> .VERSION
-elif [ "$1" = "release" ]; then
-  echo "release_assets_url: $url" > .VERSION
-  echo "release_version: $version" >> .VERSION
-  echo "alpha_assets_url: $alpha_assets_url" >> .VERSION
-  echo "alpha_version: $alpha_version" >> .VERSION
-fi
-
 filename=$(basename $url)
 
 echo "final url: $url"
 echo "filename: $filename"
 
-# 下载zip文件
-wget $url
+# # 下载zip文件
+# wget $url
 
-# 解压zip文件
-unzip -o $filename
+# # 解压zip文件
+# unzip -o $filename
 
-# 删除下载的zip文件
-rm $filename
+# # 删除下载的zip文件
+# rm $filename
 
-# 移动到指定目录
-mv dist/* labelu/internal/statics
+# # 移动到指定目录
+# mv dist/* labelu/internal/statics
