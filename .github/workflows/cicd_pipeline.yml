@@ -97,5 +97,5 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"labelU **0.5.${{ github.run_number }}** release \ud83c\udf89! \nCheck it out now \ud83d\udc49\ud83c\udffb  [v0.5.${{ github.run_number }}](https://test.pypi.org/project/labelu/#files)"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"LabelU **0.5.${{ github.run_number }}** released \ud83c\udf89! \nCheck it out now \ud83d\udc49\ud83c\udffb  [v0.5.${{ github.run_number }}](https://test.pypi.org/project/labelu/#files)"}}'
 
