@@ -22,7 +22,7 @@ if [ $# -ne 0 ]; then
   url=$3
   version=$2
 else
-  if [ $CURRENT_BRANCH = "main" ]; then
+  if [ "$CURRENT_BRANCH" = "main" ]; then
     url=$release_assets_url
   else
     url=$alpha_assets_url
@@ -47,7 +47,7 @@ fi
 
 filename=$(basename $url)
 
-echo "url: $url"
+echo "final url: $url"
 echo "filename: $filename"
 
 # 下载zip文件
