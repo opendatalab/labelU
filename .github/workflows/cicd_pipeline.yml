@@ -22,8 +22,12 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: resolve frontend
-        run: sh resolve_frontend.sh
+      - name: Resolve frontend
+        run: sh resolve_frontend.sh alpha $FRONTEND_VERSION $FRONTEND_ASSET_URL
+        env:
+          FRONTEND_VERSION: ${{ inputs.version }}
+          FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
+          CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
