@@ -7,16 +7,16 @@ on:
     branches: ["main"]
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Current frontend version'
+      branch:
+        description: 'Frontend branch'
         required: true
         default: 'release'
         type: choice
         options:
         - release
         - alpha
-      branch:
-        description: 'Frontend branch'
+      version:
+        description: 'Current frontend version'
         required: true
         type: string
       name:
