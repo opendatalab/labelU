@@ -87,3 +87,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: docker.shlab.tech/public/labelu:0.5.${{ github.run_number }}-dev
+      - name: Commit .VERSION to current branch
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update .VERSION [skip ci]"
+          file_pattern: .VERSION
