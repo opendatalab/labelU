@@ -3,30 +3,48 @@
 # 详细协同方案见：https://aicarrier.feishu.cn/wiki/wikcnEUfLmZc8rA378UuhHWC6Yt
 
 # 参数顺序：branch version url
-if [ $# -eq 0 ]; then
-  # 如果是labelu自己触发的ci，从版本文件中读取版本信息
-  branch=$(grep "branch: " .VERSION | awk -F " " '{print $2}')
-  version=$(grep "version: " .VERSION | awk -F " " '{print $2}')
-  url=$(grep "assets_url: " .VERSION | awk -F " " '{print $2}')
+alpha_version=$(grep "alpha_version: " .VERSION | awk -F " " '{print $2}')
+release_version=$(grep "release_version: " .VERSION | awk -F " " '{print $2}')
+release_assets_url=$(grep "release_assets_url: " .VERSION | awk -F " " '{print $2}')
+alpha_assets_url=$(grep "alpha_assets_url: " .VERSION | awk -F " " '{print $2}')
+
+echo "1: $alpha_assets_url"
+echo "2: $release_assets_url"
+echo "3: $release_version"
+echo "4: $alpha_version"
+
+url=""
+version=""
+
+if [ $# -ne 0 ]; then
+  url=$3
+  version=$2
 else
-  if [ $# -ne 3 ]; then
-    echo "Error: Incorrect number of arguments."
-    exit 1
+  if [ $CURRENT_BRANCH = "main" ]; then
+    url=$release_assets_url
+  else
+    url=$alpha_assets_url
   fi
+fi
 
-  branch="$1"
-  version="$2"
-  url="$3"
-
-  # 生成版本信息
-  #下次labelu迭代可使用对应分支上次下载的版本
-  echo "version: $version" > .VERSION
-  echo "branch: $branch" > .VERSION
-  echo "assets_url: $url" >> .VERSION
-
+# 生成版本信息
+# 下次labelu迭代可使用对应分支上次下载的版本
+if [ "$1" = "alpha" ]; then
+  echo "alpha_assets_url: $url" > .VERSION
+  echo "alpha_version: $version" >> .VERSION
+  echo "release_assets_url: $release_assets_url" >> .VERSION
+  echo "release_version: $release_version" >> .VERSION
+elif [ "$1" = "release" ]; then
+  echo "release_assets_url: $url" > .VERSION
+  echo "release_version: $version" >> .VERSION
+  echo "alpha_assets_url: $alpha_assets_url" >> .VERSION
+  echo "alpha_version: $alpha_version" >> .VERSION
 fi
 
 filename=$(basename $url)
+
+echo "url: $url"
+echo "filename: $filename"
 
 # 下载zip文件
 wget $url

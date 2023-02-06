@@ -2,9 +2,9 @@ name: "main CI/CD Pipeline"
 
 on:
   push:
-    branches: ["release", "main", "beta", "alpha"]
+    branches: ["main", "beta", "dev"]
   pull_request:
-    branches: ["release", "main", "beta", "alpha"]
+    branches: ["main", "beta", "dev"]
   workflow_dispatch:
 jobs:
   test:
@@ -24,7 +24,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: resolve frontend
-        run: sh resolve_frontend.sh
+        run: sh resolve_frontend.sh $FRONTEND_BRANCH $FRONTEND_VERSION $FRONTEND_ASSET_URL
+        env:
+          FRONTEND_VERSION: ${{ inputs.version }}
+          FRONTEND_BRANCH: ${{ inputs.branch }}
+          FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
+          CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
