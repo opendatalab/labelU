@@ -97,11 +97,15 @@ cli = Typer()
 
 
 @cli.command()
-def main(host: str = "localhost", port: int = 8000):
+def main(
+    host: str = "localhost", port: int = 8000, media_host: str = "http://localhost:8000"
+):
     if port:
         settings.PORT = port
     if host:
         settings.HOST = host
+    if media_host:
+        settings.MEDIA_HOST = media_host
     uvicorn.run(app=app, host=settings.HOST, port=settings.PORT)
 
 

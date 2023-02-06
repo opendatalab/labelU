@@ -143,41 +143,6 @@ async def get(
     )
 
 
-async def get_pre(
-    db: Session, task_id: int, sample_id: int, current_user: User
-) -> SampleResponse:
-    sample = crud_sample.get_pre(
-        db=db,
-        task_id=task_id,
-        sample_id=sample_id,
-    )
-
-    if not sample:
-        logger.error("cannot find sample:{}", sample_id)
-        raise UnicornException(
-            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-
-    # response
-    return SampleResponse(
-        id=sample.id,
-        state=sample.state,
-        data=json.loads(sample.data),
-        annotated_count=sample.annotated_count,
-        created_at=sample.created_at,
-        created_by=UserResp(
-            id=sample.owner.id,
-            username=sample.owner.username,
-        ),
-        updated_at=sample.updated_at,
-        updated_by=UserResp(
-            id=sample.updater.id,
-            username=sample.updater.username,
-        ),
-    )
-
-
 async def patch(
     db: Session,
     task_id: int,

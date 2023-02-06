@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     HOST: str = "localhost"
     PORT: str = "8000"
     API_V1_STR: str = "/api/v1"
+    MEDIA_HOST: str = f"{SCHEME}://{HOST}:{PORT}"
 
     BASE_DATA_DIR = get_data_dir()
     MEDIA_ROOT = Path(BASE_DATA_DIR).joinpath("media")

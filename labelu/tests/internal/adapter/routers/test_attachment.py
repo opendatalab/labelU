@@ -37,7 +37,6 @@ class TestClassTaskAttachmentRouter:
         # check
         json = new_res.json()
         assert new_res.status_code == 201
-        assert settings.HOST in json["data"]["url"]
 
         parts = json["data"]["url"].split("/")[-3:]
         assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
@@ -99,7 +98,6 @@ class TestClassTaskAttachmentRouter:
         # check
         json = new_res.json()
         assert new_res.status_code == 201
-        assert settings.HOST in json["data"]["url"]
 
         parts = json["data"]["url"].split("/")[-3:]
         assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
