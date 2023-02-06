@@ -53,14 +53,14 @@ filename=$(basename $url)
 echo "final url: $url"
 echo "filename: $filename"
 
-# # 下载zip文件
-# wget $url
+# 下载zip文件
+wget $url
 
-# # 解压zip文件
-# unzip -o $filename
+# 解压zip文件
+unzip -o $filename
 
-# # 删除下载的zip文件
-# rm $filename
+# 删除下载的zip文件
+rm $filename
 
-# # 移动到指定目录
-# mv dist/* labelu/internal/statics
+# 移动到指定目录
+mv dist/* labelu/internal/statics
