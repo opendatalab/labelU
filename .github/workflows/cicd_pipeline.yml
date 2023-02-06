@@ -5,6 +5,26 @@ on:
     branches:
       - dev
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Current frontend version'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+        - release
+        - alpha
+      branch:
+        description: 'Frontend branch'
+        required: true
+        type: string
+      name:
+        description: 'Frontend app name'
+        required: false
+      assets_url:
+        description: 'Frontend assets url'
+        required: true
+        type: string
 jobs:
   test:
     strategy:
