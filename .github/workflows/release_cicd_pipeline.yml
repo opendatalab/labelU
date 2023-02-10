@@ -43,7 +43,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Resolve frontend
-        run: sh resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
+        run: sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}

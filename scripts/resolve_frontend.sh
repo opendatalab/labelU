@@ -64,3 +64,6 @@ rm $filename
 
 # 移动到指定目录
 mv dist/* labelu/internal/statics
+
+# 删除空目录
+rm -rf dist
