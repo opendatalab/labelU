@@ -44,7 +44,7 @@ class Task(Base):
     status = Column(String(32), default=TaskStatus.DRAFT.value, comment="task status")
     created_by = Column(Integer, ForeignKey(column="user.id"), index=True)
     updated_by = Column(
-        Integer, ForeignKey(column="user.id"), comment="Last time a task was updated"
+        Integer, ForeignKey(column="user.id"), comment="Last time a task was updated by"
     )
     created_at = Column(
         DateTime, default=datetime.now, comment="Time a task was created"
