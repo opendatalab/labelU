@@ -239,7 +239,7 @@ async def export(
 
     # output data path
     out_data_dir = Path(settings.MEDIA_ROOT).joinpath(
-        settings.EXOIRT_DIR,
+        settings.EXPORT_DIR,
         f"task-{task_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}-{str(uuid.uuid4())[0:8]}",
     )
 
