@@ -25,7 +25,7 @@ class UpdateCommand(BaseModel):
         default=None, description="description: task tips", max_length=1000
     )
     media_type: Union[MediaType, None] = Field(
-        default=None, description="description: task config content"
+        default=None, description="description: task media_type content"
     )
     config: Union[str, None] = Field(
         default=None, description="description: task config content"
