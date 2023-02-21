@@ -92,7 +92,7 @@ class UvicornException(HTTPException):
         self.status_code = status_code
 
 
-async def unicorn_exception_handler(request: Request, exc: UvicornException):
+async def uvicorn_exception_handler(request: Request, exc: UvicornException):
     logger.error(exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -151,6 +151,6 @@ async def validation_exception_handler(request, exc):
 
 def add_exception_handler(app: FastAPI):
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    app.add_exception_handler(UvicornException, unicorn_exception_handler)
+    app.add_exception_handler(UvicornException, uvicorn_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
