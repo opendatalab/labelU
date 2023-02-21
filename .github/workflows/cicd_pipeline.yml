@@ -48,6 +48,42 @@ jobs:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
+      
+      - name: Inject backend info into frontend
+        uses: satackey/action-js-inline@v0.0.2
+        id: InjectBackend
+      - env:
+          PROVIDED_VERSION: 0.5.${{ github.run_number }}
+        with:
+          required-packages: toml
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const toml = require('toml');
+            const rootPath = path.join(__dirname, '../../');
+            const projectInfo = toml.parse(fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8'));
+
+            const backendInfo = {
+              version: process.env.PROVIDED_VERSION || projectInfo.version,
+              name: 'LabelU',
+              build_time: new Date().toISOString(),
+              commit: process.env.GITHUB_SHA,
+            };
+
+            const code = `
+              (function () {
+                window.__backend = ${JSON.stringify(backendInfo, null, 2)};
+              })();
+            `;
+
+            fs.writeFileSync(
+              path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
+              code,
+              'utf-8',
+            );
+
+            console.log('inject backend info success!');
+
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
