@@ -61,28 +61,35 @@ jobs:
             const path = require('path');
             const toml = require('toml');
             const rootPath = path.join(__dirname, '../../');
-            const projectInfo = toml.parse(fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8'));
 
-            const backendInfo = {
-              version: process.env.PROVIDED_VERSION || projectInfo.version,
-              name: 'LabelU',
-              build_time: new Date().toISOString(),
-              commit: process.env.GITHUB_SHA,
-            };
+            try {
 
-            const code = `
-              (function () {
-                window.__backend = ${JSON.stringify(backendInfo, null, 2)};
-              })();
-            `;
+              const projectInfo = toml.parse(fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8'));
 
-            fs.writeFileSync(
-              path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
-              code,
-              'utf-8',
-            );
+              const backendInfo = {
+                version: process.env.PROVIDED_VERSION || projectInfo.version,
+                name: 'LabelU',
+                build_time: new Date().toISOString(),
+                commit: process.env.GITHUB_SHA,
+              };
 
-            console.log('inject backend info success!');
+              const code = `
+                (function () {
+                  window.__backend = ${JSON.stringify(backendInfo, null, 2)};
+                })();
+              `;
+
+              fs.writeFileSync(
+                path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
+                code,
+                'utf-8',
+              );
+
+              console.log('inject backend info success!');
+            } catch (e) {
+              console.error(e);
+              process.exit(1);
+            }
 
       - uses: abatilo/actions-poetry@v2
         with:
