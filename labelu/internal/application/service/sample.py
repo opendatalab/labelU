@@ -189,7 +189,8 @@ async def patch(
                 db=db, owner_id=current_user.id, task_ids=[task_id]
             )
             task_obj_in = {Task.status.key: TaskStatus.INPROGRESS.value}
-            if statics.get(f"{task.id}_{SampleState.NEW.value}", 0) <= 1:
+            new_sample_cnt = statics.get(f"{task.id}_{SampleState.NEW.value}", 0)
+            if new_sample_cnt == 0 or (new_sample_cnt == 1 and sample.state == SampleState.NEW.value):
                 task_obj_in[Task.status.key] = TaskStatus.FINISHED.value
             if task.status != task_obj_in[Task.status.key]:
                 crud_task.update(db=db, db_obj=task, obj_in=task_obj_in)
