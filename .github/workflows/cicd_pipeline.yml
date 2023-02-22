@@ -55,37 +55,44 @@ jobs:
       - env:
           PROVIDED_VERSION: 0.5.${{ github.run_number }}
         with:
-          required-packages: toml
+          required-packages: '@iarna/toml'
           script: |
             const fs = require('fs');
             const path = require('path');
-            const toml = require('toml');
+            const toml = require('@iarna/toml');
             const rootPath = path.join(__dirname, '../../');
 
             try {
-
-              const projectInfo = toml.parse(fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8'));
-
               const backendInfo = {
-                version: process.env.PROVIDED_VERSION || projectInfo.version,
-                name: 'LabelU',
-                build_time: new Date().toISOString(),
-                commit: process.env.GITHUB_SHA,
-              };
+                  version: process.env.PROVIDED_VERSION || projectInfo.tool.poetry.version,
+                  name: projectInfo.tool.poetry.name || 'LabelU',
+                  build_time: new Date().toISOString(),
+                  commit: process.env.GITHUB_SHA,
+                };
 
-              const code = `
-                (function () {
-                  window.__backend = ${JSON.stringify(backendInfo, null, 2)};
-                })();
-              `;
+                const code = `
+                              (function () {
+                                window.__backend = ${JSON.stringify(backendInfo, null, 2)};
+                              })();
+                            `;
 
-              fs.writeFileSync(
-                path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
-                code,
-                'utf-8',
-              );
+                fs.writeFileSync(
+                  path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
+                  code,
+                  'utf-8'
+                );
 
-              console.log('inject backend info success!');
+                console.log('Update backend_version.js success!');
+
+                projectInfo.tool.poetry.version = process.env.PROVIDED_VERSION;
+
+                fs.writeFileSync(
+                  path.join(rootPath, 'pyproject.toml'),
+                  toml.stringify(projectInfo),
+                  'utf-8'
+                );
+
+                console.log('Update pyproject.toml success!');
             } catch (e) {
               console.error(e);
               process.exit(1);
