@@ -61,6 +61,8 @@ jobs:
             const path = require('path');
             const toml = require('@iarna/toml');
             const rootPath = path.join(__dirname, '../../');
+            
+            console.log('rootPath', rootPath);
 
             try {
               const backendInfo = {
