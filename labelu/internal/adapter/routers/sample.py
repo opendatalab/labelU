@@ -8,7 +8,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from labelu.internal.common import db
 from labelu.internal.common.security import security
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UnicornException
+from labelu.internal.common.error_code import UvicornException
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.service import sample as service
@@ -76,7 +76,7 @@ async def list_by(
     """
 
     if len([i for i in (after, before, pageNo) if i != None]) != 1:
-        raise UnicornException(
+        raise UvicornException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             code=ErrorCode.CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR,
         )
