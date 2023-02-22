@@ -65,6 +65,9 @@ jobs:
             console.log('rootPath', rootPath);
 
             try {
+              const projectInfo = toml.parse(
+                fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8')
+              );
               const backendInfo = {
                   version: process.env.PROVIDED_VERSION || projectInfo.tool.poetry.version,
                   name: projectInfo.tool.poetry.name || 'LabelU',
@@ -85,16 +88,6 @@ jobs:
                 );
 
                 console.log('Update backend_version.js success!');
-
-                projectInfo.tool.poetry.version = process.env.PROVIDED_VERSION;
-
-                fs.writeFileSync(
-                  path.join(rootPath, 'pyproject.toml'),
-                  toml.stringify(projectInfo),
-                  'utf-8'
-                );
-
-                console.log('Update pyproject.toml success!');
             } catch (e) {
               console.error(e);
               process.exit(1);
@@ -139,11 +132,11 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: docker.shlab.tech/public/labelu:0.5.${{ github.run_number }}-dev
-      - name: Commit .VERSION to current branch
+      - name: Commit .VERSION pyproject.toml files to current branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update .VERSION [skip ci]"
-          file_pattern: .VERSION
+          commit_message: "Update .VERSION and pyproject.toml [skip ci]"
+          file_pattern: '.VERSION pyproject.toml'
       - name: Webhook message
         uses: joelwmale/webhook-action@master
         with:
