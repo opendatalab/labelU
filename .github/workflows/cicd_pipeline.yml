@@ -60,7 +60,7 @@ jobs:
             const fs = require('fs');
             const path = require('path');
             const toml = require('@iarna/toml');
-            const rootPath = path.join(__dirname, '../../');
+            const rootPath = path.join(process.cwd(), '');
             
             console.log('rootPath', rootPath);
 
