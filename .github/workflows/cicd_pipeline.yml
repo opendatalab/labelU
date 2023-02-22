@@ -52,7 +52,7 @@ jobs:
       - name: Inject backend info into frontend
         uses: satackey/action-js-inline@v0.0.2
         id: InjectBackend
-      - env:
+        env:
           PROVIDED_VERSION: 0.5.${{ github.run_number }}
         with:
           required-packages: '@iarna/toml'
