@@ -1,6 +1,6 @@
 import uvicorn
 from typer import Typer
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.adapter.routers import add_router
@@ -92,6 +92,13 @@ add_router(app=app)
 add_middleware(app=app)
 
 app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
+
+@app.middleware("http")
+async def add_correct_content_type(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.endswith(".js"):
+        response.headers["content-type"] = "application/javascript"
+    return response
 
 cli = Typer()
 
