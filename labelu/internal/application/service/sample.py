@@ -14,11 +14,13 @@ from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import UvicornException
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
+from labelu.internal.adapter.persistence import crud_sample_max_id
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.domain.models.sample import SampleState
+from labelu.internal.domain.models.sample_max_id import TaskSampleMaxId
 from labelu.internal.application.command.sample import ExportType
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
@@ -41,22 +43,27 @@ async def create(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    samples = [
-        TaskSample(
-            task_id=task_id,
-            task_attachment_ids=str(sample.attachement_ids),
-            created_by=current_user.id,
-            updated_by=current_user.id,
-            data=json.dumps(sample.data),
-        )
-        for sample in cmd
-    ]
-
     with db.begin():
+        sample_id_item = crud_sample_max_id.get(db=db, task_id=task_id)
+        sample_max_id = sample_id_item.sample_max_id
+        samples = [
+            TaskSample(
+                inner_id=sample_max_id+s+1,
+                task_id=task_id,
+                task_attachment_ids=str(cmd[s].attachement_ids),
+                created_by=current_user.id,
+                updated_by=current_user.id,
+                data=json.dumps(cmd[s].data),
+            )
+            for s in range(len(cmd))
+        ]
         if task.status == TaskStatus.DRAFT.value:
             obj_in = {Task.status.key: TaskStatus.IMPORTED}
             crud_task.update(db=db, db_obj=task, obj_in=obj_in)
         new_samples = crud_sample.batch(db=db, samples=samples)
+        # update task sample max id
+        id_obj_in = {TaskSampleMaxId.sample_max_id.key: sample_max_id+len(cmd)}
+        crud_sample_max_id.update(db=db, db_obj=sample_id_item, obj_in=id_obj_in)
 
     # response
     ids = [s.id for s in new_samples]
@@ -91,6 +98,7 @@ async def list_by(
     return [
         SampleResponse(
             id=sample.id,
+            inner_id=sample.inner_id,
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
@@ -127,6 +135,7 @@ async def get(
     # response
     return SampleResponse(
         id=sample.id,
+        inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
         annotated_count=sample.annotated_count,
@@ -200,6 +209,7 @@ async def patch(
     # response
     return SampleResponse(
         id=updated_sample.id,
+        inner_id=updated_sample.inner_id,
         state=updated_sample.state,
         data=json.loads(updated_sample.data),
         annotated_count=updated_sample.annotated_count,
