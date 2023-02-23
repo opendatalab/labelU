@@ -43,6 +43,14 @@ async def create(
                 updated_by=current_user.id,
             ),
         )
+        new_sample_id = crud_sample_max_id.create(
+            db=db,
+            task_id_item=TaskSampleMaxId(
+                task_id=new_task.id,
+                create_by=new_task.owner.id,
+                update_by=new_task.owner.id,
+            ),  
+        )
 
     # response
     return TaskResponse(
