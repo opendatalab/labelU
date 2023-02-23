@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UvicornException
+from labelu.internal.common.error_code import UnicornException
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
@@ -119,7 +119,7 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UvicornException(
+        raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -159,7 +159,7 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UvicornException(
+        raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -197,7 +197,7 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UvicornException(
+        raise UnicornException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -208,7 +208,7 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
             task.created_by,
             current_user.id,
         )
-        raise UvicornException(
+        raise UnicornException(
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,
         )
