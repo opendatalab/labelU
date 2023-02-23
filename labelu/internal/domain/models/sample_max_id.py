@@ -7,7 +7,7 @@ from labelu.internal.common.db import Base
 
 
 class TaskSampleMaxId(Base):
-    __tablename__ = 'sample_max_id'
+    __tablename__ = 'task_sample_max_id'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
