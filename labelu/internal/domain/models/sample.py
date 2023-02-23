@@ -22,6 +22,7 @@ class TaskSample(Base):
     __tablename__ = "task_sample"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    inner_id = Column(Integer, ForeignKey=("sample_max_id.id"), index=True, comment="current sample id in a task")
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
     task_attachment_ids = Column(String(255), comment="task sample attachment ids")
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
@@ -51,5 +52,6 @@ class TaskSample(Base):
     task = relationship("Task", foreign_keys=[task_id])
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])
+    sample_max_id = relationship("TaskSampleMaxId", foreign_keys=[inner_id])
 
     Index("idx_sample_id_deleted_at", id, deleted_at)
