@@ -13,8 +13,10 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import SampleState
+from labelu.internal.domain.models.sample_max_id import TaskSampleMaxId
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
+from labelu.internal.adapter.persistence import crud_sample_max_id
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
 from labelu.internal.application.response.base import UserResp

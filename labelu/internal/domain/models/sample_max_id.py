@@ -14,7 +14,7 @@ class TaskSampleMaxId(Base):
     sample_max_id = Column(Integer, default=0, comment="The max sample id of task")
     create_by = Column(Integer, ForeignKey("user.id"), index=True)
     create_at = Column(DateTime, default=datetime.now, comment="The first time to create sample of a task")
-    update_by = Column(Integer, ForeignKey="user.id")
+    update_by = Column(Integer, ForeignKey("user.id"))
     update_at = Column(DateTime, default=datetime.now, comment="Last time a sample was updated")
 
     task = relationship("Task", foreign_keys=[task_id])
