@@ -53,7 +53,6 @@ async def create(
     ]
 
     with db.begin():
-        
         if task.status == TaskStatus.DRAFT.value:
             obj_in = {Task.status.key: TaskStatus.IMPORTED}
             crud_task.update(db=db, db_obj=task, obj_in=obj_in)

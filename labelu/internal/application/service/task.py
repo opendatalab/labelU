@@ -30,27 +30,30 @@ async def create(
     db: Session, cmd: BasicConfigCommand, current_user: User
 ) -> TaskResponse:
     # new a task
+    try:
+        with db.begin():
+            new_task = crud_task.create(
+                db=db,
+                task=Task(
+                    status=TaskStatus.DRAFT.value,
+                    name=cmd.name,
+                    description=cmd.description,
+                    tips=cmd.tips,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
+            new_sample_id = crud_sample_max_id.create(
+                db=db,
+                sample_max_id_item=TaskSampleMaxId(
+                    task_id=new_task.id,
+                    create_by=new_task.owner.id,
+                    update_by=new_task.owner.id,
+                ),
+            )
+    except Exception as e:
+        logger.error(e)
 
-    with db.begin():
-        new_task = crud_task.create(
-            db=db,
-            task=Task(
-                status=TaskStatus.DRAFT.value,
-                name=cmd.name,
-                description=cmd.description,
-                tips=cmd.tips,
-                created_by=current_user.id,
-                updated_by=current_user.id,
-            ),
-        )
-        new_sample_id = crud_sample_max_id.create(
-            db=db,
-            task_id_item=TaskSampleMaxId(
-                task_id=new_task.id,
-                create_by=new_task.owner.id,
-                update_by=new_task.owner.id,
-            ),  
-        )
 
     # response
     return TaskResponse(
