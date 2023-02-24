@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UnicornException
+from labelu.internal.common.error_code import LabelUException
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.attachment import TaskAttachment
@@ -30,13 +30,13 @@ async def create(
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task: {}", task_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
     if task.status == TaskStatus.FINISHED:
         logger.error("task status is finieshed, so cannot upload new files")
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_50001_TASK_FINISHED_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -87,7 +87,7 @@ async def create(
             image.save(tumbnail_full_path)
     except Exception as e:
         logger.error(e)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -102,7 +102,7 @@ async def create(
             cmd.file.content_type,
             tumbnail_full_path,
         )
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -133,7 +133,7 @@ async def download_attachment(file_path: str) -> str:
     file_full_path = settings.MEDIA_ROOT.joinpath(file_path.lstrip("/"))
     if not file_full_path.is_file() or not file_full_path.exists():
         logger.error("attachment not found:{}", file_full_path)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -150,7 +150,7 @@ async def delete(
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -161,7 +161,7 @@ async def delete(
             task.created_by,
             current_user.id,
         )
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,
         )

@@ -83,7 +83,7 @@ class ErrorCode(Enum):
     )
 
 
-class UnicornException(HTTPException):
+class LabelUException(HTTPException):
     def __init__(
         self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     ):
@@ -92,7 +92,7 @@ class UnicornException(HTTPException):
         self.status_code = status_code
 
 
-async def unicorn_exception_handler(request: Request, exc: UnicornException):
+async def labelu_exception_handler(request: Request, exc: LabelUException):
     logger.error(exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -151,6 +151,6 @@ async def validation_exception_handler(request, exc):
 
 def add_exception_handler(app: FastAPI):
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    app.add_exception_handler(UnicornException, unicorn_exception_handler)
+    app.add_exception_handler(LabelUException, labelu_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)

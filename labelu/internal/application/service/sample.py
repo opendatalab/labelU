@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UnicornException
+from labelu.internal.common.error_code import LabelUException
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.domain.models.user import User
@@ -37,7 +37,7 @@ async def create(
         task = crud_task.get(db=db, task_id=task_id, lock_label=True)
         if not task:
             logger.error("cannot find task:{}", task_id)
-            raise UnicornException(
+            raise LabelUException(
                 code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
@@ -121,7 +121,7 @@ async def get(
 
     if not sample:
         logger.error("cannot find sample:{}", sample_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -158,7 +158,7 @@ async def patch(
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -167,7 +167,7 @@ async def patch(
     sample = crud_sample.get(db=db, sample_id=sample_id)
     if not sample:
         logger.error("cannot find sample:{}", sample_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -260,7 +260,7 @@ async def export(
     except Exception as e:
         logger.error(data)
         logger.error(e)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_55002_SAMPLE_FORMAT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
