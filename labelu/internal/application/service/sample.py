@@ -31,31 +31,32 @@ from labelu.internal.application.response.sample import SampleResponse
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
 ) -> CreateSampleResponse:
-
-    # check task exist
-    task = crud_task.get(db=db, task_id=task_id)
-    if not task:
-        logger.error("cannot find task:{}", task_id)
-        raise UnicornException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-
-    samples = [
-        TaskSample(
-            task_id=task_id,
-            task_attachment_ids=str(sample.attachement_ids),
-            created_by=current_user.id,
-            updated_by=current_user.id,
-            data=json.dumps(sample.data),
-        )
-        for sample in cmd
-    ]
-
+    obj_in = {}
     with db.begin():
+        # check task exist
+        task = crud_task.get(db=db, task_id=task_id, lock_label=True)
+        if not task:
+            logger.error("cannot find task:{}", task_id)
+            raise UnicornException(
+                code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        samples = [
+            TaskSample(
+                inner_id=task.sample_max_id + s + 1,
+                task_id=task_id,
+                task_attachment_ids=str(cmd[s].attachement_ids),
+                created_by=current_user.id,
+                updated_by=current_user.id,
+                data=json.dumps(cmd[s].data),
+            )
+            for s in cmd
+        ]
+        obj_in[Task.sample_max_id.key] = task.sample_max_id + len(cmd)
         if task.status == TaskStatus.DRAFT.value:
-            obj_in = {Task.status.key: TaskStatus.IMPORTED}
-            crud_task.update(db=db, db_obj=task, obj_in=obj_in)
+            obj_in[Task.status.key] = TaskStatus.IMPORTED
+        crud_task.update(db=db, db_obj=task, obj_in=obj_in)
         new_samples = crud_sample.batch(db=db, samples=samples)
 
     # response
@@ -91,6 +92,7 @@ async def list_by(
     return [
         SampleResponse(
             id=sample.id,
+            inner_id=sample.inner_id,
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
@@ -127,6 +129,7 @@ async def get(
     # response
     return SampleResponse(
         id=sample.id,
+        inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
         annotated_count=sample.annotated_count,
@@ -200,6 +203,7 @@ async def patch(
     # response
     return SampleResponse(
         id=updated_sample.id,
+        inner_id=updated_sample.inner_id,
         state=updated_sample.state,
         data=json.loads(updated_sample.data),
         annotated_count=updated_sample.annotated_count,

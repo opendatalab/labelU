@@ -25,8 +25,12 @@ def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[
     )
 
 
-def get(db: Session, task_id: int) -> Task:
-    return db.query(Task).filter(Task.id == task_id, Task.deleted_at == None).first()
+def get(db: Session, task_id: int, lock_label: False) -> Task:
+    if lock_label:
+        return db.query(Task).filter(Task.id == task_id, Task.deleted_at == None).with_for_update().first()
+    else:
+        return db.query(Task).filter(Task.id == task_id, Task.deleted_at == None).first()
+
 
 
 def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
