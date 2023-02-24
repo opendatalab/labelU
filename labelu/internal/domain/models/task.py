@@ -36,7 +36,7 @@ class Task(Base):
     name = Column(String(64), index=True)
     description = Column(String(1024), comment="task description")
     tips = Column(String(1024), comment="task tips")
-    sample_max_id = Column(Integer, comment="The max sample id of task")
+    sample_max_id = Column(Integer, default=0, comment="The max sample id of task")
     config = Column(Text, comment="task config yaml")
     media_type = Column(
         String(32),
