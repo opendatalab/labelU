@@ -36,7 +36,7 @@ class Task(Base):
     name = Column(String(64), index=True)
     description = Column(String(1024), comment="task description")
     tips = Column(String(1024), comment="task tips")
-    sample_cnt = Column(Integer, default=0, comment="The number of sample in task")
+    sample_cnt = Column(Integer, default=0, comment="The number of sample in a task")
     config = Column(Text, comment="task config yaml")
     media_type = Column(
         String(32),
