@@ -44,16 +44,16 @@ async def create(
 
         samples = [
             TaskSample(
-                inner_id=task.sample_max_id + s + 1,
+                inner_id=task.sample_cnt + i + 1,
                 task_id=task_id,
-                task_attachment_ids=str(cmd[s].attachement_ids),
+                task_attachment_ids=str(sample.attachement_ids),
                 created_by=current_user.id,
                 updated_by=current_user.id,
-                data=json.dumps(cmd[s].data),
+                data=json.dumps(sample.data),
             )
-            for s in range(len(cmd))
+            for i, sample in enumerate(cmd)
         ]
-        obj_in[Task.sample_max_id.key] = task.sample_max_id + len(cmd)
+        obj_in[Task.sample_cnt.key] = task.sample_cnt + len(cmd)
         if task.status == TaskStatus.DRAFT.value:
             obj_in[Task.status.key] = TaskStatus.IMPORTED
         crud_task.update(db=db, db_obj=task, obj_in=obj_in)
