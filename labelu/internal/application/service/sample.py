@@ -51,7 +51,7 @@ async def create(
                 updated_by=current_user.id,
                 data=json.dumps(cmd[s].data),
             )
-            for s in cmd
+            for s in range(len(cmd))
         ]
         obj_in[Task.sample_max_id.key] = task.sample_max_id + len(cmd)
         if task.status == TaskStatus.DRAFT.value:

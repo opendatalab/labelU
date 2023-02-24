@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
@@ -25,7 +25,7 @@ def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[
     )
 
 
-def get(db: Session, task_id: int, lock_label: bool=False) -> Task:
+def get(db: Session, task_id: int, lock_label: Union[bool, None]=False) -> Task:
     if not lock_label:
         return db.query(Task).filter(Task.id == task_id, Task.deleted_at == None).first()
     else:
