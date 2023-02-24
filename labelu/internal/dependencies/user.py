@@ -10,7 +10,7 @@ from labelu.internal.common import db
 from labelu.internal.common.config import settings
 from labelu.internal.common.security import AccessToken
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UvicornException
+from labelu.internal.common.error_code import UnicornException
 from labelu.internal.adapter.persistence import crud_user
 
 
@@ -36,13 +36,13 @@ def get_current_user(
         )
         token_data = AccessToken(**payload)
     except (jwt.JWTError, ValidationError):
-        raise UvicornException(
+        raise UnicornException(
             code=ErrorCode.CODE_40003_CREDENTIAL_ERROR,
             status_code=status.HTTP_403_FORBIDDEN,
         )
     user = crud_user.get(db, id=token_data.id)
     if not user:
-        raise UvicornException(
+        raise UnicornException(
             code=ErrorCode.CODE_40002_USER_NOT_FOUND, status_code=404
         )
     return user
