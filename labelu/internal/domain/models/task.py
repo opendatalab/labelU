@@ -36,6 +36,9 @@ class Task(Base):
     name = Column(String(64), index=True)
     description = Column(String(1024), comment="task description")
     tips = Column(String(1024), comment="task tips")
+    last_sample_inner_id = Column(
+        Integer, default=0, comment="The last inner id of sample in a task"
+    )
     config = Column(Text, comment="task config yaml")
     media_type = Column(
         String(32),
