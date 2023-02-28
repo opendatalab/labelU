@@ -31,31 +31,32 @@ from labelu.internal.application.response.sample import SampleResponse
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
 ) -> CreateSampleResponse:
-
-    # check task exist
-    task = crud_task.get(db=db, task_id=task_id)
-    if not task:
-        logger.error("cannot find task:{}", task_id)
-        raise LabelUException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-
-    samples = [
-        TaskSample(
-            task_id=task_id,
-            task_attachment_ids=str(sample.attachement_ids),
-            created_by=current_user.id,
-            updated_by=current_user.id,
-            data=json.dumps(sample.data),
-        )
-        for sample in cmd
-    ]
-
+    obj_in = {}
     with db.begin():
+        # check task exist
+        task = crud_task.get(db=db, task_id=task_id, lock=True)
+        if not task:
+            logger.error("cannot find task:{}", task_id)
+            raise LabelUException(
+                code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        samples = [
+            TaskSample(
+                inner_id=task.last_sample_inner_id + i + 1,
+                task_id=task_id,
+                task_attachment_ids=str(sample.attachement_ids),
+                created_by=current_user.id,
+                updated_by=current_user.id,
+                data=json.dumps(sample.data),
+            )
+            for i, sample in enumerate(cmd)
+        ]
+        obj_in[Task.last_sample_inner_id.key] = task.last_sample_inner_id + len(cmd)
         if task.status == TaskStatus.DRAFT.value:
-            obj_in = {Task.status.key: TaskStatus.IMPORTED}
-            crud_task.update(db=db, db_obj=task, obj_in=obj_in)
+            obj_in[Task.status.key] = TaskStatus.IMPORTED
+        crud_task.update(db=db, db_obj=task, obj_in=obj_in)
         new_samples = crud_sample.batch(db=db, samples=samples)
 
     # response
