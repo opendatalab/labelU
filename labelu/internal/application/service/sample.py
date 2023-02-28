@@ -92,6 +92,7 @@ async def list_by(
     return [
         SampleResponse(
             id=sample.id,
+            inner_id=sample.inner_id,
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
@@ -128,6 +129,7 @@ async def get(
     # response
     return SampleResponse(
         id=sample.id,
+        inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
         annotated_count=sample.annotated_count,
@@ -203,6 +205,7 @@ async def patch(
     # response
     return SampleResponse(
         id=updated_sample.id,
+        inner_id=updated_sample.inner_id,
         state=updated_sample.state,
         data=json.loads(updated_sample.data),
         annotated_count=updated_sample.annotated_count,
