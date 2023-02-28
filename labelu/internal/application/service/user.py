@@ -8,7 +8,7 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UvicornException
+from labelu.internal.common.error_code import LabelUException
 from labelu.internal.common.security import AccessToken
 from labelu.internal.common.security import verify_password
 from labelu.internal.common.security import get_password_hash
@@ -24,7 +24,7 @@ async def signup(db: Session, cmd: SignupCommand) -> SignupResponse:
     user = crud_user.get_user_by_username(db, username=cmd.username)
     if user:
         logger.error("user already exist:{}", cmd.username)
-        raise UvicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_40001_USERNAME_ALREADY_EXISTS,
             status_code=status.HTTP_400_BAD_REQUEST,
         )
@@ -48,7 +48,7 @@ async def login(db: Session, cmd: LoginCommand) -> LoginResponse:
     # check user exsit and verify password
     user = crud_user.get_user_by_username(db, cmd.username)
     if not user or not verify_password(cmd.password, user.hashed_password):
-        raise UvicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_40000_USERNAME_OR_PASSWORD_INCORRECT,
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
