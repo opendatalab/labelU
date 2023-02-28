@@ -25,8 +25,25 @@ def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[
     )
 
 
-def get(db: Session, task_id: int) -> Task:
-    return db.query(Task).filter(Task.id == task_id, Task.deleted_at == None).first()
+def get(db: Session, task_id: int, lock: bool = False) -> Task:
+    """return a Task item according to task id
+
+    Args:
+        db (Session): a session connect to table
+        task_id (int): a given task id
+        lock (bool, optional): if lock is True, means add exclusive lock in a row. Defaults to False.
+    """
+    if not lock:
+        return (
+            db.query(Task).filter(Task.id == task_id, Task.deleted_at == None).first()
+        )
+    else:
+        return (
+            db.query(Task)
+            .filter(Task.id == task_id, Task.deleted_at == None)
+            .with_for_update()
+            .first()
+        )
 
 
 def update(db: Session, db_obj: Task, obj_in: Dict[str, Any]) -> Task:
