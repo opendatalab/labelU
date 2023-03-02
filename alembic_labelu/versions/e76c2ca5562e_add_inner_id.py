@@ -58,12 +58,6 @@ def upgrade() -> None:
                     ),
                     insert_after="id",
                 )
-            op.create_index(
-                op.f("ix_task_sample_inner_id"),
-                "task_sample",
-                ["inner_id"],
-                unique=False,
-            )
 
         op.execute(
             "UPDATE task SET last_sample_inner_id=(SELECT sample_number FROM ( SELECT task_id, COUNT(id) AS sample_number FROM task_sample GROUP BY task_id ) task_sample_number WHERE task.id=task_sample_number.task_id )"
