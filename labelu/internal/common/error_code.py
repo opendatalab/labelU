@@ -1,14 +1,15 @@
 from enum import Enum
 
 from loguru import logger
-from fastapi.responses import JSONResponse
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
 from labelu.internal.common.config import settings
+
+import pkg_resources
+import os
 
 # common init error code
 COMMON_INIT_CODE = 30000
@@ -107,7 +108,14 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         exc.status_code == status.HTTP_404_NOT_FOUND
         and not request.url.path.startswith(settings.API_V1_STR)
     ):
-        return RedirectResponse("/")
+        return FileResponse(
+            os.path.join(
+                pkg_resources.resource_filename('labelu.internal', 'statics'),
+                'index.html'
+                ),
+            status_code=200,
+            headers={'Content-Type': 'text/html', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive'}
+            )
     elif exc.status_code == status.HTTP_403_FORBIDDEN:
         JSONResponse(
             status_code=exc.status_code,
