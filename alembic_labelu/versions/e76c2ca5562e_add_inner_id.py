@@ -27,31 +27,37 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # add inner_id and last_sample_inner_id columns in the task and sample tables
+    """
+    add inner_id and last_sample_inner_id columns in the task and sample tables
+    """
     with context.begin_transaction():
         if not alembic_labelu_tools.column_exist_in_table(
             "task", "last_sample_inner_id"
         ):
-            op.add_column(
-                "task",
-                sa.Column(
-                    "last_sample_inner_id",
-                    sa.Integer(),
-                    nullable=True,
-                    comment="The last inner id of sample in a task",
-                    server_default=text("0"),
-                ),
-            )
+            with op.batch_alter_table("task", recreate="always") as batch_op_task:
+                batch_op_task.add_column(
+                    sa.Column(
+                        "last_sample_inner_id",
+                        sa.Integer(),
+                        nullable=True,
+                        comment="The last inner id of sample in a task",
+                        server_default=text("0"),
+                    ),
+                    insert_before="config",
+                )
         if not alembic_labelu_tools.column_exist_in_table("task_sample", "inner_id"):
-            op.add_column(
-                "task_sample",
-                sa.Column(
-                    "inner_id",
-                    sa.Integer(),
-                    nullable=True,
-                    comment="sample id in a task",
-                ),
-            )
+            with op.batch_alter_table(
+                "task_sample", recreate="always"
+            ) as batch_op_task_sample:
+                batch_op_task_sample.add_column(
+                    sa.Column(
+                        "inner_id",
+                        sa.Integer(),
+                        nullable=True,
+                        comment="sample id in a task",
+                    ),
+                    insert_after="id",
+                )
             op.create_index(
                 op.f("ix_task_sample_inner_id"),
                 "task_sample",
@@ -68,7 +74,9 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # delete inner_id and last_sample_inner_id columns in the task and sample tables
+    """
+    delete inner_id and last_sample_inner_id columns in the task and sample tables
+    """
     op.drop_index(op.f("ix_task_sample_inner_id"), table_name="task_sample")
     op.drop_column("task_sample", "inner_id")
     op.drop_column("task", "last_sample_inner_id")
