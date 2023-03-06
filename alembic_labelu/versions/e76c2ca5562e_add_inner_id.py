@@ -71,6 +71,5 @@ def downgrade() -> None:
     """
     delete inner_id and last_sample_inner_id columns in the task and sample tables
     """
-    op.drop_index(op.f("ix_task_sample_inner_id"), table_name="task_sample")
     op.drop_column("task_sample", "inner_id")
     op.drop_column("task", "last_sample_inner_id")
