@@ -26,19 +26,12 @@ async def create(
     db: Session, task_id: int, cmd: AttachmentCommand, current_user: User
 ) -> AttachmentResponse:
 
-    # check task not finished
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task: {}", task_id)
         raise LabelUException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
-        )
-    if task.status == TaskStatus.FINISHED:
-        logger.error("task status is finieshed, so cannot upload new files")
-        raise LabelUException(
-            code=ErrorCode.CODE_50001_TASK_FINISHED_ERROR,
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     # save file
