@@ -49,7 +49,7 @@ async def create(
                 task_attachment_ids=str(sample.attachement_ids),
                 created_by=current_user.id,
                 updated_by=current_user.id,
-                data=json.dumps(sample.data),
+                data=json.dumps(sample.data, ensure_ascii=False),
             )
             for i, sample in enumerate(cmd)
         ]
