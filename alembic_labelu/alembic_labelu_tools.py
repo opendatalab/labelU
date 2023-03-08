@@ -11,7 +11,7 @@ def column_exist_in_table(table_name, column_name):
         column_name (string): the name of column
 
     Returns:
-        bool: true or false, whether the column_name exists in the table_name 
+        bool: true or false, whether the column_name exists in the table_name
     """
     config = op.get_context().config
     engine = engine_from_config(

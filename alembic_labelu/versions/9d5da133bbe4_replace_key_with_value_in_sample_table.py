@@ -38,7 +38,9 @@ def upgrade() -> None:
 
     # replace the key with value in a transaction
     with context.begin_transaction():
-        task_items = session.execute("SELECT id, config FROM task")
+        task_items = session.execute(
+            "SELECT id, config FROM task WHERE config IS NOT NULL"
+        )
         for task_item in task_items:
             label_dict = {"无标签": "noneAttribute"}
             task_id = task_item[0]
@@ -51,17 +53,18 @@ def upgrade() -> None:
                 if normal_label.get("key", ""):
                     label_dict[normal_label.get("key")] = normal_label.get("value")
             # get the labels in configuration defined by user
-            for task_tool in task_config.get("tools"):
-                labels = task_tool.get("config").get("attributeList")
+            for task_tool in task_config.get("tools", []):
+                labels = task_tool.get("config").get("attributeList", [])
                 for label in labels:
-                    if label.get("key"):
+                    if label.get("key", ""):
                         label_dict[label.get("key")] = label.get("value")
 
             # replace key with value in the sample of current task
             # get the sample data items of the task id
             sample_items = session.execute(
-                f"SELECT id, data FROM task_sample WHERE task_id={task_id}"
+                f"SELECT id, data FROM task_sample WHERE task_id={task_id} AND annotated_count > 0"
             )
+            # if task have several annotated sample, continute to replace key with value
             for sample_item in sample_items:
                 sample_id = sample_item[0]
                 sample_data_item = json.loads(sample_item[1])
