@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UvicornException
+from labelu.internal.common.error_code import LabelUException
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.domain.models.user import User
@@ -31,31 +31,32 @@ from labelu.internal.application.response.sample import SampleResponse
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
 ) -> CreateSampleResponse:
-
-    # check task exist
-    task = crud_task.get(db=db, task_id=task_id)
-    if not task:
-        logger.error("cannot find task:{}", task_id)
-        raise UvicornException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-
-    samples = [
-        TaskSample(
-            task_id=task_id,
-            task_attachment_ids=str(sample.attachement_ids),
-            created_by=current_user.id,
-            updated_by=current_user.id,
-            data=json.dumps(sample.data),
-        )
-        for sample in cmd
-    ]
-
+    obj_in = {}
     with db.begin():
+        # check task exist
+        task = crud_task.get(db=db, task_id=task_id, lock=True)
+        if not task:
+            logger.error("cannot find task:{}", task_id)
+            raise LabelUException(
+                code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        samples = [
+            TaskSample(
+                inner_id=task.last_sample_inner_id + i + 1,
+                task_id=task_id,
+                task_attachment_ids=str(sample.attachement_ids),
+                created_by=current_user.id,
+                updated_by=current_user.id,
+                data=json.dumps(sample.data, ensure_ascii=False),
+            )
+            for i, sample in enumerate(cmd)
+        ]
+        obj_in[Task.last_sample_inner_id.key] = task.last_sample_inner_id + len(cmd)
         if task.status == TaskStatus.DRAFT.value:
-            obj_in = {Task.status.key: TaskStatus.IMPORTED}
-            crud_task.update(db=db, db_obj=task, obj_in=obj_in)
+            obj_in[Task.status.key] = TaskStatus.IMPORTED
+        crud_task.update(db=db, db_obj=task, obj_in=obj_in)
         new_samples = crud_sample.batch(db=db, samples=samples)
 
     # response
@@ -91,6 +92,7 @@ async def list_by(
     return [
         SampleResponse(
             id=sample.id,
+            inner_id=sample.inner_id,
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
@@ -119,7 +121,7 @@ async def get(
 
     if not sample:
         logger.error("cannot find sample:{}", sample_id)
-        raise UvicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -127,6 +129,7 @@ async def get(
     # response
     return SampleResponse(
         id=sample.id,
+        inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
         annotated_count=sample.annotated_count,
@@ -155,7 +158,7 @@ async def patch(
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UvicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -164,7 +167,7 @@ async def patch(
     sample = crud_sample.get(db=db, sample_id=sample_id)
     if not sample:
         logger.error("cannot find sample:{}", sample_id)
-        raise UvicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -190,7 +193,9 @@ async def patch(
             )
             task_obj_in = {Task.status.key: TaskStatus.INPROGRESS.value}
             new_sample_cnt = statics.get(f"{task.id}_{SampleState.NEW.value}", 0)
-            if new_sample_cnt == 0 or (new_sample_cnt == 1 and sample.state == SampleState.NEW.value):
+            if new_sample_cnt == 0 or (
+                new_sample_cnt == 1 and sample.state == SampleState.NEW.value
+            ):
                 task_obj_in[Task.status.key] = TaskStatus.FINISHED.value
             if task.status != task_obj_in[Task.status.key]:
                 crud_task.update(db=db, db_obj=task, obj_in=task_obj_in)
@@ -200,6 +205,7 @@ async def patch(
     # response
     return SampleResponse(
         id=updated_sample.id,
+        inner_id=updated_sample.inner_id,
         state=updated_sample.state,
         data=json.loads(updated_sample.data),
         annotated_count=updated_sample.annotated_count,
@@ -256,7 +262,7 @@ async def export(
     except Exception as e:
         logger.error(data)
         logger.error(e)
-        raise UvicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_55002_SAMPLE_FORMAT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

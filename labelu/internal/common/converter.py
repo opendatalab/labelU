@@ -71,13 +71,15 @@ class Converter:
                         tool_results = annotated_result.pop(tool)
                         for tool_result in tool_results.get("result", []):
                             tool_result["label"] = tool_result.pop("attribute", "")
-                            tool_result["attribute"] = tool_result.pop("textAttribute", "")
+                            tool_result["attribute"] = tool_result.pop(
+                                "textAttribute", ""
+                            )
                             tool_result.pop("sourceID", None)
                         annotations.append(tool_results)
 
                 annotated_result["annotations"] = annotations
 
-            annotated_result_str = json.dumps(annotated_result)
+            annotated_result_str = json.dumps(annotated_result, ensure_ascii=False)
             results.append(
                 {
                     "id": sample.get("id"),
