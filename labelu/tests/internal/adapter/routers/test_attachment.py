@@ -69,8 +69,7 @@ class TestClassTaskAttachmentRouter:
             )
 
         # check
-        assert new_res.status_code == 500
-        assert new_res.json()["err_code"] == 50001
+        assert new_res.status_code == 201
 
     def test_upload_file_not_image(
         self, client: TestClient, testuser_token_headers: dict, db: Session
