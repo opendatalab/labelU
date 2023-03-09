@@ -54,7 +54,7 @@ def upgrade() -> None:
                     label_dict[normal_label.get("key")] = normal_label.get("value")
             # get the labels in configuration defined by user
             for task_tool in task_config.get("tools", []):
-                labels = task_tool.get("config").get("attributeList", [])
+                labels = task_tool.get("config", "").get("attributeList", [])
                 for label in labels:
                     if label.get("key", ""):
                         label_dict[label.get("key")] = label.get("value")
