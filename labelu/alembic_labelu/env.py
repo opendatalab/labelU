@@ -6,6 +6,8 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+from alembic.config import Config
+from alembic import command
 
 from labelu.internal.common.db import Base
 from labelu.internal.domain.models.task import Task
@@ -14,20 +16,22 @@ from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.domain.models.attachment import TaskAttachment
 from labelu.internal.common.config import settings
 
+
 # append the alembic_labelu and alembic.ini to system path
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-sys.path.append(
-    os.path.join(
-        os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "alembic.ini"
-    )
-)
+# alembic_labelu_path = os.path.abspath(os.path.dirname(__file__))
+# alembic_ini_path = os.path.join(
+#     os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "alembic.ini"
+# )
+# sys.path.append(alembic_labelu_path)
+# sys.path.append(alembic_ini_path)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 # Directly use the sql url in labelu app
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

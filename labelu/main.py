@@ -9,7 +9,7 @@ from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import add_exception_handler
-from alembic_labelu.run_migrate import run_sqlite_migrations
+from labelu.alembic_labelu.run_migrate import run_sqlite_migrations
 
 
 description = """
