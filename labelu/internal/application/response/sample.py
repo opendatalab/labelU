@@ -14,7 +14,6 @@ class CreateSampleResponse(BaseModel):
 
 class SampleResponse(BaseModel):
     id: Union[int, None] = Field(default=None, description="description: annotation id")
-    inner_id: Union[int, None] = Field(default=None, description="description: inner id of a sample in task")
     state: Union[str, None] = Field(
         default=None,
         description="description: sample file state, NEW is has not start yet, DONE is completed, SKIPPED is skipped",

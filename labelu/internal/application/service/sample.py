@@ -44,7 +44,6 @@ async def create(
 
         samples = [
             TaskSample(
-                inner_id=task.last_sample_inner_id + i + 1,
                 task_id=task_id,
                 task_attachment_ids=str(sample.attachement_ids),
                 created_by=current_user.id,
@@ -53,7 +52,6 @@ async def create(
             )
             for i, sample in enumerate(cmd)
         ]
-        obj_in[Task.last_sample_inner_id.key] = task.last_sample_inner_id + len(cmd)
         if task.status == TaskStatus.DRAFT.value:
             obj_in[Task.status.key] = TaskStatus.IMPORTED
         crud_task.update(db=db, db_obj=task, obj_in=obj_in)
