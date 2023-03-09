@@ -9,7 +9,6 @@ from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import add_exception_handler
-from alembic_labelu.run_migrate import run_sqlite_migrations
 
 
 description = """
@@ -88,7 +87,6 @@ app = FastAPI(
 
 init_logging()
 init_tables()
-run_sqlite_migrations()
 add_exception_handler(app=app)
 add_router(app=app)
 add_middleware(app=app)

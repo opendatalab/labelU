@@ -22,7 +22,6 @@ class TaskSample(Base):
     __tablename__ = "task_sample"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    inner_id = Column(Integer, comment="sample id in a task")
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
     task_attachment_ids = Column(String(255), comment="task sample attachment ids")
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
