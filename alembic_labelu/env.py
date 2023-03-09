@@ -14,8 +14,13 @@ from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.domain.models.attachment import TaskAttachment
 from labelu.internal.common.config import settings
 
-# append the current directory to path
-sys.path.append(os.getcwd())
+# append the alembic_labelu and alembic.ini to system path
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+sys.path.append(
+    os.path.join(
+        os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "alembic.ini"
+    )
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
