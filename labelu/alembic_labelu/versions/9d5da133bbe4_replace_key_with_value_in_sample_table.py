@@ -13,6 +13,11 @@ from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.automap import automap_base
 
+from labelu.alembic_labelu.alembic_labelu_tools import (
+    get_tool_labels,
+    replace_key_with_value,
+)
+
 
 # revision identifiers, used by Alembic.
 revision = "9d5da133bbe4"
@@ -42,25 +47,9 @@ def upgrade() -> None:
             'SELECT id, config FROM task WHERE config IS NOT NULL AND config != ""'
         )
         for task_item in task_items:
-            label_dict = {"无标签": "noneAttribute"}
             task_id = task_item[0]
-            task_config = task_item[1]
-            task_config = json.loads(task_config)
-
-            # obtain the labels in current task
-            # get the general labels
-            for normal_label in task_config.get("attribute", []):
-                if normal_label.get("key", ""):
-                    label_dict[normal_label.get("key")] = normal_label.get("value")
-            # get the labels in configuration defined by user
-            for task_tool in task_config.get("tools", []):
-                if "config" not in task_tool.keys():
-                    continue
-                labels = task_tool.get("config").get("attributeList", [])
-                for label in labels:
-                    if label.get("key", ""):
-                        label_dict[label.get("key")] = label.get("value")
-
+            task_config = json.loads(task_item[1])
+            label_dict = get_tool_labels(task_config)
             # replace key with value in the sample of current task
             # get the sample data items of the task id
             sample_items = session.execute(
@@ -70,13 +59,9 @@ def upgrade() -> None:
             for sample_item in sample_items:
                 sample_id = sample_item[0]
                 sample_data_item = json.loads(sample_item[1])
-                sample_annotated_result = json.loads(sample_data_item.get("result"))
-                for sample_tool, sample_tool_results in sample_annotated_result.items():
-                    if sample_tool.endswith("Tool"):
-                        for sample_tool_result in sample_tool_results.get("result", []):
-                            tool_label = sample_tool_result.get("attribute", "")
-                            if tool_label in label_dict:
-                                sample_tool_result["attribute"] = label_dict[tool_label]
+                sample_annotated_result = replace_key_with_value(
+                    sample_data_item, label_dict
+                )
                 sample_data_item["result"] = json.dumps(
                     sample_annotated_result, ensure_ascii=False
                 )
