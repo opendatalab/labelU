@@ -1,4 +1,4 @@
-"""replace key with value in sample table
+"""replace key with value in sample table and display unicode as the corresponding Chinese
 
 Revision ID: 9d5da133bbe4
 Revises: e76c2ca5562e
@@ -12,6 +12,11 @@ from alembic import context
 from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.automap import automap_base
+
+from labelu.alembic_labelu.alembic_labelu_tools import (
+    get_tool_label_dict,
+    replace_key_with_value,
+)
 
 
 # revision identifiers, used by Alembic.
@@ -39,47 +44,32 @@ def upgrade() -> None:
     # replace the key with value in a transaction
     with context.begin_transaction():
         task_items = session.execute(
-            "SELECT id, config FROM task WHERE config IS NOT NULL"
+            'SELECT id, config FROM task WHERE config IS NOT NULL AND config != ""'
         )
         for task_item in task_items:
-            label_dict = {"无标签": "noneAttribute"}
             task_id = task_item[0]
-            task_config = task_item[1]
-            task_config = json.loads(task_config)
-
-            # obtain the labels in current task
-            # get the general labels
-            for normal_label in task_config.get("attribute", []):
-                if normal_label.get("key", ""):
-                    label_dict[normal_label.get("key")] = normal_label.get("value")
-            # get the labels in configuration defined by user
-            for task_tool in task_config.get("tools", []):
-                labels = task_tool.get("config").get("attributeList", [])
-                for label in labels:
-                    if label.get("key", ""):
-                        label_dict[label.get("key")] = label.get("value")
-
+            task_config = json.loads(task_item[1])
+            label_dict = get_tool_label_dict(task_config)
             # replace key with value in the sample of current task
             # get the sample data items of the task id
             sample_items = session.execute(
-                f"SELECT id, data FROM task_sample WHERE task_id={task_id} AND annotated_count > 0"
+                f"SELECT id, data, annotated_count FROM task_sample WHERE task_id={task_id}"
             )
             # if task have several annotated sample, continute to replace key with value
             for sample_item in sample_items:
                 sample_id = sample_item[0]
                 sample_data_item = json.loads(sample_item[1])
-                sample_annotated_result = json.loads(sample_data_item.get("result"))
-                for sample_tool in sample_annotated_result.keys():
-                    if sample_tool.endswith("Tool"):
-                        for sample_tool_result in sample_annotated_result.get(
-                            sample_tool
-                        ).get("result", []):
-                            tool_label = sample_tool_result.get("attribute", "")
-                            if tool_label in label_dict:
-                                sample_tool_result["attribute"] = label_dict[tool_label]
-                sample_data_item["result"] = json.dumps(
-                    sample_annotated_result, ensure_ascii=False
-                )
+                # replace key with value and display unicode as the corresponding Chinesedisplays unicode as the corresponding Chinese
+                if sample_item[2] > 0:
+                    sample_annotated_result = replace_key_with_value(
+                        sample_data_item, label_dict
+                    )
+                    sample_data_item["result"] = json.dumps(
+                        sample_annotated_result, ensure_ascii=False
+                    )
+                # display unicode as the corresponding Chinese
+                else:
+                    pass
                 sample_annotated_item_str = json.dumps(
                     sample_data_item, ensure_ascii=False
                 )

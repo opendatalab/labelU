@@ -16,7 +16,12 @@ from sqlalchemy.sql import text
 # import alembic_labelu_tools from the absolute path
 alembic_labelu_tools = imp.load_source(
     "alembic_labelu_tools",
-    (os.getcwd() + "/" + op.get_context().script.dir + "/alembic_labelu_tools.py"),
+    (
+        os.path.join(
+            os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+            "alembic_labelu_tools.py",
+        )
+    ),
 )
 
 # revision identifiers, used by Alembic.
