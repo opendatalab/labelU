@@ -6,8 +6,6 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from alembic.config import Config
-from alembic import command
 
 from labelu.internal.common.db import Base
 from labelu.internal.domain.models.task import Task
