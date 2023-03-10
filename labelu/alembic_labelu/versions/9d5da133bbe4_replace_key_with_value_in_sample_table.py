@@ -39,7 +39,7 @@ def upgrade() -> None:
     # replace the key with value in a transaction
     with context.begin_transaction():
         task_items = session.execute(
-            "SELECT id, config FROM task WHERE config IS NOT NULL"
+            'SELECT id, config FROM task WHERE config IS NOT NULL AND config != ""'
         )
         for task_item in task_items:
             label_dict = {"无标签": "noneAttribute"}
@@ -54,7 +54,9 @@ def upgrade() -> None:
                     label_dict[normal_label.get("key")] = normal_label.get("value")
             # get the labels in configuration defined by user
             for task_tool in task_config.get("tools", []):
-                labels = task_tool.get("config", "").get("attributeList", [])
+                if "config" not in task_tool.keys():
+                    continue
+                labels = task_tool.get("config").get("attributeList", [])
                 for label in labels:
                     if label.get("key", ""):
                         label_dict[label.get("key")] = label.get("value")
@@ -69,11 +71,9 @@ def upgrade() -> None:
                 sample_id = sample_item[0]
                 sample_data_item = json.loads(sample_item[1])
                 sample_annotated_result = json.loads(sample_data_item.get("result"))
-                for sample_tool in sample_annotated_result.keys():
+                for sample_tool, sample_tool_results in sample_annotated_result.items():
                     if sample_tool.endswith("Tool"):
-                        for sample_tool_result in sample_annotated_result.get(
-                            sample_tool
-                        ).get("result", []):
+                        for sample_tool_result in sample_tool_results.get("result", []):
                             tool_label = sample_tool_result.get("attribute", "")
                             if tool_label in label_dict:
                                 sample_tool_result["attribute"] = label_dict[tool_label]
