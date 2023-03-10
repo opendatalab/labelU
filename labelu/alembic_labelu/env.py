@@ -14,15 +14,10 @@ from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.domain.models.attachment import TaskAttachment
 from labelu.internal.common.config import settings
 
-# append the current directory to path
-sys.path.append(os.getcwd())
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-
-# Directly use the sql url in labelu app
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

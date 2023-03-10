@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "labelu"
-version = '0.5.331'
+version = '0.5.334'
 description = ""
 license = "Apache-2.0"
 authors = ["pengjinhu <pengjinhu@pjlab.org.cn>"]
 readme = "README.md"
 repository = "https://github.com/opendatalab/labelU"
-packages = [{include = "labelu"},{include = "alembic_labelu"}, {include="alembic.ini"}]
+packages = [{include = "labelu"}]
 
 [tool.poetry.scripts]
 labelu = "labelu.main:cli"
