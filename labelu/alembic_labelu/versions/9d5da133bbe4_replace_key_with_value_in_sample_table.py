@@ -1,4 +1,4 @@
-"""replace key with value in sample table
+"""replace key with value in sample table and display unicode as the corresponding Chinese
 
 Revision ID: 9d5da133bbe4
 Revises: e76c2ca5562e
@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.automap import automap_base
 
 from labelu.alembic_labelu.alembic_labelu_tools import (
-    get_tool_labels,
+    get_tool_label_dict,
     replace_key_with_value,
 )
 
@@ -49,22 +49,27 @@ def upgrade() -> None:
         for task_item in task_items:
             task_id = task_item[0]
             task_config = json.loads(task_item[1])
-            label_dict = get_tool_labels(task_config)
+            label_dict = get_tool_label_dict(task_config)
             # replace key with value in the sample of current task
             # get the sample data items of the task id
             sample_items = session.execute(
-                f"SELECT id, data FROM task_sample WHERE task_id={task_id} AND annotated_count > 0"
+                f"SELECT id, data, annotated_count FROM task_sample WHERE task_id={task_id}"
             )
             # if task have several annotated sample, continute to replace key with value
             for sample_item in sample_items:
                 sample_id = sample_item[0]
                 sample_data_item = json.loads(sample_item[1])
-                sample_annotated_result = replace_key_with_value(
-                    sample_data_item, label_dict
-                )
-                sample_data_item["result"] = json.dumps(
-                    sample_annotated_result, ensure_ascii=False
-                )
+                # replace key with value and display unicode as the corresponding Chinesedisplays unicode as the corresponding Chinese
+                if sample_item[2] > 0:
+                    sample_annotated_result = replace_key_with_value(
+                        sample_data_item, label_dict
+                    )
+                    sample_data_item["result"] = json.dumps(
+                        sample_annotated_result, ensure_ascii=False
+                    )
+                # display unicode as the corresponding Chinese
+                else:
+                    pass
                 sample_annotated_item_str = json.dumps(
                     sample_data_item, ensure_ascii=False
                 )

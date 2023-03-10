@@ -28,7 +28,7 @@ def column_exist_in_table(table_name, column_name):
     return column_exist
 
 
-def get_tool_labels(task_config: dict) -> dict:
+def get_tool_label_dict(task_config: dict) -> dict:
     """get the key value of labels in a given task_id and task_config"""
 
     label_dict = {"无标签": "noneAttribute"}
