@@ -3,7 +3,7 @@ name: "release CI/CD Pipeline"
 on:
   push:
     branches:
-      - release/**
+      - 'release/**'
   workflow_dispatch:
     inputs:
       branch:
