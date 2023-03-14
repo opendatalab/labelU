@@ -65,10 +65,10 @@ def upgrade() -> None:
                 )
 
         op.execute(
-            "UPDATE task SET last_sample_inner_id=task_sample_number.sample_number FROM (SELECT task_id, COUNT(id) AS sample_number FROM task_sample GROUP BY task_id ) task_sample_number WHERE task.id = task_sample_number.task_id"
+            "UPDATE task SET last_sample_inner_id=(SELECT sample_number FROM ( SELECT task_id, COUNT(id) AS sample_number FROM task_sample GROUP BY task_id ) task_sample_number WHERE task.id=task_sample_number.task_id )"
         )
         op.execute(
-            "UPDATE task_sample SET inner_id=tmp_sample_inner_id.newid FROM ( SELECT id,  ROW_NUMBER() OVER (PARTITION BY task_id ORDER BY created_at) AS newid FROM task_sample) tmp_sample_inner_id WHERE task_sample.id=tmp_sample_inner_id.id"
+            "UPDATE task_sample SET inner_id=(SELECT newid FROM ( SELECT id,  ROW_NUMBER() OVER (PARTITION BY task_id ORDER BY created_at) AS newid FROM task_sample) tmp_sample_inner_id WHERE task_sample.id=tmp_sample_inner_id.id)"
         )
 
 
