@@ -47,12 +47,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Resolve frontend
-        run: sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
+        run: |
+          sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
+          echo "BACKEND_CHANGELOG=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
+          echo "FRONTEND_CHANGELOG=${{ inputs.changelog }}" >> $GITHUB_ENV
+          echo "PROVIDED_VERSION=${GITHUB_REF##*/v}" >> $GITHUB_ENV
+          echo "CHANGELOG=${{ inputs.changelog || github.event.head_commit.message }}" >> $GITHUB_ENV
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
-          FRONTEND_CHANGELOG: ${{ inputs.changelog }} 
-          BACKEND_CHANGELOG: ${{ github.event.head_commit.message }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
       - uses: abatilo/actions-poetry@v2
         with:
@@ -69,8 +72,6 @@ jobs:
           verbose: true
       - name: Manage version
         run: |
-          PROVIDED_VERSION=$(echo ${GITHUB_REF##*/v})
-          echo "PROVIDED_VERSION=${GITHUB_REF##*/v}" >> $GITHUB_ENV
           sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
       - name: Publish
         env:
@@ -85,10 +86,8 @@ jobs:
           file_pattern: .VERSION
       - name: Webhook message
         uses: joelwmale/webhook-action@master
-        env:
-          CHANGELOG: ${{ env.FRONTEND_CHANGELOG || env.BACKEND_CHANGELOG }}
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${PROVIDED_VERSION}(prod) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${PROVIDED_VERSION}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${CHANGELOG}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(prod) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${{ env.CHANGELOG }}"}}'
 
