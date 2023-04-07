@@ -47,19 +47,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Resolve frontend
-        run: sh ./scripts/resolve_frontend.sh alpha $FRONTEND_VERSION $FRONTEND_ASSET_URL
+        run: |
+          sh ./scripts/resolve_frontend.sh alpha $FRONTEND_VERSION $FRONTEND_ASSET_URL
+          echo "BACKEND_CHANGELOG=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
+          echo "FRONTEND_CHANGELOG=${{ inputs.changelog }}" >> $GITHUB_ENV
+          echo "PROVIDED_VERSION=${GITHUB_REF##*/v}" >> $GITHUB_ENV
+          echo "CHANGELOG=${{ env.FRONTEND_CHANGELOG || env.BACKEND_CHANGELOG }}" >> $GITHUB_ENV
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
-          FRONTEND_CHANGELOG: ${{ inputs.changelog }} 
-          BACKEND_CHANGELOG: ${{ github.event.head_commit.message }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
       
       - name: Inject backend info into frontend
         uses: satackey/action-js-inline@v0.0.2
         id: InjectBackend
-        env:
-          PROVIDED_VERSION: 0.5.${{ github.run_number }}
         with:
           required-packages: '@iarna/toml'
           script: |
@@ -113,9 +114,6 @@ jobs:
           files: ./coverage.xml
           verbose: true
       - name: Manage version
-        env:
-          PROVIDED_VERSION: 0.5.${{ github.run_number }}
-          CHANGELOG: ${{ env.FRONTEND_CHANGELOG || env.BACKEND_CHANGELOG }}
         run: |
           sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
       - name: Publish
@@ -149,5 +147,5 @@ jobs:
         with:
           url: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=21ef6861-3a53-46ef-86bc-19918ae2a974
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${PROVIDED_VERSION}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${CHANGELOG}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${CHANGELOG}"}}'
 
