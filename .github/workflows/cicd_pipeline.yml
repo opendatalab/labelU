@@ -115,6 +115,7 @@ jobs:
       - name: Manage version
         env:
           PROVIDED_VERSION: 0.5.${{ github.run_number }}
+          CHANGELOG: ${{ env.FRONTEND_CHANGELOG || env.BACKEND_CHANGELOG }}
         run: |
           sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
       - name: Publish
@@ -145,11 +146,8 @@ jobs:
           file_pattern: '.VERSION pyproject.toml'
       - name: Webhook message
         uses: joelwmale/webhook-action@master
-        env:
-          CHANGELOG: ${{ env.FRONTEND_CHANGELOG || env.BACKEND_CHANGELOG }}
-          TEST_VERSION: 0.5.${{ github.run_number }}
         with:
           url: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=21ef6861-3a53-46ef-86bc-19918ae2a974
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${TEST_VERSION}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${TEST_VERSION}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${CHANGELOG}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${PROVIDED_VERSION}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${PROVIDED_VERSION}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${CHANGELOG}"}}'
 
