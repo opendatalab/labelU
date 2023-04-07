@@ -24,6 +24,10 @@ on:
         description: 'Frontend assets url'
         required: true
         type: string
+      changelog:
+        description: 'Frontend changelog'
+        required: false
+        type: string
 jobs:
   test:
     strategy:
@@ -46,6 +50,8 @@ jobs:
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
+          FRONTEND_CHANGELOG: ${{ inputs.changelog }} 
+          BACKEND_CHANGELOG: ${{ github.event.head_commit.message }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
       - uses: abatilo/actions-poetry@v2
         with:
@@ -78,8 +84,10 @@ jobs:
           file_pattern: .VERSION
       - name: Webhook message
         uses: joelwmale/webhook-action@master
+        env:
+          CHANGELOG: ${{ env.FRONTEND_CHANGELOG or env.BACKEND_CHANGELOG }}
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"LabelU **0.5.${{ github.run_number }}** is released \ud83c\udf89! \nCheck it out now \ud83d\udc49\ud83c\udffb  [v0.5.${{ github.run_number }}](https://test.pypi.org/project/labelu/#files)"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"LabelU[test]@**0.5.${{ github.run_number }}** is released \ud83c\udf89! \nCheck it out now \ud83d\udc49\ud83c\udffb  [v0.5.${{ github.run_number }}](https://test.pypi.org/project/labelu/#files)"}}'
 

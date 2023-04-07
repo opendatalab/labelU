@@ -25,6 +25,10 @@ on:
         description: 'Frontend assets url'
         required: true
         type: string
+      changelog:
+        description: 'Frontend changelog'
+        required: false
+        type: string
 jobs:
   test:
     strategy:
@@ -47,6 +51,8 @@ jobs:
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
+          FRONTEND_CHANGELOG: ${{ inputs.changelog }} 
+          BACKEND_CHANGELOG: ${{ github.event.head_commit.message }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
       - uses: abatilo/actions-poetry@v2
         with:
@@ -64,6 +70,7 @@ jobs:
       - name: Manage version
         run: |
           PROVIDED_VERSION=$(echo ${GITHUB_REF##*/v})
+          echo "PROVIDED_VERSION=${GITHUB_REF##*/v}" >> $GITHUB_ENV
           sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
       - name: Publish
         env:
@@ -78,10 +85,10 @@ jobs:
           file_pattern: .VERSION
       - name: Webhook message
         uses: joelwmale/webhook-action@master
-        run: |
-          PROVIDED_VERSION=$(echo ${GITHUB_REF##*/v})
+        env:
+          CHANGELOG: ${{ env.FRONTEND_CHANGELOG or env.BACKEND_CHANGELOG }}
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"LabelU **${{ PROVIDED_VERSION }}** is released \ud83c\udf89! \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ PROVIDED_VERSION }}](https://pypi.org/project/labelu/#files)"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${PROVIDED_VERSION}(prod) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${PROVIDED_VERSION}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${CHANGELOG}"}}'
 
