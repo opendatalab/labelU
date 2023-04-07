@@ -85,7 +85,7 @@ jobs:
       - name: Webhook message
         uses: joelwmale/webhook-action@master
         env:
-          CHANGELOG: ${{ env.FRONTEND_CHANGELOG or env.BACKEND_CHANGELOG }}
+          CHANGELOG: ${{ env.FRONTEND_CHANGELOG || env.BACKEND_CHANGELOG }}
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
