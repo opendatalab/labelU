@@ -66,6 +66,10 @@ jobs:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
+
+      - name: Show changelog txt
+        run: |
+          cat changelog.txt
       
       - name: Inject backend info into frontend
         uses: satackey/action-js-inline@v0.0.2
