@@ -157,7 +157,7 @@ jobs:
           file_pattern: '.VERSION pyproject.toml'
       - name: Webhook message
         env:
-          CHANGELOG: $(cat changelog.txt)
+          CHANGELOG: "$(cat changelog.txt)"
         uses: joelwmale/webhook-action@master
         with:
           url: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=21ef6861-3a53-46ef-86bc-19918ae2a974
