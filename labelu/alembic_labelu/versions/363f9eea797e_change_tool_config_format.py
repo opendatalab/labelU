@@ -72,7 +72,6 @@ class NewConfigAttribute(BaseModel):
     options: Optional[List[NewOption]] 
     type: Optional[str] 
     stringType: Optional[str] 
-    label: Optional[str] 
     required: Optional[bool] 
     defaultValue: Optional[str] 
     maxLength: Optional[int] 
@@ -262,8 +261,8 @@ class OldToolConfig(BaseModel):
                                 NewConfigAttribute(
                                     type="string",
                                     stringType="text",
-                                    label=attribute_item.label,
-                                    key=attribute_item.key,
+                                    key=attribute_item.label,
+                                    value=attribute_item.key,
                                     required=attribute_item.required,
                                     defaultValue=attribute_item.default,
                                     maxLength=attribute_item.maxLength,
