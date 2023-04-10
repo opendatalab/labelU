@@ -49,27 +49,11 @@ jobs:
       - name: Resolve frontend
         run: |
           sh ./scripts/resolve_frontend.sh alpha $FRONTEND_VERSION $FRONTEND_ASSET_URL
-          echo "BACKEND_CHANGELOG=$(cat <<'EOF'
-          ${{ github.event.head_commit.message }}
-          EOF
-          )"
-          echo "FRONTEND_CHANGELOG=$(cat <<'EOF'
-          ${{ inputs.changelog }}
-          EOF
-          )"
           echo "PROVIDED_VERSION=0.5.${{ github.run_number }}" >> $GITHUB_ENV
-          echo "$(cat <<'EOF'
-          ${{ inputs.changelog || github.event.head_commit.message }}
-          EOF
-          )" > changelog.txt
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
-
-      - name: Show changelog txt
-        run: |
-          cat changelog.txt
       
       - name: Inject backend info into frontend
         uses: satackey/action-js-inline@v0.0.2
@@ -156,15 +140,10 @@ jobs:
           commit_message: "Update .VERSION and pyproject.toml [skip ci]"
           file_pattern: '.VERSION pyproject.toml'
 
-      - name: Set Changelog variable
-        run: |
-          VER=$(cat changelog.txt)
-          echo "CHANGELOG=$VER" >> $GITHUB_ENV
-
       - name: Webhook message
         uses: joelwmale/webhook-action@master
         with:
           url: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=21ef6861-3a53-46ef-86bc-19918ae2a974
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${{ env.CHANGELOG }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${{ inputs.changelog || github.event.head_commit.message }}"}}'
 
