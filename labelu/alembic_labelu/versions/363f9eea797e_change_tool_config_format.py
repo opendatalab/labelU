@@ -210,7 +210,7 @@ class OldToolConfig(BaseModel):
                             )
                             for attribute in tool.config.attributeList
                         ] if tool.config.attributeList else None,
-                    ),
+                    ) if tool.config else None,
                 )
                 for tool in self.tools
             ]
@@ -239,7 +239,7 @@ class OldToolConfig(BaseModel):
                                             else None,
                                         )
                                         for subSelected in tag.subSelected
-                                    ],
+                                    ] if tag.subSelected else None,
                                 )
                                 for tag in self.tagList
                             ],
