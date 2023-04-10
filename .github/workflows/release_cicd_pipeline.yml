@@ -49,10 +49,7 @@ jobs:
       - name: Resolve frontend
         run: |
           sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
-          echo "BACKEND_CHANGELOG=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
-          echo "FRONTEND_CHANGELOG=${{ inputs.changelog }}" >> $GITHUB_ENV
           echo "PROVIDED_VERSION=${GITHUB_REF##*/v}" >> $GITHUB_ENV
-          echo "CHANGELOG=${{ inputs.changelog || github.event.head_commit.message }}" >> $GITHUB_ENV
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
@@ -89,5 +86,5 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(prod) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${{ env.CHANGELOG }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(prod) is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n${{ inputs.changelog || github.event.head_commit.message }}"}}'
 
