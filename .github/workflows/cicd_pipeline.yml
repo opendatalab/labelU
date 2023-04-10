@@ -52,11 +52,11 @@ jobs:
           echo "BACKEND_CHANGELOG=$(cat <<'EOF'
           ${{ github.event.head_commit.message }}
           EOF
-          )" >> $GITHUB_ENV
+          )"
           echo "FRONTEND_CHANGELOG=$(cat <<'EOF'
           ${{ inputs.changelog }}
           EOF
-          )" >> $GITHUB_ENV
+          )"
           echo "PROVIDED_VERSION=0.5.${{ github.run_number }}" >> $GITHUB_ENV
           echo "CHANGELOG=$(cat <<'EOF'
           ${{ inputs.changelog || github.event.head_commit.message }}
