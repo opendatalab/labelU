@@ -61,7 +61,7 @@ jobs:
           echo "CHANGELOG=$(cat <<'EOF'
           ${{ inputs.changelog || github.event.head_commit.message }}
           EOF
-          )" >> $GITHUB_ENV
+          )" > changelog.txt
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
@@ -156,5 +156,5 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n ${{ env.CHANGELOG }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(test) is Released 🎉\n \n Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n $(cat changelog.txt)"}}'
 
