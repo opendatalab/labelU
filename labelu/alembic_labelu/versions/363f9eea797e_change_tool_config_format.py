@@ -49,14 +49,14 @@ defaultColors = [
 
 # define the new tool config model
 class NewAttribute(BaseModel):
-    color: str
-    key: str
-    value: str
+    color: Optional[str]
+    key: Optional[str]
+    value: Optional[str]
 
 
 class NewOption(BaseModel):
-    key: str
-    value: str
+    key: Optional[str]
+    value: Optional[str]
     type: Optional[str] 
     maxLength: Optional[int] 
     stringType: Optional[str] 
@@ -67,7 +67,7 @@ class NewOption(BaseModel):
 
 class NewConfigAttribute(BaseModel):
     color: Optional[str] 
-    key: str
+    key: Optional[str]
     value: Optional[str] 
     options: Optional[List[NewOption]] 
     type: Optional[str] 
@@ -92,8 +92,8 @@ class NewConfig(BaseModel):
 
 
 class NewTool(BaseModel):
-    tool: str
-    config: NewConfig
+    tool: Optional[str]
+    config: Optional[NewConfig]
 
 
 class NewToolConfig(BaseModel):
@@ -104,13 +104,13 @@ class NewToolConfig(BaseModel):
 
 # define the old tool config model
 class OldAttributeItem(BaseModel):
-    key: str
-    value: str
+    key: Optional[str]
+    value: Optional[str]
 
 
 class OldAttributeListItem(BaseModel):
-    key: str
-    value: str
+    key: Optional[str]
+    value: Optional[str]
 
 
 class OldConfig(BaseModel):
