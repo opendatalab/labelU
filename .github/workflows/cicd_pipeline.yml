@@ -155,9 +155,13 @@ jobs:
         with:
           commit_message: "Update .VERSION and pyproject.toml [skip ci]"
           file_pattern: '.VERSION pyproject.toml'
+
+      - name: Set Changelog variable
+        run: |
+          VER=$(cat changelog.txt)
+          echo "CHANGELOG=$VER" >> $GITHUB_ENV
+
       - name: Webhook message
-        env:
-          CHANGELOG: "$(cat changelog.txt)"
         uses: joelwmale/webhook-action@master
         with:
           url: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=21ef6861-3a53-46ef-86bc-19918ae2a974
