@@ -52,10 +52,23 @@ class OldResult(BaseModel):
     sourceID: Optional[str] = None
     textAttribute: Optional[str] = None
     order: Optional[int] = None
+    result : Optional[dict] = None
 
     def to_new(self):
-        new_result = NewResult.parse_obj(self.dict())
-        new_result.attributes = {self.attribute: self.textAttribute}
+        new_result = NewResult(
+            x=self.x,
+            y=self.y,
+            width=self.width,
+            height=self.height,
+            attribute=self.attribute,
+            valid=self.valid,
+            isVisible=self.isVisible,
+            id=self.id,
+            sourceID=self.sourceID,
+            textAttribute=self.textAttribute,
+            order=self.order,
+        )
+        new_result.attributes = self.result if self.result else {self.attribute: self.textAttribute}
         return new_result
 
 

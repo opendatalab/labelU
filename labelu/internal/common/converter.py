@@ -75,6 +75,13 @@ class Converter:
                                 "textAttribute", ""
                             )
                             tool_result.pop("sourceID", None)
+
+                            if tool == "tagTool":
+                                tool_result.pop("label")
+
+                            if tool == "textTool" or tool == "tagTool":
+                                tool_result.pop("attribute")
+
                         annotations.append(tool_results)
 
                 annotated_result["annotations"] = annotations
