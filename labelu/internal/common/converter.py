@@ -79,8 +79,7 @@ class Converter:
                             if tool == "tagTool":
                                 tool_result.pop("label")
 
-                            if tool == "textTool" or tool == "tagTool":
-                                tool_result.pop("attribute")
+                            tool_result.pop("attribute")
 
                         annotations.append(tool_results)
 
