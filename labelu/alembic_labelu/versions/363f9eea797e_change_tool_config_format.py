@@ -78,6 +78,7 @@ class NewConfigAttribute(BaseModel):
     key: Optional[str]
     value: Optional[str]
     options: Optional[List[NewOption]]
+    attributes: Optional[List[NewOption]]
     type: Optional[str]
     stringType: Optional[str]
     required: Optional[bool]
@@ -218,10 +219,10 @@ class OldToolConfig(BaseModel):
                         attributes=[
                             NewConfigAttribute(
                                 color=choice(defaultColors),
-                                options=[
+                                attributes=[
                                     NewOption(
-                                        key="文本属性-1",
-                                        value="text-attribute-1",
+                                        key=attribute.key,
+                                        value=attribute.value,
                                         type="string",
                                         maxLength=1000,
                                         stringType=stringTypeMap.get(
