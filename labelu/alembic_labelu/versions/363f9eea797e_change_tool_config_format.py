@@ -100,8 +100,8 @@ class NewConfig(BaseModel):
     lineType: Optional[int]
     isShowOrder: Optional[bool]
     upperLimit: Optional[int | str]
-    lowerLimitPointNum: Optional[int]
-    upperLimitPointNum: Optional[int]
+    lowerLimitPointNum: Optional[int | str]
+    upperLimitPointNum: Optional[int | str]
 
 
 class NewTool(BaseModel):
@@ -143,8 +143,8 @@ class OldConfig(BaseModel):
     lineType: Optional[int]
     isShowOrder: Optional[bool]
     upperLimit: Optional[int | str]
-    lowerLimitPointNum: Optional[int]
-    upperLimitPointNum: Optional[int]
+    lowerLimitPointNum: Optional[int | str]
+    upperLimitPointNum: Optional[int | str]
 
 
 class OldTool(BaseModel):
