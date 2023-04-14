@@ -99,9 +99,9 @@ class NewConfig(BaseModel):
     edgeAdsorption: Optional[bool]
     lineType: Optional[int]
     isShowOrder: Optional[bool]
-    upperLimit: Optional[int | str]
-    lowerLimitPointNum: Optional[int | str]
-    upperLimitPointNum: Optional[int | str]
+    upperLimit: Optional[str]
+    lowerLimitPointNum: Optional[str]
+    upperLimitPointNum: Optional[str]
 
 
 class NewTool(BaseModel):
@@ -142,9 +142,9 @@ class OldConfig(BaseModel):
     edgeAdsorption: Optional[bool]
     lineType: Optional[int]
     isShowOrder: Optional[bool]
-    upperLimit: Optional[int | str]
-    lowerLimitPointNum: Optional[int | str]
-    upperLimitPointNum: Optional[int | str]
+    upperLimit: Optional[str]
+    lowerLimitPointNum: Optional[str]
+    upperLimitPointNum: Optional[str]
 
 
 class OldTool(BaseModel):
