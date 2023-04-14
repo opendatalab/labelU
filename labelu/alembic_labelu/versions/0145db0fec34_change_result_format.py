@@ -5,14 +5,14 @@ Revises: 363f9eea797e
 Create Date: 2023-04-06 14:52:24.255060
 
 """
-from alembic import op
-from alembic import context
-from sqlalchemy import update
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.automap import automap_base
-from pydantic import BaseModel
-from typing import Optional
 import json
+from typing import Optional
+
+from alembic import context, op
+from pydantic import BaseModel
+from sqlalchemy import update
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import sessionmaker
 
 # revision identifiers, used by Alembic.
 revision = "0145db0fec34"
@@ -37,6 +37,11 @@ class NewResult(BaseModel):
     textAttribute: Optional[str] = None
     order: Optional[int] = None
     attributes: Optional[dict] = None
+    pointList: Optional[list] = None
+    label: Optional[str] = None
+    isReference: Optional[bool] = None
+    disableDelete: Optional[bool] = None
+    isRect: Optional[bool] = None
 
 
 # define the old result model
@@ -52,7 +57,12 @@ class OldResult(BaseModel):
     sourceID: Optional[str] = None
     textAttribute: Optional[str] = None
     order: Optional[int] = None
-    result : Optional[dict] = None
+    result: Optional[dict] = None
+    pointList: Optional[list] = None
+    label: Optional[str] = None
+    isReference: Optional[bool] = None
+    disableDelete: Optional[bool] = None
+    isRect: Optional[bool] = None
 
     def to_new(self):
         new_result = NewResult(
@@ -67,8 +77,15 @@ class OldResult(BaseModel):
             sourceID=self.sourceID,
             textAttribute=self.textAttribute,
             order=self.order,
+            pointList=self.pointList,
+            label=self.label,
+            isReference=self.isReference,
+            disableDelete=self.disableDelete,
+            isRect=self.isRect,
         )
-        new_result.attributes = self.result if self.result else {self.attribute: self.textAttribute}
+        new_result.attributes = (
+            self.result if self.result else {self.attribute: self.textAttribute}
+        )
         return new_result
 
 
@@ -103,7 +120,7 @@ def upgrade() -> None:
 
             sample_data["result"] = json.dumps(data_result, ensure_ascii=False)
             data = json.dumps(sample_data, ensure_ascii=False)
-            
+
             session.execute(
                 update(task_sample).where(task_sample.id == sample_id).values(data=data)
             )
