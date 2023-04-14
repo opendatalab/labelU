@@ -5,14 +5,14 @@ Revises: 9d5da133bbe4
 Create Date: 2023-04-03 15:08:12.508189
 
 """
-from alembic import op
-from alembic import context
-from sqlalchemy import update
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.automap import automap_base
-from pydantic import BaseModel
-from typing import Optional, List
 from random import choice
+from typing import List, Optional
+
+from alembic import context, op
+from pydantic import BaseModel
+from sqlalchemy import update
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import sessionmaker
 
 # revision identifiers, used by Alembic.
 revision = "363f9eea797e"
@@ -47,6 +47,14 @@ defaultColors = [
     "#B77259",
 ]
 
+stringTypeMap = {
+    0: "text",
+    1: "order",
+    2: "english",
+    3: "number",
+    4: "regexp",
+}
+
 # define the new tool config model
 class NewAttribute(BaseModel):
     color: Optional[str]
@@ -57,37 +65,43 @@ class NewAttribute(BaseModel):
 class NewOption(BaseModel):
     key: Optional[str]
     value: Optional[str]
-    type: Optional[str] 
-    maxLength: Optional[int] 
-    stringType: Optional[str] 
-    defaultValue: Optional[str] 
-    regexp: Optional[str] 
-    isDefault: Optional[bool] 
+    type: Optional[str]
+    maxLength: Optional[int]
+    stringType: Optional[str]
+    defaultValue: Optional[str]
+    regexp: Optional[str]
+    isDefault: Optional[bool]
 
 
 class NewConfigAttribute(BaseModel):
-    color: Optional[str] 
+    color: Optional[str]
     key: Optional[str]
-    value: Optional[str] 
-    options: Optional[List[NewOption]] 
-    type: Optional[str] 
-    stringType: Optional[str] 
-    required: Optional[bool] 
-    defaultValue: Optional[str] 
-    maxLength: Optional[int] 
+    value: Optional[str]
+    options: Optional[List[NewOption]]
+    type: Optional[str]
+    stringType: Optional[str]
+    required: Optional[bool]
+    defaultValue: Optional[str]
+    maxLength: Optional[int]
 
 
 class NewConfig(BaseModel):
-    isShowCursor: Optional[bool] 
-    showConfirm: Optional[bool] 
-    skipWhileNoDependencies: Optional[bool] 
-    drawOutsideTarget: Optional[bool] 
-    copyBackwardResult: Optional[bool] 
-    minWidth: Optional[int] 
-    attributeConfigurable: Optional[bool] 
-    textConfigurable: Optional[bool] 
+    isShowCursor: Optional[bool]
+    showConfirm: Optional[bool]
+    skipWhileNoDependencies: Optional[bool]
+    drawOutsideTarget: Optional[bool]
+    copyBackwardResult: Optional[bool]
+    minWidth: Optional[int]
+    attributeConfigurable: Optional[bool]
+    textConfigurable: Optional[bool]
     attributes: Optional[List[NewConfigAttribute]]
-    minHeight: Optional[int] 
+    minHeight: Optional[int]
+    edgeAdsorption: Optional[bool]
+    lineType: Optional[int]
+    isShowOrder: Optional[bool]
+    upperLimit: Optional[int | str]
+    lowerLimitPointNum: Optional[int]
+    upperLimitPointNum: Optional[int]
 
 
 class NewTool(BaseModel):
@@ -96,9 +110,9 @@ class NewTool(BaseModel):
 
 
 class NewToolConfig(BaseModel):
-    attributes: Optional[List[NewAttribute]] 
-    tools: Optional[List[NewTool]] 
-    commonAttributeConfigurable: Optional[bool] 
+    attributes: Optional[List[NewAttribute]]
+    tools: Optional[List[NewTool]]
+    commonAttributeConfigurable: Optional[bool]
 
 
 # define the old tool config model
@@ -125,41 +139,47 @@ class OldConfig(BaseModel):
     customFormat: Optional[str]
     attributeList: Optional[List[OldAttributeListItem]]
     minHeight: Optional[int]
+    edgeAdsorption: Optional[bool]
+    lineType: Optional[int]
+    isShowOrder: Optional[bool]
+    upperLimit: Optional[int | str]
+    lowerLimitPointNum: Optional[int]
+    upperLimitPointNum: Optional[int]
 
 
 class OldTool(BaseModel):
     tool: Optional[str]
-    config: Optional[OldConfig] 
+    config: Optional[OldConfig]
 
 
 class OldSubSelectedItem(BaseModel):
     key: Optional[str]
     value: Optional[str]
-    isDefault: Optional[bool] 
-    isMulti: Optional[bool] 
+    isDefault: Optional[bool]
+    isMulti: Optional[bool]
 
 
 class OldTagListItem(BaseModel):
     key: Optional[str]
     value: Optional[str]
     isMulti: Optional[bool]
-    subSelected:  Optional[List[OldSubSelectedItem]]
+    subSelected: Optional[List[OldSubSelectedItem]]
 
 
 class OldTextConfigItem(BaseModel):
-    label:  Optional[str]
-    key:  Optional[str]
-    required:  Optional[bool]
-    default:  Optional[str]
-    maxLength:  Optional[int]
+    label: Optional[str]
+    key: Optional[str]
+    required: Optional[bool]
+    default: Optional[str]
+    maxLength: Optional[int]
 
 
 class OldToolConfig(BaseModel):
-    attribute: Optional[List[OldAttributeItem]] 
-    tools: Optional[List[OldTool]] 
-    commonAttributeConfigurable: Optional[bool] 
-    tagList: Optional[List[OldTagListItem]] 
-    textConfig: Optional[List[OldTextConfigItem]] 
+    attribute: Optional[List[OldAttributeItem]]
+    tools: Optional[List[OldTool]]
+    commonAttributeConfigurable: Optional[bool]
+    tagList: Optional[List[OldTagListItem]]
+    textConfig: Optional[List[OldTextConfigItem]]
 
     def to_new(self) -> NewToolConfig:
 
@@ -189,6 +209,12 @@ class OldToolConfig(BaseModel):
                         attributeConfigurable=tool.config.attributeConfigurable,
                         textConfigurable=tool.config.textConfigurable,
                         minHeight=tool.config.minHeight,
+                        edgeAdsorption=tool.config.edgeAdsorption,
+                        lineType=tool.config.lineType,
+                        isShowOrder=tool.config.isShowOrder,
+                        upperLimit=tool.config.upperLimit,
+                        lowerLimitPointNum=tool.config.lowerLimitPointNum,
+                        upperLimitPointNum=tool.config.upperLimitPointNum,
                         attributes=[
                             NewConfigAttribute(
                                 color=choice(defaultColors),
@@ -198,18 +224,24 @@ class OldToolConfig(BaseModel):
                                         value="text-attribute-1",
                                         type="string",
                                         maxLength=1000,
-                                        stringType="regexp",
+                                        stringType=stringTypeMap.get(
+                                            tool.config.textCheckType, ""
+                                        ),
                                         defaultValue="",
-                                        regexp=tool.config.customFormat,
+                                        regexp=tool.config.customFormat
+                                        if tool.config.textCheckType == 4
+                                        else None,
                                     )
-                                ]
-                                if tool.config.textCheckType == 4
-                                else None,
+                                ],
                                 **attribute.dict(),
                             )
                             for attribute in tool.config.attributeList
-                        ] if tool.config.attributeList else None,
-                    ) if tool.config else None,
+                        ]
+                        if tool.config.attributeList
+                        else None,
+                    )
+                    if tool.config
+                    else None,
                 )
                 for tool in self.tools
             ]
@@ -238,7 +270,9 @@ class OldToolConfig(BaseModel):
                                             else None,
                                         )
                                         for subSelected in tag.subSelected
-                                    ] if tag.subSelected else None,
+                                    ]
+                                    if tag.subSelected
+                                    else None,
                                 )
                                 for tag in self.tagList
                             ],
@@ -304,7 +338,9 @@ def upgrade() -> None:
             session.execute(
                 update(task)
                 .where(task.id == task_id)
-                .values(config=new_tool_config.json(exclude_none=True, ensure_ascii=False))
+                .values(
+                    config=new_tool_config.json(exclude_none=True, ensure_ascii=False)
+                )
             )
 
 
