@@ -16,6 +16,10 @@ LabelU is an open source data annotation tool that supports Chinese. At present,
 
 ## Getting started
 
+<a href="https://labelu.shlab.tech/">
+    <button>Try online</button>
+</a>
+
 ### Install locally with miniconda
 ```
 # Download and Install miniconda
