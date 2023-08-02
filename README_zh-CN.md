@@ -16,6 +16,10 @@ LabelU 是一款中文的开源数据标注工具。目前具备拉框、多边�
 
 ## 快速开始
 
+<a href="https://labelu.shlab.tech/">
+    <button>体验在线版</button>
+</a>
+
 ### 使用miniconda安装
 ```
 # 安装miniconda
