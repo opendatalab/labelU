@@ -6,6 +6,9 @@ from labelu.internal.domain.models.task import MediaType
 
 class BasicConfigCommand(BaseModel):
     name: str = Field(description="description: task name", max_length=50)
+    media_type: Union[MediaType, None] = Field(
+        default=None, description="description: media type of task files"
+    )
     description: str = Field(
         default=None, description="description: task description", max_length=500
     )
