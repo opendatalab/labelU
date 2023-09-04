@@ -36,6 +36,7 @@ async def create(
                 status=TaskStatus.DRAFT.value,
                 name=cmd.name,
                 description=cmd.description,
+                media_type=cmd.media_type,
                 tips=cmd.tips,
                 created_by=current_user.id,
                 updated_by=current_user.id,
@@ -49,6 +50,7 @@ async def create(
         description=new_task.description,
         tips=new_task.tips,
         status=new_task.status,
+        media_type=new_task.media_type,
         created_at=new_task.created_at,
         created_by=UserResp(
             id=new_task.owner.id,
@@ -156,7 +158,6 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     if cmd.config and cmd.media_type:
         obj_in[Task.status.key] = TaskStatus.CONFIGURED
     else:
-        obj_in[Task.media_type.key] = None
         obj_in[Task.config.key] = None
     with db.begin():
         updated_task = crud_task.update(db=db, db_obj=task, obj_in=obj_in)
