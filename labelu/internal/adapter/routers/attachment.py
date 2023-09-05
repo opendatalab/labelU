@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
 from fastapi import File, UploadFile
-from fastapi.responses import FileResponse
+from starlette.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
@@ -55,11 +55,11 @@ async def download_attachment(file_path: str):
     download attachment.
     """
 
-    # business logic
-    data = await service.download_attachment(file_path=file_path)
+    # Business logic
+    file_path = await service.download_attachment(file_path=file_path)
 
-    # response
-    return data
+    # Response 视频文件支持快进
+    return FileResponse(file_path, media_type="application/octet-stream")
 
 
 @router.delete(
