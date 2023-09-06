@@ -3,7 +3,6 @@ from fastapi import APIRouter, status, Depends, Security
 from fastapi import File, Header, Response, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
-import os
 import mimetypes
 
 from labelu.internal.common import db
