@@ -70,6 +70,7 @@ async def download_attachment(file_path: str):
         # 视频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
         headers = {"Accept-Ranges": "bytes", "Content-Range": f"bytes 0-{file_size - 1}/{file_size}"}
         with open(file_path, 'rb') as video:
+            video.seek(0)
             data = video.read(file_size)
             # 目前视频标注仅能支持mp4上传
         return Response(data, headers=headers, media_type="video/mp4", status_code=206)
