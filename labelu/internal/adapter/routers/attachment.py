@@ -65,6 +65,7 @@ async def download_attachment(file_path: str):
         return mime_type and mime_type.startswith("video/")
     
     if is_video_file(file_path):
+        # 目前限制了视频文件在200mb以内
         file_size = os.path.getsize(file_path)
         # 视频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
         headers = {"Accept-Ranges": "bytes", "Content-Range": f"bytes 0-{file_size - 1}/{file_size}"}
