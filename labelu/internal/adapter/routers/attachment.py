@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
-from fastapi import File, Request, Response, UploadFile
+from fastapi import File, Header, Response, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 import os
@@ -51,29 +51,31 @@ async def create(
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
-async def download_attachment(file_path: str):
+async def download_attachment(file_path: str, range: str = Header(None)):
     """
     download attachment.
     """
 
     # Business logic
     file_path = await service.download_attachment(file_path=file_path)
-    
+    CHUNK_SIZE = 1024 * 1024
     
     def is_video_file(file_path: str) -> bool:
         mime_type, _ = mimetypes.guess_type(file_path)
         return mime_type and mime_type.startswith("video/")
     
     if is_video_file(file_path):
-        # 目前限制了视频文件在200mb以内
         file_size = os.path.getsize(file_path)
-        # 视频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
-        headers = {"Accept-Ranges": "bytes", "Content-Range": f"bytes 0-{file_size - 1}/{file_size}"}
+        start, end = range.replace("bytes=", "").split("-")
+        start = int(start)
+        end = int(end) if end else start + CHUNK_SIZE
         with open(file_path, 'rb') as video:
-            video.seek(0)
-            data = video.read(file_size)
-            # 目前视频标注仅能支持mp4上传
-        return Response(data, headers=headers, media_type="video/mp4", status_code=206)
+            video.seek(start)
+            data = video.read(end - start)
+            file_size = str(file_path.stat().st_size)
+            # 视频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
+            headers = {"Accept-Ranges": "bytes", "Content-Range": f"bytes {str(start)}-{str(end)}/{file_size}"}
+        return Response(data, headers=headers, media_type="application/octet-stream", status_code=206)
     else:
         return file_path
 
