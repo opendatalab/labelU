@@ -65,7 +65,6 @@ async def download_attachment(file_path: str, range: str = Header(None)):
         return mime_type and mime_type.startswith("video/")
     
     if is_video_file(file_path):
-        file_size = os.path.getsize(file_path)
         start, end = range.replace("bytes=", "").split("-")
         start = int(start)
         end = int(end) if end else start + CHUNK_SIZE
