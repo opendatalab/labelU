@@ -66,7 +66,7 @@ async def download_attachment(file_path: str):
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
-async def get_video(file_path: str, range: str = Header(None)):
+async def get_content(file_path: str, range: str = Header(None)):
     """
     partial content
     """
