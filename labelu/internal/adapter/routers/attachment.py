@@ -4,6 +4,7 @@ from fastapi import File, Header, Response, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 import mimetypes
+import os
 
 from labelu.internal.common import db
 from labelu.internal.common.config import settings
