@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
-from fastapi import File, UploadFile
-from starlette.responses import FileResponse
+from fastapi import File, Request, Response, UploadFile
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
+import os
+import mimetypes
 
 from labelu.internal.common import db
 from labelu.internal.common.config import settings
@@ -44,22 +46,35 @@ async def create(
     # response
     return OkResp[AttachmentResponse](data=data)
 
-
 @router.get(
     "/attachment/{file_path:path}",
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
-async def download_attachment(file_path: str):
+async def download_attachment(file_path: str, request: Request):
     """
     download attachment.
     """
 
     # Business logic
     file_path = await service.download_attachment(file_path=file_path)
-
-    # Response 视频文件支持快进
-    return FileResponse(file_path, media_type="application/octet-stream")
+    
+    
+    def is_video_file(file_path: str) -> bool:
+        mime_type, _ = mimetypes.guess_type(file_path)
+        return mime_type and mime_type.startswith("video/")
+    
+    if is_video_file(file_path):
+        file_size = os.path.getsize(file_path)
+        # 视频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
+        headers = {"Accept-Ranges": "bytes", "Content-Range": f"bytes 0-{file_size - 1}/{file_size}"}
+        with open(file_path, 'rb') as video:
+            video.seek(0)
+            data = video.read(file_size)
+            # 目前视频标注仅能支持mp4上传
+        return Response(data, headers=headers, media_type="video/mp4", status_code=206)
+    else:
+        return file_path
 
 
 @router.delete(
