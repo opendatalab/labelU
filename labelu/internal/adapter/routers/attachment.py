@@ -61,15 +61,14 @@ async def download_attachment(file_path: str):
     
     return data
 
-# 视频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
 @router.get(
-    "/video/{file_path:path}",
+    "/partial/{file_path:path}",
     response_class=FileResponse,
     status_code=status.HTTP_200_OK,
 )
 async def get_video(file_path: str, range: str = Header(None)):
     """
-    Video partial content
+    partial content
     """
 
     # Business logic
@@ -88,6 +87,7 @@ async def get_video(file_path: str, range: str = Header(None)):
         video.seek(start)
         data = video.read(end - start)
         file_size = str(full_path.stat().st_size)
+        # 视频或音频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
         headers = {"Accept-Ranges": "bytes", "Content-Range": f"bytes {str(start)}-{str(end)}/{file_size}"}
     return Response(data, headers=headers, media_type=media_type, status_code=206)
 
