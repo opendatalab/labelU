@@ -58,6 +58,7 @@ async def download_attachment(file_path: str, range: str = Header(None)):
     # Business logic
     file_path = await service.download_attachment(file_path=file_path)
     CHUNK_SIZE = 1024 * 1024
+    full_size = os.path.getsize(file_path)
     
     def is_video_file(file_path: str) -> bool:
         mime_type, _ = mimetypes.guess_type(file_path)
@@ -66,14 +67,19 @@ async def download_attachment(file_path: str, range: str = Header(None)):
     if is_video_file(file_path):
         start, end = range.replace("bytes=", "").split("-")
         start = int(start)
-        end = int(end) if end else start + CHUNK_SIZE
+        end = int(end) if end else min(start + CHUNK_SIZE, full_size) - 1
+        media_type = mimetypes.guess_type(file_path)[0]
+        # TODO 不知为何到最后range阶段视频播放失效，先加上这个处理取消byte range暂时解决
+        if full_size - end == 1:
+            return file_path
+        
         with open(file_path, 'rb') as video:
             video.seek(start)
             data = video.read(end - start)
             file_size = str(file_path.stat().st_size)
             # 视频标注时，需要支持快进等选定播放时间点，因此需要手动增加以下响应头部
             headers = {"Accept-Ranges": "bytes", "Content-Range": f"bytes {str(start)}-{str(end)}/{file_size}"}
-        return Response(data, headers=headers, media_type="application/octet-stream", status_code=206)
+        return Response(data, headers=headers, media_type=media_type, status_code=206)
     else:
         return file_path
 
