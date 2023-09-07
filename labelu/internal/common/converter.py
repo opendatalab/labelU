@@ -70,7 +70,9 @@ class Converter:
                     if tool.endswith("Tool"):
                         tool_results = annotated_result.pop(tool)
                         for tool_result in tool_results.get("result", []):
-                            tool_result["label"] = tool_result.pop("attribute", "")
+                            # 视频文件的标注结果已经保存了 label 键的值，不需要再做转换
+                            if "label" not in tool_result:
+                                tool_result["label"] = tool_result.pop("attribute", "")
                             tool_result["attribute"] = tool_result.pop(
                                 "textAttribute", ""
                             )
