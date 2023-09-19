@@ -78,7 +78,7 @@ class Converter:
                             )
                             tool_result.pop("sourceID", None)
 
-                            if tool == "tagTool":
+                            if tool == "tagTool" or tool == "textTool":
                                 tool_result.pop("label")
 
                             tool_result.pop("attribute")
