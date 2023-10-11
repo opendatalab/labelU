@@ -48,7 +48,7 @@ jobs:
       - name: Resolve frontend
         run: |
           sh ./scripts/resolve_frontend.sh alpha $FRONTEND_VERSION $FRONTEND_ASSET_URL
-          echo "PROVIDED_VERSION=0.5.${{ github.run_number }}" >> $GITHUB_ENV
+          echo "PROVIDED_VERSION=0.7.${{ github.run_number }}" >> $GITHUB_ENV
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
