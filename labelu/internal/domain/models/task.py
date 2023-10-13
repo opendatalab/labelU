@@ -27,6 +27,7 @@ class MediaType(str, Enum):
 
     IMAGE = "IMAGE"
     VIDEO = "VIDEO"
+    AUDIO = "AUDIO"
 
 
 class Task(Base):
@@ -36,6 +37,9 @@ class Task(Base):
     name = Column(String(64), index=True)
     description = Column(String(1024), comment="task description")
     tips = Column(String(1024), comment="task tips")
+    last_sample_inner_id = Column(
+        Integer, default=0, comment="The last inner id of sample in a task"
+    )
     config = Column(Text, comment="task config yaml")
     media_type = Column(
         String(32),
@@ -44,7 +48,7 @@ class Task(Base):
     status = Column(String(32), default=TaskStatus.DRAFT.value, comment="task status")
     created_by = Column(Integer, ForeignKey(column="user.id"), index=True)
     updated_by = Column(
-        Integer, ForeignKey(column="user.id"), comment="Last time a task was updated"
+        Integer, ForeignKey(column="user.id"), comment="Last time a task was updated by"
     )
     created_at = Column(
         DateTime, default=datetime.now, comment="Time a task was created"

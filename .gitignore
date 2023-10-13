@@ -161,3 +161,8 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
+
+# vscode local history plugin
+# if the local history plugin is installed in vscode, when we modify or add code, a folder 
+# .history will be added in project, but it is not the needed file.
+.history/

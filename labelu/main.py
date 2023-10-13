@@ -1,6 +1,6 @@
 import uvicorn
 from typer import Typer
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.adapter.routers import add_router
@@ -9,6 +9,7 @@ from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import add_exception_handler
+from labelu.alembic_labelu.run_migrate import run_sqlite_migrations
 
 
 description = """
@@ -87,21 +88,35 @@ app = FastAPI(
 
 init_logging()
 init_tables()
+run_sqlite_migrations()
 add_exception_handler(app=app)
 add_router(app=app)
 add_middleware(app=app)
 
 app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
 
+
+@app.middleware("http")
+async def add_correct_content_type(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.endswith(".js"):
+        response.headers["content-type"] = "application/javascript"
+    return response
+
+
 cli = Typer()
 
 
 @cli.command()
-def main(host: str = "localhost", port: int = 8000):
+def main(
+    host: str = "localhost", port: int = 8000, media_host: str = "http://localhost:8000"
+):
     if port:
         settings.PORT = port
     if host:
         settings.HOST = host
+    if media_host:
+        settings.MEDIA_HOST = media_host
     uvicorn.run(app=app, host=settings.HOST, port=settings.PORT)
 
 

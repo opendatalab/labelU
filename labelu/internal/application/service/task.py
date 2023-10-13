@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UnicornException
+from labelu.internal.common.error_code import LabelUException
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
@@ -36,6 +36,7 @@ async def create(
                 status=TaskStatus.DRAFT.value,
                 name=cmd.name,
                 description=cmd.description,
+                media_type=cmd.media_type,
                 tips=cmd.tips,
                 created_by=current_user.id,
                 updated_by=current_user.id,
@@ -49,6 +50,7 @@ async def create(
         description=new_task.description,
         tips=new_task.tips,
         status=new_task.status,
+        media_type=new_task.media_type,
         created_at=new_task.created_at,
         created_by=UserResp(
             id=new_task.owner.id,
@@ -106,7 +108,7 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -146,7 +148,7 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -156,7 +158,6 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
     if cmd.config and cmd.media_type:
         obj_in[Task.status.key] = TaskStatus.CONFIGURED
     else:
-        obj_in[Task.media_type.key] = None
         obj_in[Task.config.key] = None
     with db.begin():
         updated_task = crud_task.update(db=db, db_obj=task, obj_in=obj_in)
@@ -184,7 +185,7 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task:{}", task_id)
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -195,7 +196,7 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
             task.created_by,
             current_user.id,
         )
-        raise UnicornException(
+        raise LabelUException(
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,
         )

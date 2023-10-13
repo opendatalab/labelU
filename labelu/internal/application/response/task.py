@@ -27,7 +27,7 @@ class TaskResponse(BaseModel):
         default=None, description="description: task created at time"
     )
     created_by: Union[UserResp, None] = Field(
-        default=None, description="description: task created at time"
+        default=None, description="description: task created by"
     )
 
 

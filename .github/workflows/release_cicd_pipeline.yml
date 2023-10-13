@@ -1,8 +1,9 @@
-name: "main CI/CD Pipeline"
+name: "release CI/CD Pipeline"
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - 'release/**'
   workflow_dispatch:
     inputs:
       branch:
@@ -47,13 +48,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Resolve frontend
         run: |
-          sh ./scripts/resolve_frontend.sh alpha $FRONTEND_VERSION $FRONTEND_ASSET_URL
-          echo "PROVIDED_VERSION=0.7.${{ github.run_number }}" >> $GITHUB_ENV
+          sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
+          echo "PROVIDED_VERSION=${GITHUB_REF##*/v}" >> $GITHUB_ENV
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
-          FRONTEND_CHANGELOG: ${{ inputs.changelog }} 
-          BACKEND_CHANGELOG: ${{ github.event.head_commit.message }}
           CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
       - uses: abatilo/actions-poetry@v2
         with:
@@ -68,23 +67,24 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: ./coverage.xml
           verbose: true
-      - name: Manage version 
+      - name: Manage version
         run: |
           sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
       - name: Publish
         env:
-          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
-          poetry publish --build --skip-existing -r testpypi
+          poetry config pypi-token.pypi $PYPI_TOKEN
+          poetry publish --build --skip-existing
       - name: Commit .VERSION to current branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Update .VERSION [skip ci]"
           file_pattern: .VERSION
       - name: Webhook message
-        uses: joelwmale/webhook-action@master 
+        uses: joelwmale/webhook-action@master
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(test) is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://test.pypi.org/project/labelu/#files) \n \n ## Changelog \n \n${{ inputs.changelog || github.event.head_commit.message }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(prod) is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n${{ inputs.changelog || github.event.head_commit.message }}"}}'
+

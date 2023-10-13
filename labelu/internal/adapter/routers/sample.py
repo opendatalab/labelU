@@ -8,7 +8,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from labelu.internal.common import db
 from labelu.internal.common.security import security
 from labelu.internal.common.error_code import ErrorCode
-from labelu.internal.common.error_code import UnicornException
+from labelu.internal.common.error_code import LabelUException
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.service import sample as service
@@ -76,7 +76,7 @@ async def list_by(
     """
 
     if len([i for i in (after, before, pageNo) if i != None]) != 1:
-        raise UnicornException(
+        raise LabelUException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             code=ErrorCode.CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR,
         )
@@ -116,31 +116,6 @@ async def get(
 
     # business logic
     data = await service.get(
-        db=db, task_id=task_id, sample_id=sample_id, current_user=current_user
-    )
-
-    # response
-    return OkResp[SampleResponse](data=data)
-
-
-@router.get(
-    "/{task_id}/samples/{sample_id}/pre",
-    response_model=OkResp[SampleResponse],
-    status_code=status.HTTP_200_OK,
-)
-async def get_pre(
-    task_id: int,
-    sample_id: int,
-    authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
-    current_user: User = Depends(get_current_user),
-):
-    """
-    Get a annotation result.
-    """
-
-    # business logic
-    data = await service.get_pre(
         db=db, task_id=task_id, sample_id=sample_id, current_user=current_user
     )
 

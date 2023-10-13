@@ -1,14 +1,15 @@
 from enum import Enum
 
 from loguru import logger
-from fastapi.responses import JSONResponse
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
 from labelu.internal.common.config import settings
+
+import pkg_resources
+import os
 
 # common init error code
 COMMON_INIT_CODE = 30000
@@ -83,7 +84,7 @@ class ErrorCode(Enum):
     )
 
 
-class UnicornException(HTTPException):
+class LabelUException(HTTPException):
     def __init__(
         self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     ):
@@ -92,7 +93,7 @@ class UnicornException(HTTPException):
         self.status_code = status_code
 
 
-async def unicorn_exception_handler(request: Request, exc: UnicornException):
+async def labelu_exception_handler(request: Request, exc: LabelUException):
     logger.error(exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -107,7 +108,14 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         exc.status_code == status.HTTP_404_NOT_FOUND
         and not request.url.path.startswith(settings.API_V1_STR)
     ):
-        return RedirectResponse("/")
+        return FileResponse(
+            os.path.join(
+                pkg_resources.resource_filename('labelu.internal', 'statics'),
+                'index.html'
+                ),
+            status_code=200,
+            headers={'Content-Type': 'text/html', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive'}
+            )
     elif exc.status_code == status.HTTP_403_FORBIDDEN:
         JSONResponse(
             status_code=exc.status_code,
@@ -151,6 +159,6 @@ async def validation_exception_handler(request, exc):
 
 def add_exception_handler(app: FastAPI):
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    app.add_exception_handler(UnicornException, unicorn_exception_handler)
+    app.add_exception_handler(LabelUException, labelu_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)

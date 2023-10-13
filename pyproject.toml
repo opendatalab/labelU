@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "labelu"
-version = "0.1.2"
+version = '0.7.487'
 description = ""
 license = "Apache-2.0"
 authors = ["pengjinhu <pengjinhu@pjlab.org.cn>"]
@@ -26,6 +26,7 @@ python-dotenv = "^0.21.0"
 appdirs = "^1.4.4"
 aiofiles = "^22.1.0"
 pillow = "^9.3.0"
+alembic = "^1.9.4"
 
 
 

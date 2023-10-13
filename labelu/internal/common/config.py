@@ -12,11 +12,12 @@ class Settings(BaseSettings):
     HOST: str = "localhost"
     PORT: str = "8000"
     API_V1_STR: str = "/api/v1"
+    MEDIA_HOST: str = f"{SCHEME}://{HOST}:{PORT}"
 
     BASE_DATA_DIR = get_data_dir()
     MEDIA_ROOT = Path(BASE_DATA_DIR).joinpath("media")
     UPLOAD_DIR = "upload"
-    EXOIRT_DIR = "export"
+    EXPORT_DIR = "export"
     os.makedirs(MEDIA_ROOT, exist_ok=True)
     logger.info("Database and media directory: {}", BASE_DATA_DIR)
     UPLOAD_FILE_MAX_SIZE = 200_000_000  # ~200MB
