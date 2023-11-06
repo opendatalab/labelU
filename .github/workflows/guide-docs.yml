@@ -55,7 +55,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: 18
           cache: ${{ steps.detect-package-manager.outputs.manager }}
           cache-dependency-path: ./apps/docs/package-lock.json
       - name: Setup Pages
@@ -70,8 +70,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ./apps/docs/public
-            ./apps/docs/.cache
+            ./websiite/dist
+            ./websiite/.cache
           key: ${{ runner.os }}-gatsby-build-${{ hashFiles('public') }}
           restore-keys: |
             ${{ runner.os }}-gatsby-build-
@@ -81,17 +81,18 @@ jobs:
 
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-        working-directory: ./apps/docs
+        working-directory: ./website
 
-      - name: Build with Gatsby
-        working-directory: ./apps/docs
+      - name: Build website
+        working-directory: ./website
         env:
           PREFIX_PATHS: 'true'
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./apps/docs/public
+          path: ./website/dist
 
   # Deployment job
   deploy:
