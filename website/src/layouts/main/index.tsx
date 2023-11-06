@@ -14,6 +14,11 @@ const links = [
     icon: null,
   },
   {
+    title: '标注结果格式',
+    path: 'schema',
+    icon: null,
+  },
+  {
     title: 'API',
     path: 'api',
     icon: <BiLinkExternal />,

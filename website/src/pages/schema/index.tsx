@@ -3,11 +3,11 @@ import { Outlet } from 'react-router-dom';
 import { MDXProvider } from '@mdx-js/react';
 import { Menu } from '@/components/menu';
 
-export default function Guide() {
+export default function Schema() {
   return (
     <FlexLayout full>
       <FlexLayout.Item>
-        <Menu path='/guide' />
+        <Menu path='/schema' />
       </FlexLayout.Item>
       <FlexLayout.Content>
         <FlexLayout.Content className="prose prose-slate py-2 px-6">
