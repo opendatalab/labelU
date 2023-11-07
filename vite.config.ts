@@ -8,6 +8,7 @@ import { ViteEjsPlugin } from 'vite-plugin-ejs';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/labelU/',
   publicDir: resolve(__dirname, 'public'),
   server: {
     host: '0.0.0.0',
