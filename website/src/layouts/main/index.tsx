@@ -19,12 +19,6 @@ const links = [
     icon: null,
   },
   {
-    title: 'API',
-    path: 'api',
-    icon: <BiLinkExternal />,
-    type: 'external',
-  },
-  {
     title: 'LabelU-kit',
     path: 'https://github.com/opendatalab/labelU-kit#readme',
     icon: <BiLinkExternal />,
@@ -53,7 +47,7 @@ export default function Layout() {
   }, [location.pathname, navigate]);
 
   return (
-    <FlexLayout flex="column" full items="stretch">
+    <FlexLayout flex="column" items="stretch" full>
       <FlexLayout.Header flex justify="space-between" items="center" gap="1rem" className="h-[56px] px-6">
         <FlexLayout.Item flex gap="4rem">
           <Link to="/">
@@ -82,7 +76,7 @@ export default function Layout() {
           </FlexLayout.Item>
         </FlexLayout.Item>
       </FlexLayout.Header>
-      <FlexLayout.Content flex="column">
+      <FlexLayout.Content flex="column" scroll>
         <Outlet />
       </FlexLayout.Content>
     </FlexLayout>

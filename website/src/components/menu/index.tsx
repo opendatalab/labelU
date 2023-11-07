@@ -1,7 +1,7 @@
 import allRoutes, { RouteWithName } from '@/routes';
 import clsx from 'clsx';
 import { useMemo } from 'react';
-import { Link, useLocation, useMatch } from 'react-router-dom';
+import { Link, useMatch } from 'react-router-dom';
 
 export function MenuItem({
   title = '',
@@ -79,7 +79,7 @@ export function Menu({
   }
 
   return (
-    <ul className="menu text-base h-full rounded-r-lg lg:w-[280px]">
+    <ul className="menu flex-nowrap text-base h-full rounded-r-lg">
       {menu.map(({ name, children, path: routePath, index }) => {
         const topPath = index ? path : `${path}/${routePath}`;
 

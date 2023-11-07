@@ -1,8 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@labelu/audio-annotator-react': latest
-  '@labelu/components-react': latest
+  '@labelu/components-react': ^1.2.1
   '@mdx-js/react': ^3.0.0
   '@mdx-js/rollup': ^3.0.0
   '@react-icons/all-files': ^4.1.0
@@ -28,7 +27,6 @@ specifiers:
   vite-plugin-svgr: ^2.4.0
 
 dependencies:
-  '@labelu/audio-annotator-react': registry.npmjs.org/@labelu/audio-annotator-react/1.2.1_biqbaboplfbrettd7655fr4n2y
   '@labelu/components-react': registry.npmjs.org/@labelu/components-react/1.2.1_biqbaboplfbrettd7655fr4n2y
   '@mdx-js/react': registry.npmjs.org/@mdx-js/react/3.0.0_u77dfqzwgecmykiac2ja76gsta
   '@react-icons/all-files': registry.npmjs.org/@react-icons/all-files/4.1.0_react@18.2.0
@@ -680,49 +678,6 @@ packages:
       '@jridgewell/resolve-uri': registry.npmjs.org/@jridgewell/resolve-uri/3.1.1
       '@jridgewell/sourcemap-codec': registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.15
 
-  registry.npmjs.org/@labelu/audio-annotator-react/1.2.1_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-GlXZewewa3BKdzm0taEdo6Zpi69UYrsDW6JlYLW3vbFgAyUorBTONWlzoAeNqPg1+gu5XDbsF558MTIPSLBefA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@labelu/audio-annotator-react/-/audio-annotator-react-1.2.1.tgz}
-    id: registry.npmjs.org/@labelu/audio-annotator-react/1.2.1
-    name: '@labelu/audio-annotator-react'
-    version: 1.2.1
-    peerDependencies:
-      react: ^18.2.0
-      react-dom: ^18.2.0
-    dependencies:
-      '@labelu/audio-react': registry.npmjs.org/@labelu/audio-react/1.2.1_biqbaboplfbrettd7655fr4n2y
-      '@labelu/components-react': registry.npmjs.org/@labelu/components-react/1.2.1_biqbaboplfbrettd7655fr4n2y
-      '@labelu/interface': registry.npmjs.org/@labelu/interface/1.2.1
-      polished: registry.npmjs.org/polished/4.2.2
-      react: registry.npmjs.org/react/18.2.0
-      react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
-      react-hotkeys-hook: registry.npmjs.org/react-hotkeys-hook/4.4.1_biqbaboplfbrettd7655fr4n2y
-      styled-components: registry.npmjs.org/styled-components/5.3.11_biqbaboplfbrettd7655fr4n2y
-    transitivePeerDependencies:
-      - '@babel/core'
-      - react-is
-    dev: false
-
-  registry.npmjs.org/@labelu/audio-react/1.2.1_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-lj6JxvkDj4O0nXtnqsd4YV0MoNDSx4hRHefbgCNh1tOqyAioDlzIxQvt0SMOnVwkBfjvj6skk4bC6ApDMAC/IQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@labelu/audio-react/-/audio-react-1.2.1.tgz}
-    id: registry.npmjs.org/@labelu/audio-react/1.2.1
-    name: '@labelu/audio-react'
-    version: 1.2.1
-    peerDependencies:
-      react: ^18.2.0
-      react-dom: ^18.2.0
-    dependencies:
-      '@labelu/components-react': registry.npmjs.org/@labelu/components-react/1.2.1_biqbaboplfbrettd7655fr4n2y
-      polished: registry.npmjs.org/polished/4.2.2
-      react: registry.npmjs.org/react/18.2.0
-      react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
-      react-hotkeys-hook: registry.npmjs.org/react-hotkeys-hook/4.4.1_biqbaboplfbrettd7655fr4n2y
-      styled-components: registry.npmjs.org/styled-components/5.3.11_biqbaboplfbrettd7655fr4n2y
-      wavesurfer.js: registry.npmjs.org/wavesurfer.js/7.4.3
-    transitivePeerDependencies:
-      - '@babel/core'
-      - react-is
-    dev: false
-
   registry.npmjs.org/@labelu/components-react/1.2.1_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-FGM+OtcARxDjPRgsniYNGHG8R4A4AVntXWZwDwMGfRSgZ+8SY9oduOFpojAipnKyf2+NFcD+7ZOoOe/iB6FO7A==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@labelu/components-react/-/components-react-1.2.1.tgz}
     id: registry.npmjs.org/@labelu/components-react/1.2.1
@@ -746,12 +701,6 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - react-is
-    dev: false
-
-  registry.npmjs.org/@labelu/interface/1.2.1:
-    resolution: {integrity: sha512-pcuTVxO9pzlM02wvKseXvw278l9zGhCjwXNVh6ITLikEOGwIapOoUfKn7Ai02GC380526AY6e0AEZHvOwljk6w==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@labelu/interface/-/interface-1.2.1.tgz}
-    name: '@labelu/interface'
-    version: 1.2.1
     dev: false
 
   registry.npmjs.org/@mdx-js/mdx/3.0.0:
@@ -851,7 +800,7 @@ packages:
     dependencies:
       '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
       classnames: registry.npmjs.org/classnames/2.3.2
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
@@ -871,7 +820,7 @@ packages:
       classnames: registry.npmjs.org/classnames/2.3.2
       rc-motion: registry.npmjs.org/rc-motion/2.9.0_biqbaboplfbrettd7655fr4n2y
       rc-resize-observer: registry.npmjs.org/rc-resize-observer/1.4.0_biqbaboplfbrettd7655fr4n2y
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
@@ -4192,7 +4141,7 @@ packages:
       '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
       classnames: registry.npmjs.org/classnames/2.3.2
       rc-motion: registry.npmjs.org/rc-motion/2.9.0_biqbaboplfbrettd7655fr4n2y
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
@@ -4210,7 +4159,7 @@ packages:
       '@rc-component/portal': registry.npmjs.org/@rc-component/portal/1.1.2_biqbaboplfbrettd7655fr4n2y
       classnames: registry.npmjs.org/classnames/2.3.2
       rc-motion: registry.npmjs.org/rc-motion/2.9.0_biqbaboplfbrettd7655fr4n2y
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
@@ -4227,7 +4176,7 @@ packages:
     dependencies:
       '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
       async-validator: registry.npmjs.org/async-validator/4.2.5
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
@@ -4243,7 +4192,7 @@ packages:
     dependencies:
       '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
       classnames: registry.npmjs.org/classnames/2.3.2
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
@@ -4259,7 +4208,7 @@ packages:
     dependencies:
       '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
       classnames: registry.npmjs.org/classnames/2.3.2
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
       resize-observer-polyfill: registry.npmjs.org/resize-observer-polyfill/1.5.1
@@ -4294,17 +4243,17 @@ packages:
       '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
       classnames: registry.npmjs.org/classnames/2.3.2
       rc-motion: registry.npmjs.org/rc-motion/2.9.0_biqbaboplfbrettd7655fr4n2y
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       rc-virtual-list: registry.npmjs.org/rc-virtual-list/3.11.3_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
 
-  registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-yV/YBNdFn+edyBpBdCqkPE29Su0jWcHNgwx2dJbRqMrMfrUcMJUjCRV+ZPhcvWyKFJ63GzEerPrz9JIVo0zXmA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/rc-util/-/rc-util-5.38.0.tgz}
-    id: registry.npmjs.org/rc-util/5.38.0
+  registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-e4ZMs7q9XqwTuhIK7zBIVFltUtMSjphuPPQXHoHlzRzNdOwUxDejo0Zls5HYaJfRKNURcsS/ceKVULlhjBrxng==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/rc-util/-/rc-util-5.38.1.tgz}
+    id: registry.npmjs.org/rc-util/5.38.1
     name: rc-util
-    version: 5.38.0
+    version: 5.38.1
     peerDependencies:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
@@ -4328,7 +4277,7 @@ packages:
       '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
       classnames: registry.npmjs.org/classnames/2.3.2
       rc-resize-observer: registry.npmjs.org/rc-resize-observer/1.4.0_biqbaboplfbrettd7655fr4n2y
-      rc-util: registry.npmjs.org/rc-util/5.38.0_biqbaboplfbrettd7655fr4n2y
+      rc-util: registry.npmjs.org/rc-util/5.38.1_biqbaboplfbrettd7655fr4n2y
       react: registry.npmjs.org/react/18.2.0
       react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
     dev: false
@@ -5343,12 +5292,6 @@ packages:
     optionalDependencies:
       fsevents: registry.npmjs.org/fsevents/2.3.3
     dev: true
-
-  registry.npmjs.org/wavesurfer.js/7.4.3:
-    resolution: {integrity: sha512-jpg/gMfXKrvt2HSLlpriq3vVQXFHv04xGxiRaZefvqVU69iLXCOEoYVupAes/vS2t+VnBbncebLVo9ylnXvDxA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/wavesurfer.js/-/wavesurfer.js-7.4.3.tgz}
-    name: wavesurfer.js
-    version: 7.4.3
-    dev: false
 
   registry.npmjs.org/wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz}
