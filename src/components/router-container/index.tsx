@@ -10,13 +10,15 @@ export type RouteWithParent = RouteObject & {
   parent: RouteWithParent | null;
 };
 
-export type Match = UIMatch<any, {crumb: (data: any) => string}>
+export type Match = UIMatch<any, { crumb: (data: any) => string }>;
 
 // 将对应的面包屑信息添加到页面标题中
 function RouteWithTitle({ children }: { children: React.ReactNode }) {
   const matches = useMatches() as Match[];
-  const titles = useMemo(() => matches.filter((match) => Boolean(match.handle?.crumb))
-    .map((match) => match.handle.crumb!(match.data)), [matches]);
+  const titles = useMemo(
+    () => matches.filter((match) => Boolean(match.handle?.crumb)).map((match) => match.handle.crumb!(match.data)),
+    [matches],
+  );
 
   const title = titles.length > 0 ? titles[titles.length - 1] : null;
 
@@ -64,12 +66,8 @@ export interface RouterProps {
   basename?: string;
 }
 
-export default function RouterContainer({ routes, basename }: RouterProps) {
-  const router = useMemo(
-    () =>
-      createHashRouter(createRoutesFromElements(mapRoutes(routes))),
-    [basename, routes],
-  );
+export default function RouterContainer({ routes }: RouterProps) {
+  const router = useMemo(() => createHashRouter(createRoutesFromElements(mapRoutes(routes))), [routes]);
   const fallback = <div style={{ width: '100vw', marginTop: '40vh' }}> loading </div>;
 
   return <RouterProvider router={router} fallbackElement={fallback} />;

@@ -1,0 +1,16 @@
+dist
+node_modules
+coverage
+.next
+build
+mock
+public
+__tests__
+storybook-static
+cy-example
+**/*.stories.ts
+**/*.stories.tsx
+**/*.test.ts
+**/*.test.tsx
+es
+example
