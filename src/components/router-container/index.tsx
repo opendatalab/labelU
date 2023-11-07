@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useMemo } from 'react';
 import type { RouteObject, UIMatch } from 'react-router-dom';
-import { createHashRouter, createHashRouter, createRoutesFromElements, Route, RouterProvider, useMatches } from 'react-router-dom';
+import { createHashRouter, createRoutesFromElements, Route, RouterProvider, useMatches } from 'react-router-dom';
 
 export type RouteWithParent = RouteObject & {
   parent: RouteWithParent | null;
