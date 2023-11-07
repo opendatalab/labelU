@@ -6,10 +6,10 @@ import { Menu } from '@/components/menu';
 export default function Schema() {
   return (
     <FlexLayout full>
-      <FlexLayout.Item>
+      <FlexLayout.Item className='lg:w-[280px] max-h-[calc(100vh-56px)] overflow-auto'>
         <Menu path='/schema' />
       </FlexLayout.Item>
-      <FlexLayout.Content>
+      <FlexLayout.Content className="max-h-[calc(100vh-56px)] overflow-auto">
         <FlexLayout.Content className="prose prose-slate py-2 px-6">
           <MDXProvider>
             <Outlet />

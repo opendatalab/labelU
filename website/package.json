@@ -2,8 +2,7 @@
   "name": "labelu-website",
   "private": true,
   "dependencies": {
-    "@labelu/audio-annotator-react": "latest",
-    "@labelu/components-react": "latest",
+    "@labelu/components-react": "^1.2.1",
     "@mdx-js/react": "^3.0.0",
     "@react-icons/all-files": "^4.1.0",
     "@tailwindcss/typography": "^0.5.10",
@@ -15,7 +14,8 @@
     "react-syntax-highlighter": "^15.5.0"
   },
   "scripts": {
-    "start": "vite --port 3005"
+    "start": "vite --port 3005",
+    "build": "vite build"
   },
   "type": "module",
   "devDependencies": {
