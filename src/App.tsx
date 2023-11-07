@@ -17,7 +17,7 @@ import routes from './routes';
 
 export default function App() {
   return (
-    <RouterContainer routes={routes} basename='labelU' />
+    <RouterContainer routes={routes} basename='/labelU' />
     // <Routes>
     //   <Route path="/" element={<Layout />}>
     //     <Route path="guide" element={<Guide />}>
