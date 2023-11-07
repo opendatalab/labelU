@@ -4,6 +4,6 @@ import routes from './routes';
 
 export default function App() {
   return (
-    <RouterContainer routes={routes} basename='/labelU' />
+    <RouterContainer routes={routes} />
   );
 }
