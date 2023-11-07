@@ -18,19 +18,5 @@ import routes from './routes';
 export default function App() {
   return (
     <RouterContainer routes={routes} basename='/labelU' />
-    // <Routes>
-    //   <Route path="/" element={<Layout />}>
-    //     <Route path="guide" element={<Guide />}>
-    //       <Route index element={<GettingStarted />} />
-    //       <Route path="image" element={<ImageGuide />} />
-    //       <Route path="point-cloud" element={<PointCloudGuide />} />
-    //       <Route path="text" element={<TextGuide />} />
-    //       <Route path="audio" element={<AudioGuide />} />
-    //       <Route path="video" element={<VideoGuide />} />
-    //     </Route>
-    //     <Route path="schema" element={<Schema />} />
-    //     <Route path="*" element={<NoMatch />} />
-    //   </Route>
-    // </Routes>
   );
 }

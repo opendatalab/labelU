@@ -65,8 +65,6 @@ export function Menu({
     return submenu;
   }, [path, routes]);
 
-  console.log('menu', menu);
-
   // 子菜单
   if (top) {
     return (
