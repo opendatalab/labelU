@@ -21,7 +21,7 @@ function RouteWithTitle({ children }: { children: React.ReactNode }) {
   const title = titles.length > 0 ? titles[titles.length - 1] : null;
 
   useEffect(() => {
-    document.title = title || '上海人工智能实验室';
+    document.title = title || 'LabelU';
   }, [title]);
 
   return <>{children}</>;
