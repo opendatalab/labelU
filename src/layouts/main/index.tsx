@@ -16,7 +16,7 @@ const links = [
     icon: null,
   },
   {
-    title: '标注结果格式',
+    title: '标注格式',
     path: 'schema',
     icon: null,
   },
@@ -59,7 +59,7 @@ export default function Layout() {
               <div className="text-3xl">
                 <Logo />
               </div>
-              <span className="font-bold">LabelU</span>
+              <span className="hidden sm:block font-bold">LabelU</span>
             </div>
           </Link>
         </div>
@@ -80,7 +80,7 @@ export default function Layout() {
               </Link>
             ))}
             <div className="block sm:hidden">
-              <Drawer content={<Menu path={`/${secondPath}`} />}>
+              <Drawer content={<Menu path={`/${secondPath}`} />} width="calc(100vw - 100px)">
                 <button className="btn btn-ghost text-lg">
                   <BiMenu />
                 </button>

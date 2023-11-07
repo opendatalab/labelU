@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { cloneElement, isValidElement, useEffect, useState } from 'react';
+import { cloneElement, isValidElement, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 
 export type DrawerProps = React.PropsWithChildren<{
@@ -33,6 +33,13 @@ export function Drawer({ children, open: propsOpen, width, content }: DrawerProp
     setOpen(false);
   }, [location]);
 
+  const contentStyle = useMemo(
+    () => ({
+      width,
+    }),
+    [width],
+  );
+
   return (
     <>
       {trigger}
@@ -47,10 +54,9 @@ export function Drawer({ children, open: propsOpen, width, content }: DrawerProp
         onClick={handleClose}
       >
         <div
+          style={contentStyle}
           className={clsx(
-            `z-51 bg-white w-${
-              width ? `[${width}]` : '1/2'
-            } p-4 transition-transform duration-300 ease-in-out transform overflow-auto h-full`,
+            `z-51 bg-white p-4 transition-transform duration-300 ease-in-out transform overflow-auto h-full`,
             {
               'translate-x-0': open,
               '-translate-x-full': !open,
