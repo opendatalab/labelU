@@ -10,15 +10,6 @@ import { ViteEjsPlugin } from 'vite-plugin-ejs';
 export default defineConfig({
   base: '/labelU/',
   publicDir: resolve(__dirname, 'public'),
-  server: {
-    host: '0.0.0.0',
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-    },
-  },
 
   optimizeDeps: {
     include: ['react/jsx-runtime'],
@@ -31,12 +22,6 @@ export default defineConfig({
     },
   },
   build: {
-    target: 'es2015',
-    terserOptions: {
-      compress: {
-        drop_console: false,
-        drop_debugger: false,
-      },
-    },
+    target: 'es2015'
   },
 });
