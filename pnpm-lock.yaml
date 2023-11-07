@@ -13,7 +13,6 @@ specifiers:
   autoprefixer: ^10.4.16
   clsx: ^2.0.0
   daisyui: ^3.9.3
-  history: ^5.3.0
   postcss: ^8.4.21
   react: ^18.2.0
   react-dom: ^18.2.0
@@ -34,7 +33,6 @@ dependencies:
   '@react-icons/all-files': registry.npmjs.org/@react-icons/all-files/4.1.0_react@18.2.0
   '@tailwindcss/typography': registry.npmjs.org/@tailwindcss/typography/0.5.10_tailwindcss@3.3.5
   clsx: registry.npmjs.org/clsx/2.0.0
-  history: registry.npmjs.org/history/5.3.0
   react: registry.npmjs.org/react/18.2.0
   react-dom: registry.npmjs.org/react-dom/18.2.0_react@18.2.0
   react-router: registry.npmjs.org/react-router/6.18.0_react@18.2.0
@@ -5656,14 +5654,6 @@ packages:
     resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/highlight.js/-/highlight.js-10.7.3.tgz}
     name: highlight.js
     version: 10.7.3
-    dev: false
-
-  registry.npmjs.org/history/5.3.0:
-    resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/history/-/history-5.3.0.tgz}
-    name: history
-    version: 5.3.0
-    dependencies:
-      '@babel/runtime': registry.npmjs.org/@babel/runtime/7.23.2
     dev: false
 
   registry.npmjs.org/hoist-non-react-statics/3.3.2:
