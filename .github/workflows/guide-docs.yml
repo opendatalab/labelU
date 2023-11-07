@@ -2,12 +2,12 @@
 #
 # To get started with Gatsby see: https://www.gatsbyjs.com/docs/quick-start/
 #
-name: Api Documentation
+name: Documentation
 
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['main']
+    branches: ['website']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -65,16 +65,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-        working-directory: ./website
 
       - name: Build website
         run: pnpm run build
-        working-directory: ./website
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./website/dist
+          path: ./dist
 
   # Deployment job
   deploy:
