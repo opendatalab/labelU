@@ -89,12 +89,12 @@ export default function Layout() {
           </div>
         </div>
       </header>
-      <div className="flex min-h-0 overflow-auto flex-col">
+      <div className="flex min-h-0 overflow-auto">
         <div className="hidden sm:block lg:w-[280px] sm:w-[180px] max-h-[calc(100vh-56px)] overflow-auto">
-          <Menu path="/guide" />
+          <Menu path={`/${secondPath}`} />
         </div>
         <div className="flex min-h-0 overflow-auto flex-auto max-h-[calc(100vh-56px)]">
-          <div className="flex min-h-0 overflow-auto flex-auto prose prose-slate py-2 px-6">
+          <div className="overflow-auto prose prose-slate py-2 px-6">
             <Outlet />
           </div>
         </div>
