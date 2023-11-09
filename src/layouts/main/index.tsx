@@ -62,7 +62,7 @@ export default function Layout() {
 
   return (
     <div className="flex flex-col items-stretch">
-      <header className="flex justify-between items-center gap-4 h-[64px] px-6 shadow-sm">
+      <header className="flex justify-between items-center gap-4 h-[64px] px-2 sm:px-6 shadow-sm">
         <div className="flex gap-2 items-center">
           <div className="block sm:hidden">
             <Drawer
