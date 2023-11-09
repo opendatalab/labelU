@@ -19,7 +19,7 @@ const links = [
     icon: null,
   },
   {
-    title: i18nLocale.t('annotation format'),
+    title: i18nLocale.t('schema'),
     path: 'schema',
     icon: null,
   },
@@ -109,7 +109,7 @@ export default function Layout() {
                   key={path}
                   to={path}
                   target={type === 'external' ? '_blank' : undefined}
-                  className={clsx('hidden items-center gap-1 px-2 py-2 rounded-full', {
+                  className={clsx('hidden items-center gap-1 px-4 py-2 rounded-full', {
                     'bg-primary text-white': location.pathname.startsWith(`/${path}`),
                     'xs:flex': type !== 'external',
                     'sm:flex': type === 'external',

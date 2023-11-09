@@ -17,7 +17,6 @@ const routes = [
     path: '/',
     id: 'root',
     element: <Layout />,
-    name: i18n.t('guide'),
     children: [
       {
         path: 'guide',
@@ -29,7 +28,7 @@ const routes = [
         id: 'guide',
         handle: {
           crumb: () => {
-            return 'Guide';
+            return i18n.t('guide');
           },
         },
         children: [
@@ -37,110 +36,63 @@ const routes = [
             name: '开始',
             index: true,
             element: <GettingStarted />,
+            handle: {
+              crumb: () => {
+                return i18n.t('getting started');
+              },
+            },
           },
           {
             name: '安装',
-            path: 'installation',
+            path: 'install',
             element: <Outlet />,
+            handle: {
+              crumb: () => {
+                return i18n.t('install');
+              },
+            },
             children: [
               {
                 path: 'windows',
                 name: 'Windows',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('windows');
+                  },
+                },
                 element: <div>Windows</div>,
               },
               {
                 name: 'MacOS',
                 path: 'macos',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('macos');
+                  },
+                },
                 element: <div>MacOS</div>,
               },
               {
                 name: 'Linux',
                 path: 'linux',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('linux');
+                  },
+                },
                 element: <div>Linux</div>,
-              },
-            ],
-          },
-          {
-            name: '图片',
-            path: 'image',
-            element: <Outlet />,
-            children: [
-              {
-                name: '概览',
-                index: true,
-                element: <div>标点</div>,
-              },
-              {
-                name: '标点',
-                path: 'point',
-                element: <div>标点</div>,
-              },
-              {
-                name: '标线',
-                path: 'line',
-                element: <div>标线</div>,
-              },
-              {
-                name: '拉框',
-                path: 'rect',
-                element: <div>拉框</div>,
-              },
-              {
-                name: '多边形',
-                path: 'polygon',
-                element: <div>多边形</div>,
-              },
-            ],
-          },
-          {
-            name: '音频',
-            path: 'audio',
-            element: <AudioGuide />,
-            children: [
-              {
-                name: '概览',
-                index: true,
-                element: <div>音频概览</div>,
-              },
-              {
-                name: '片断截取',
-                path: 'segment',
-                element: <div>片断截取</div>,
-              },
-              {
-                name: '时间戳',
-                path: 'frame',
-                element: <div>片断截取</div>,
-              },
-            ],
-          },
-          {
-            name: '视频',
-            path: 'video',
-            element: <VideoGuide />,
-            children: [
-              {
-                name: '概览',
-                index: true,
-                element: <div>视频概览</div>,
-              },
-              {
-                name: '片断截取',
-                path: 'segment',
-                element: <div>片断截取</div>,
-              },
-              {
-                name: '时间戳',
-                path: 'frame',
-                element: <div>片断截取</div>,
               },
             ],
           },
         ],
       },
       {
-        name: i18n.t('annotation formatter'),
         path: 'schema',
+        handle: {
+          crumb: () => {
+            return i18n.t('schema');
+          },
+        },
         element: (
           <MDXProvider>
             <Outlet />
@@ -148,62 +100,106 @@ const routes = [
         ),
         children: [
           {
-            name: '图片',
             path: 'image',
             element: <Outlet />,
+            handle: {
+              crumb: () => {
+                return i18n.t('image');
+              },
+            },
             children: [
               {
-                name: '标点',
                 path: 'point',
                 element: <div>标点</div>,
+                handle: {
+                  crumb: () => {
+                    return i18n.t('image.point');
+                  },
+                },
               },
               {
-                name: '标线',
                 path: 'line',
                 element: <div>标线</div>,
+                handle: {
+                  crumb: () => {
+                    return i18n.t('image.line');
+                  },
+                },
               },
               {
-                name: '拉框',
                 path: 'rect',
                 element: <div>拉框</div>,
+                handle: {
+                  crumb: () => {
+                    return i18n.t('image.rect');
+                  },
+                },
               },
               {
-                name: '多边形',
                 path: 'polygon',
                 element: <div>多边形</div>,
+                handle: {
+                  crumb: () => {
+                    return i18n.t('image.polygon');
+                  },
+                },
               },
             ],
           },
           {
-            name: '音频',
             path: 'audio',
             element: <AudioGuide />,
+            handle: {
+              crumb: () => {
+                return i18n.t('audio');
+              },
+            },
             children: [
               {
-                name: '片断截取',
                 path: 'segment',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('audio.segment');
+                  },
+                },
                 element: <div>片断截取</div>,
               },
               {
-                name: '时间戳',
                 path: 'frame',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('audio.frame');
+                  },
+                },
                 element: <div>片断截取</div>,
               },
             ],
           },
           {
-            name: '视频',
             path: 'video',
             element: <VideoGuide />,
+            handle: {
+              crumb: () => {
+                return i18n.t('video');
+              },
+            },
             children: [
               {
-                name: '片断截取',
                 path: 'segment',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('video.segment');
+                  },
+                },
                 element: <div>片断截取</div>,
               },
               {
-                name: '时间戳',
                 path: 'frame',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('video.frame');
+                  },
+                },
                 element: <div>片断截取</div>,
               },
             ],

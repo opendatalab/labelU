@@ -63,11 +63,11 @@ export function Menu({ path, top, routes = allRoutes }: { path: string; top?: st
   if (top) {
     return (
       <ul>
-        {menu.map(({ name, path: routePath, index }) => (
+        {menu.map(({ handle, path: routePath, index }) => (
           <MenuItem
             key={`${index ? top : `${top}/${routePath}`}`}
             path={`${index ? top : `${top}/${routePath}`}`}
-            title={name}
+            title={handle ? handle.crumb() : 'unknown'}
           />
         ))}
       </ul>
@@ -76,18 +76,19 @@ export function Menu({ path, top, routes = allRoutes }: { path: string; top?: st
 
   return (
     <ul className="menu flex-nowrap text-base h-full rounded-r-lg">
-      {menu.map(({ name, children, path: routePath, index }) => {
+      {menu.map(({ handle, children, path: routePath, index }) => {
         const topPath = index ? path : `${path}/${routePath}`;
+        const title = handle?.crumb() ?? 'unknown';
 
         if (children) {
           return (
-            <MenuItem key={routePath} path={routePath!} title={name}>
+            <MenuItem key={routePath} path={routePath!} title={title}>
               <Menu path={routePath!} top={topPath} routes={menu} />
             </MenuItem>
           );
         }
 
-        return <MenuItem key={topPath} path={topPath} title={name} />;
+        return <MenuItem key={topPath} path={topPath} title={title} />;
       })}
     </ul>
   );

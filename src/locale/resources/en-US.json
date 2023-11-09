@@ -1,4 +1,20 @@
 {
   "guide": "Guide",
-  "annotation format": "Schema"
+  "schema": "Schema",
+  "getting started": "Getting Started",
+  "install": "Install",
+  "windows": "Windows",
+  "macos": "MacOS",
+  "linux": "Linux",
+  "image": "Image",
+  "image.rect": "Rect",
+  "image.polygon": "Polygon",
+  "image.point": "Point",
+  "image.line": "Line",
+  "video": "Video",
+  "video.segment": "Segment",
+  "video.frame": "Timestamp",
+  "audio": "Audio",
+  "audio.segment": "Segment",
+  "audio.frame": "Timestamp"
 }

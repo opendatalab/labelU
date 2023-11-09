@@ -1,4 +1,20 @@
 {
   "guide": "使用指南",
-  "annotation format": "标注格式"
+  "schema": "标注格式",
+  "getting started": "开始",
+  "install": "安装",
+  "windows": "Windows",
+  "macos": "MacOS",
+  "linux": "Linux",
+  "image": "图片",
+  "image.rect": "拉框",
+  "image.polygon": "多边形",
+  "image.point": "标点",
+  "image.line": "标线",
+  "video": "视频",
+  "video.segment": "片断截取",
+  "video.frame": "时间戳",
+  "audio": "音频",
+  "audio.segment": "片断截取",
+  "audio.frame": "时间戳"
 }
