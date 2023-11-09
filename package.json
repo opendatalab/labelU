@@ -2,6 +2,7 @@
   "name": "labelu-website",
   "private": true,
   "dependencies": {
+    "@loadable/component": "^5.15.3",
     "@mdx-js/react": "^3.0.0",
     "@react-icons/all-files": "^4.1.0",
     "@tailwindcss/typography": "^0.5.10",
