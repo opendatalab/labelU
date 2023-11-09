@@ -34,7 +34,7 @@
   },
   "include": [
     "src",
-    "src/styles/theme.json"
+    "src/locale/**/*.json"
   ],
   "references": [
     {

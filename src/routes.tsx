@@ -5,6 +5,8 @@ import Layout from './layouts/main';
 import NoMatch from './pages/no-match';
 import AudioGuide from './pages/guide.audio';
 import VideoGuide from './pages/guide.video';
+import i18n from './locale';
+import GettingStarted from './pages/getting-started';
 
 export interface RouteWithName extends NonIndexRouteObject {
   name?: string;
@@ -15,7 +17,7 @@ const routes = [
     path: '/',
     id: 'root',
     element: <Layout />,
-    name: '使用指南',
+    name: i18n.t('guide'),
     children: [
       {
         path: 'guide',
@@ -34,7 +36,7 @@ const routes = [
           {
             name: '开始',
             index: true,
-            element: <div>概览介绍</div>,
+            element: <GettingStarted />,
           },
           {
             name: '安装',
@@ -137,7 +139,7 @@ const routes = [
         ],
       },
       {
-        name: '标注结果格式',
+        name: i18n.t('annotation formatter'),
         path: 'schema',
         element: (
           <MDXProvider>

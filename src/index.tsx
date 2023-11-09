@@ -1,8 +1,8 @@
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 
 import '@/styles/globals.css';
 
+import './locale/index';
 import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<App />);
