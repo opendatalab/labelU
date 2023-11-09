@@ -19,6 +19,7 @@ i18n
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
     resources,
+    lng: localStorage.getItem('i18nextLng') || navigator.language || 'zh-CN',
     interpolation: {
       escapeValue: false, // react already safes from xss
     },
