@@ -68,13 +68,13 @@ export default function Layout() {
             <Drawer
               content={
                 <div className="flex flex-col">
-                  <div className="flex my-2 justify-around">
+                  <div className="flex my-2 text-sm justify-around">
                     {links.map(({ title, path, icon, type }) => (
                       <Link
                         key={path}
                         to={path}
                         target={type === 'external' ? '_blank' : undefined}
-                        className={clsx('items-center gap-1 px-4 py-2 rounded-full flex', {
+                        className={clsx('items-center gap-1 p-2 rounded-full flex', {
                           'bg-primary text-white': location.pathname.startsWith(`/${path}`),
                         })}
                       >
@@ -85,7 +85,7 @@ export default function Layout() {
                   <Menu path={`/${secondPath}`} />
                 </div>
               }
-              width="calc(100vw - 100px)"
+              width="calc(100vw - 72px)"
             >
               <button className="btn btn-ghost text-xl">
                 <BiMenu />
@@ -109,7 +109,7 @@ export default function Layout() {
                   key={path}
                   to={path}
                   target={type === 'external' ? '_blank' : undefined}
-                  className={clsx('hidden items-center gap-1 px-4 py-2 rounded-full', {
+                  className={clsx('hidden items-center gap-1 px-2 py-2 rounded-full', {
                     'bg-primary text-white': location.pathname.startsWith(`/${path}`),
                     'xs:flex': type !== 'external',
                     'sm:flex': type === 'external',
