@@ -105,7 +105,12 @@ const JsonSchemaTable: FC<JsonSchemaTableProps> = ({ schema }) => {
       if (value.additionalProperties && expandedFields.includes(fullKey)) {
         if (value.additionalProperties.anyOf) {
           rows.push(
-            ...generateRows({ '[string]': { type: ['number', 'string'] } }, requiredFields, `${fullKey}.`, true),
+            ...generateRows(
+              { '[string]': { type: value.additionalProperties.anyOf.map((item) => item.type as unknown as string) } },
+              requiredFields,
+              `${fullKey}.`,
+              true,
+            ),
           );
         }
       }

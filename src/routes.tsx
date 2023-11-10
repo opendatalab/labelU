@@ -3,13 +3,17 @@ import { MDXProvider } from '@mdx-js/react';
 
 import Layout from './layouts/main';
 import NoMatch from './pages/no-match';
-import AudioGuide from './pages/guide.audio';
-import VideoGuide from './pages/guide.video';
+import VideoSegmentSchema from './pages/schema.video.segment';
+import VideoFrameSchema from './pages/schema.video.frame';
 import i18n from './locale';
 import GettingStarted from './pages/getting-started';
 import Schema from './pages/schema';
 import RectSchema from './pages/schema.image.rect';
+import PointSchema from './pages/schema.image.point';
 import LineSchema from './pages/schema.image.line';
+import PolygonSchema from './pages/schema.image.polygon';
+import AudioSegmentSchema from './pages/schema.audio.segment';
+import AudioFrameSchema from './pages/schema.audio.frame';
 
 export interface RouteWithName extends NonIndexRouteObject {
   name?: string;
@@ -112,7 +116,7 @@ const routes = [
             children: [
               {
                 path: 'point',
-                element: <Outlet />,
+                element: <PointSchema />,
                 handle: {
                   crumb: () => {
                     return i18n.t('image.point');
@@ -139,7 +143,7 @@ const routes = [
               },
               {
                 path: 'polygon',
-                element: <div>多边形</div>,
+                element: <PolygonSchema />,
                 handle: {
                   crumb: () => {
                     return i18n.t('image.polygon');
@@ -150,7 +154,7 @@ const routes = [
           },
           {
             path: 'audio',
-            element: <AudioGuide />,
+            element: <Outlet />,
             handle: {
               crumb: () => {
                 return i18n.t('audio');
@@ -164,7 +168,7 @@ const routes = [
                     return i18n.t('audio.segment');
                   },
                 },
-                element: <div>片断截取</div>,
+                element: <AudioSegmentSchema />,
               },
               {
                 path: 'frame',
@@ -173,13 +177,13 @@ const routes = [
                     return i18n.t('audio.frame');
                   },
                 },
-                element: <div>片断截取</div>,
+                element: <AudioFrameSchema />,
               },
             ],
           },
           {
             path: 'video',
-            element: <VideoGuide />,
+            element: <Outlet />,
             handle: {
               crumb: () => {
                 return i18n.t('video');
@@ -193,7 +197,7 @@ const routes = [
                     return i18n.t('video.segment');
                   },
                 },
-                element: <div>片断截取</div>,
+                element: <VideoSegmentSchema />,
               },
               {
                 path: 'frame',
@@ -202,7 +206,7 @@ const routes = [
                     return i18n.t('video.frame');
                   },
                 },
-                element: <div>片断截取</div>,
+                element: <VideoFrameSchema />,
               },
             ],
           },

@@ -1,6 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generated schema for Root",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
     "pointList": {
@@ -16,22 +15,15 @@
           "y": {
             "type": "number",
             "description": "y坐标"
-          },
-          "id": {
-            "type": "string",
-            "description": "唯一标识"
           }
         },
-        "required": ["x", "y", "id"]
+        "required": ["x", "y"]
       }
-    },
-    "id": {
-      "type": "string",
-      "description": "唯一标识"
     },
     "valid": {
       "type": "boolean",
-      "description": "是否有效"
+      "description": "是否有效",
+      "default": true
     },
     "attributes": {
       "type": "object",
@@ -44,14 +36,20 @@
         ]
       }
     },
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
     "order": {
-      "type": "number",
-      "description": "标注顺序"
+      "type": "integer",
+      "description": "标注顺序",
+      "minimum": 0
     },
     "label": {
       "type": "string",
-      "description": "标注类别"
+      "description": "标注类别",
+      "default": "none"
     }
   },
-  "required": ["pointList", "id", "valid", "order", "label"]
+  "required": ["x", "y", "width", "height", "id", "order", "label"]
 }

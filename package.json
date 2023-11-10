@@ -26,6 +26,7 @@
     "@shlab/fabric": "^1.2.1",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
+    "@types/react-syntax-highlighter": "^15.5.10",
     "@vitejs/plugin-react": "^3.1.0",
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.9.3",

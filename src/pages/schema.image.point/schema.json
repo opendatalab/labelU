@@ -4,19 +4,11 @@
   "properties": {
     "x": {
       "type": "number",
-      "description": "拉框左上角x坐标"
+      "description": "x坐标"
     },
     "y": {
       "type": "number",
-      "description": "拉框左上角y坐标"
-    },
-    "width": {
-      "type": "number",
-      "description": "拉框宽度"
-    },
-    "height": {
-      "type": "number",
-      "description": "拉框高度"
+      "description": "y坐标"
     },
     "valid": {
       "type": "boolean",

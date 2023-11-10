@@ -1,6 +1,8 @@
 import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { BiLinkExternal } from '@react-icons/all-files/bi/BiLinkExternal';
+import { BiBookContent } from '@react-icons/all-files/bi/BiBookContent';
+import { BiCodeCurly } from '@react-icons/all-files/bi/BiCodeCurly';
 import { AiOutlineGithub } from '@react-icons/all-files/ai/AiOutlineGithub';
 import { HiTranslate } from '@react-icons/all-files/hi/HiTranslate';
 import clsx from 'clsx';
@@ -16,17 +18,17 @@ const links = [
   {
     title: i18nLocale.t('guide'),
     path: 'guide',
-    icon: null,
+    icon: <BiBookContent />,
   },
   {
     title: i18nLocale.t('schema'),
     path: 'schema',
-    icon: null,
+    icon: <BiCodeCurly />,
   },
   {
     title: 'LabelU-kit',
     path: 'https://github.com/opendatalab/labelU-kit#readme',
-    icon: <BiLinkExternal />,
+    icon: null,
     type: 'external',
   },
 ];
@@ -115,7 +117,8 @@ export default function Layout() {
                     'sm:flex': type === 'external',
                   })}
                 >
-                  {title} {icon}
+                  <span className="text-xl">{icon}</span> {title}
+                  {type === 'external' && <BiLinkExternal />}
                 </Link>
               ))}
             </div>

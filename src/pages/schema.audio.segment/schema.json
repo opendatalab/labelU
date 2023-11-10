@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
+    "start": {
+      "type": "number",
+      "description": "起始时间"
+    },
+    "end": {
+      "type": "number",
+      "description": "结束时间"
+    },
+    "order": {
+      "type": "integer",
+      "description": "标注顺序",
+      "minimum": 0
+    },
+    "label": {
+      "type": "string",
+      "description": "标注类别",
+      "default": "none"
+    },
+    "attributes": {
+      "type": "object",
+      "description": "类别属性，键值对",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": ["x", "y", "width", "height", "id", "order", "label"]
+}

@@ -1,5 +1,5 @@
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import 'react-syntax-highlighter/dist/esm/styles/hljs/night-owl';
+import { githubGist } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import React from 'react';
 import type { MDXComponents, MergeComponents } from '@mdx-js/react/lib';
 
@@ -7,31 +7,19 @@ function code({ className, ...props }: React.DetailedHTMLProps<React.HTMLAttribu
   const match = /language-(\w+)/.exec(className || '');
 
   return match ? (
-    <SyntaxHighlighter language={match[1]} PreTag="div" {...props} />
+    <SyntaxHighlighter
+      lineNumberStyle={{
+        color: '#999',
+      }}
+      showLineNumbers
+      language={match[1]}
+      PreTag="div"
+      // @ts-ignore
+      style={githubGist}
+      {...props}
+    />
   ) : (
     <code className={className} {...props} />
-  );
-}
-
-function getAnchor(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5 ]/g, '')
-    .replace(/[ ]/g, '-');
-}
-
-function h2({ children }: React.PropsWithChildren) {
-  const anchor = getAnchor(children as string);
-  const link = `#${anchor}`;
-
-  return (
-    <h2 id={anchor}>
-      <a href={link} className="anchor-link">
-        §
-      </a>
-      &nbsp;
-      {children as string}
-    </h2>
   );
 }
 
@@ -42,7 +30,7 @@ interface ExtraProps {
 export default function MarkdownWithHighlight({ children }: React.PropsWithChildren) {
   const childrenWithExtraProp = React.Children.map(children, (child) => {
     if (React.isValidElement<ExtraProps>(child)) {
-      return React.cloneElement(child, { components: { code, h2 } });
+      return React.cloneElement(child, { components: { code } });
     }
 
     return child;

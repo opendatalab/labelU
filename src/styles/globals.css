@@ -6,14 +6,16 @@ body {
   margin: 0;
 }
 
-.prose pre > div {
-  background: none !important;
+.prose pre {
+  padding: 0;
+  background: transparent;
+  border: 1px solid #ebebeb;
   color: inherit !important;
 }
 
-.prose img, .prose video {
-  box-shadow: 0px 3px 20px #00000038;
-  border-radius: 0.375rem;
+.prose pre > div {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
 }
 
 #root {

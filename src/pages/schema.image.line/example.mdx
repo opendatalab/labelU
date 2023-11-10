@@ -1,38 +1,71 @@
 import jsonschema from './schema.json';
 import JsonSchemaTable from '../../components/schema-table';
 
-## Schema
+## Line Schema
 
 <JsonSchemaTable schema={jsonschema} />
 
-## 示例
+## Example
 
 ```json
 {
   "result": [
     {
-      "x": 148.66463414634154,
-      "y": 594.4123475609755,
-      "width": 168.1326219512195,
-      "height": 134.5060975609756,
+      "pointList": [
+        {
+          "x": 346.88414634146346,
+          "y": 229.8300304878049,
+          "id": "eWT6BJJv"
+        },
+        {
+          "x": 481.39024390243907,
+          "y": 328.9397865853659,
+          "id": "ITAQu1gF"
+        },
+        {
+          "x": 322.10670731707324,
+          "y": 385.5739329268293,
+          "id": "G4c3972f"
+        },
+        {
+          "x": 300.86890243902445,
+          "y": 309.4717987804878,
+          "id": "PMCqLAsQ"
+        }
+      ],
+      "id": "rW5Jbd8G",
       "valid": true,
+      "attributes": {},
+      "order": 1,
       "isVisible": true,
-      "id": "0kjFS5rI",
-      "order": 4,
-      "label": "label-1"
+      "label": "noneAttribute"
     },
     {
-      "x": 515.016768292683,
-      "y": 603.2614329268292,
-      "width": 194.67987804878047,
-      "height": 69.02286585365853,
+      "pointList": [
+        {
+          "x": 684.9192073170732,
+          "y": 127.18064024390246,
+          "id": "yjRg1N7e"
+        },
+        {
+          "x": 787.5685975609756,
+          "y": 173.19588414634148,
+          "id": "ZNhLz1HW"
+        },
+        {
+          "x": 732.704268292683,
+          "y": 240.4489329268293,
+          "id": "4SKym9kd"
+        }
+      ],
+      "id": "TZZj1VdS",
       "valid": true,
+      "attributes": {},
+      "order": 2,
       "isVisible": true,
-      "id": "AcO6GXyc",
-      "order": 5,
-      "label": "label-1"
+      "label": "noneAttribute"
     }
   ],
-  "toolName": "rectTool"
+  "toolName": "lineTool"
 }
 ```

@@ -1,0 +1,45 @@
+import jsonschema from './schema.json';
+import JsonSchemaTable from '../../components/schema-table';
+
+## Polygon Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "result": [
+    {
+      "id": "FuzuAJ4q",
+      "valid": true,
+      "isVisible": true,
+      "pointList": [
+        {
+          "x": 803.4969512195122,
+          "y": 605.0312499999999
+        },
+        {
+          "x": 807.0365853658536,
+          "y": 735.9977134146341
+        },
+        {
+          "x": 900.8368902439024,
+          "y": 702.3711890243901
+        },
+        {
+          "x": 922.0746951219511,
+          "y": 631.5785060975609
+        },
+        {
+          "x": 909.6859756097559,
+          "y": 564.3254573170731
+        }
+      ],
+      "order": 6,
+      "label": "label-1"
+    }
+  ],
+  "toolName": "polygonTool"
+}
+```

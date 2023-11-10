@@ -1,0 +1,34 @@
+import jsonschema from './schema.json';
+import JsonSchemaTable from '../../components/schema-table';
+
+## Audio Timestamp Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json filename="index.json"
+{
+  "toolName": "audioFrameTool",
+  "result": [
+    {
+      "id": "cbqbst6gj5f",
+      "time": 5.6555891238670695,
+      "label": "label-1",
+      "order": 3,
+      "attributes": {
+        "contains": "Hello"
+      }
+    },
+    {
+      "id": "c8il22ceipi",
+      "time": 7.917824773413897,
+      "label": "label-1",
+      "order": 4,
+      "attributes": {
+        "contains": "Human"
+      }
+    }
+  ]
+}
+```

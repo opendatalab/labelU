@@ -1,0 +1,36 @@
+import jsonschema from './schema.json';
+import JsonSchemaTable from '../../components/schema-table';
+
+## Video Segment Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "toolName": "videoSegmentTool",
+  "result": [
+    {
+      "id": "58gz4irdvip",
+      "start": 4.2634441087613295,
+      "end": 8.845921,
+      "order": 1,
+      "label": "label-1",
+      "attributes": {
+        "car": ["bmw"]
+      }
+    },
+    {
+      "id": "dtgvrzgfgcp",
+      "start": 5.713595166163143,
+      "end": 9.89003,
+      "order": 2,
+      "label": "label-1",
+      "attributes": {
+        "car": ["bmw"]
+      }
+    }
+  ]
+}
+```

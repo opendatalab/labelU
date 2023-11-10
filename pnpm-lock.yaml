@@ -9,6 +9,7 @@ specifiers:
   '@tailwindcss/typography': ^0.5.10
   '@types/react': ^18.0.28
   '@types/react-dom': ^18.0.11
+  '@types/react-syntax-highlighter': ^15.5.10
   '@vitejs/plugin-react': ^3.1.0
   autoprefixer: ^10.4.16
   clsx: ^2.0.0
@@ -50,6 +51,7 @@ devDependencies:
   '@shlab/fabric': 1.2.1
   '@types/react': registry.npmjs.org/@types/react/18.2.35
   '@types/react-dom': registry.npmjs.org/@types/react-dom/18.2.14
+  '@types/react-syntax-highlighter': registry.npmjs.org/@types/react-syntax-highlighter/15.5.10
   '@vitejs/plugin-react': registry.npmjs.org/@vitejs/plugin-react/3.1.0_vite@4.5.0
   autoprefixer: registry.npmjs.org/autoprefixer/10.4.16_postcss@8.4.31
   daisyui: registry.npmjs.org/daisyui/3.9.4
@@ -2609,6 +2611,14 @@ packages:
     resolution: {integrity: sha512-V835xgdSVmyQmI1KLV2BEIUgqEuinxp9O4G6g3FqO/SqLac049E53aysv0oEFD2kHfejeKU+ZqL2bcFWj9gLAQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@types/react-dom/-/react-dom-18.2.14.tgz}
     name: '@types/react-dom'
     version: 18.2.14
+    dependencies:
+      '@types/react': registry.npmjs.org/@types/react/18.2.35
+    dev: true
+
+  registry.npmjs.org/@types/react-syntax-highlighter/15.5.10:
+    resolution: {integrity: sha512-Vf8nNkGHnjwK37b2wDs92zJSAWS2Mb57NcYHgajCNssHeTNEixvjINnXJkKdY0V0/eLrYkPP1xDKvNmYIr4HIg==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@types/react-syntax-highlighter/-/react-syntax-highlighter-15.5.10.tgz}
+    name: '@types/react-syntax-highlighter'
+    version: 15.5.10
     dependencies:
       '@types/react': registry.npmjs.org/@types/react/18.2.35
     dev: true
