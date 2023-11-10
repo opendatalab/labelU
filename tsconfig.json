@@ -34,7 +34,7 @@
   },
   "include": [
     "src",
-    "src/locale/**/*.json"
+    "src/**/*.json"
   ],
   "references": [
     {

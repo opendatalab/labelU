@@ -7,6 +7,9 @@ import AudioGuide from './pages/guide.audio';
 import VideoGuide from './pages/guide.video';
 import i18n from './locale';
 import GettingStarted from './pages/getting-started';
+import Schema from './pages/schema';
+import RectSchema from './pages/schema.image.rect';
+import LineSchema from './pages/schema.image.line';
 
 export interface RouteWithName extends NonIndexRouteObject {
   name?: string;
@@ -25,7 +28,6 @@ const routes = [
             <Outlet />
           </MDXProvider>
         ),
-        id: 'guide',
         handle: {
           crumb: () => {
             return i18n.t('guide');
@@ -95,7 +97,7 @@ const routes = [
         },
         element: (
           <MDXProvider>
-            <Outlet />
+            <Schema />
           </MDXProvider>
         ),
         children: [
@@ -110,7 +112,7 @@ const routes = [
             children: [
               {
                 path: 'point',
-                element: <div>标点</div>,
+                element: <Outlet />,
                 handle: {
                   crumb: () => {
                     return i18n.t('image.point');
@@ -119,7 +121,7 @@ const routes = [
               },
               {
                 path: 'line',
-                element: <div>标线</div>,
+                element: <LineSchema />,
                 handle: {
                   crumb: () => {
                     return i18n.t('image.line');
@@ -128,7 +130,7 @@ const routes = [
               },
               {
                 path: 'rect',
-                element: <div>拉框</div>,
+                element: <RectSchema />,
                 handle: {
                   crumb: () => {
                     return i18n.t('image.rect');

@@ -16,5 +16,12 @@
   "video.frame": "Timestamp",
   "audio": "Audio",
   "audio.segment": "Segment",
-  "audio.frame": "Timestamp"
+  "audio.frame": "Timestamp",
+  "field": "Field",
+  "type": "Type",
+  "description": "Description",
+  "default": "Default",
+  "required": "Required",
+  "yes": "Yes",
+  "no": "No"
 }

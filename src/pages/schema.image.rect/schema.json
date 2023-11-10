@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "x": {
+      "type": "number",
+      "description": "拉框左上角x坐标"
+    },
+    "y": {
+      "type": "number",
+      "description": "拉框左上角y坐标"
+    },
+    "width": {
+      "type": "number",
+      "description": "拉框宽度"
+    },
+    "height": {
+      "type": "number",
+      "description": "拉框高度"
+    },
+    "valid": {
+      "type": "boolean",
+      "description": "是否有效",
+      "default": true
+    },
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
+    "order": {
+      "type": "integer",
+      "description": "标注顺序",
+      "minimum": 0
+    },
+    "label": {
+      "type": "string",
+      "description": "标注类别",
+      "default": "none"
+    }
+  },
+  "required": ["x", "y", "width", "height", "id", "order", "label"]
+}

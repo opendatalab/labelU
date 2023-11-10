@@ -6,11 +6,6 @@ body {
   margin: 0;
 }
 
-.prose pre {
-  max-height: 40rem;
-  overflow: auto;
-}
-
 .prose pre > div {
   background: none !important;
   color: inherit !important;

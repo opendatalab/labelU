@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "pointList": {
+      "type": "array",
+      "description": "标注点列表",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "x坐标"
+          },
+          "y": {
+            "type": "number",
+            "description": "y坐标"
+          },
+          "id": {
+            "type": "string",
+            "description": "唯一标识"
+          }
+        },
+        "required": ["x", "y", "id"]
+      }
+    },
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
+    "valid": {
+      "type": "boolean",
+      "description": "是否有效"
+    },
+    "attributes": {
+      "type": "object",
+      "description": "类别属性，键值对，可为空",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          }
+        ]
+      }
+    },
+    "order": {
+      "type": "number",
+      "description": "标注顺序"
+    },
+    "label": {
+      "type": "string",
+      "description": "标注类别"
+    }
+  },
+  "required": ["pointList", "id", "valid", "order", "label"]
+}
