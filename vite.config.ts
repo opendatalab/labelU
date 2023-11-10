@@ -9,7 +9,7 @@ import { ViteEjsPlugin } from 'vite-plugin-ejs';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/labelU/',
   publicDir: resolve(__dirname, 'public'),
 
   optimizeDeps: {
