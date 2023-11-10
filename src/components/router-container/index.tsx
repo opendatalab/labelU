@@ -76,9 +76,5 @@ export default function RouterContainer({ routes, basename }: RouterProps) {
   );
   const fallback = <div style={{ width: '100vw', marginTop: '40vh' }}> loading </div>;
 
-  useEffect(() => {
-    document.dispatchEvent(new Event('custom-render-trigger'));
-  }, []);
-
   return <RouterProvider router={router} fallbackElement={fallback} />;
 }
