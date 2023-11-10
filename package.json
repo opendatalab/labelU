@@ -23,6 +23,8 @@
   "type": "module",
   "devDependencies": {
     "@mdx-js/rollup": "^3.0.0",
+    "@prerenderer/renderer-puppeteer": "^1.2.2",
+    "@prerenderer/rollup-plugin": "^0.3.7",
     "@shlab/fabric": "^1.2.1",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",

@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { BiLinkExternal } from '@react-icons/all-files/bi/BiLinkExternal';
-import { BiBookContent } from '@react-icons/all-files/bi/BiBookContent';
+import { BiBookOpen } from '@react-icons/all-files/bi/BiBookOpen';
 import { BiCodeCurly } from '@react-icons/all-files/bi/BiCodeCurly';
 import { AiOutlineGithub } from '@react-icons/all-files/ai/AiOutlineGithub';
 import { HiTranslate } from '@react-icons/all-files/hi/HiTranslate';
@@ -18,7 +18,7 @@ const links = [
   {
     title: i18nLocale.t('guide'),
     path: 'guide',
-    icon: <BiBookContent />,
+    icon: <BiBookOpen />,
   },
   {
     title: i18nLocale.t('schema'),

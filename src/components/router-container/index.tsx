@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useMemo } from 'react';
 import type { RouteObject, UIMatch } from 'react-router-dom';
-import { createHashRouter, createRoutesFromElements, Route, RouterProvider, useMatches } from 'react-router-dom';
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, useMatches } from 'react-router-dom';
 
 export type RouteWithParent = RouteObject & {
   parent: RouteWithParent | null;
@@ -66,9 +66,19 @@ export interface RouterProps {
   basename?: string;
 }
 
-export default function RouterContainer({ routes }: RouterProps) {
-  const router = useMemo(() => createHashRouter(createRoutesFromElements(mapRoutes(routes))), [routes]);
+export default function RouterContainer({ routes, basename }: RouterProps) {
+  const router = useMemo(
+    () =>
+      createBrowserRouter(createRoutesFromElements(mapRoutes(routes)), {
+        basename,
+      }),
+    [routes, basename],
+  );
   const fallback = <div style={{ width: '100vw', marginTop: '40vh' }}> loading </div>;
+
+  useEffect(() => {
+    document.dispatchEvent(new Event('custom-render-trigger'));
+  }, []);
 
   return <RouterProvider router={router} fallbackElement={fallback} />;
 }
