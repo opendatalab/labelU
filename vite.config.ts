@@ -9,7 +9,7 @@ import { ViteEjsPlugin } from 'vite-plugin-ejs';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/labelU/',
+  base: '/',
   publicDir: resolve(__dirname, 'public'),
 
   optimizeDeps: {
@@ -22,16 +22,10 @@ export default defineConfig({
     svgr(),
     ViteEjsPlugin(),
     // prerender({
-    //   routes: ['/', '/guide/install/windows', '/guide/install/macos', '/schema/image/point'],
+    //   routes: ['/', '/schema/image/point'],
     //   renderer: '@prerenderer/renderer-puppeteer',
     //   rendererOptions: {
     //     renderAfterDocumentEvent: 'custom-render-trigger',
-    //   },
-    //   postProcess(renderedRoute) {
-    //     // Replace all http with https urls and localhost to your site url
-    //     renderedRoute.html = renderedRoute.html
-    //       .replace(/http:/i, 'https:')
-    //       .replace(/(https:\/\/)?(localhost|127\.0\.0\.1):\d*/i, process.env.CI_ENVIRONMENT_URL || '');
     //   },
     // }),
   ].filter(Boolean),
