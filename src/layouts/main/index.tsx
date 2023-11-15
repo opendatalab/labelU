@@ -113,8 +113,8 @@ export default function Layout() {
                   key={path}
                   to={path}
                   target={type === 'external' ? '_blank' : undefined}
-                  className={clsx('hidden items-center gap-1 px-4 py-2 rounded-full', {
-                    'bg-primary text-white': location.pathname.startsWith(`/${path}`),
+                  className={clsx('hidden items-center gap-1 px-4 py-2 rounded-full hover:text-[var(--color-primary)', {
+                    'text-[var(--color-primary)]': location.pathname.startsWith(`/${path}`),
                     'xs:flex': type !== 'external',
                     'sm:flex': type === 'external',
                   })}
@@ -142,8 +142,8 @@ export default function Layout() {
                   <li
                     key={path}
                     onClick={handleLangChange(path)}
-                    className={clsx('hover:text-primary', {
-                      'text-primary': i18n.language === path,
+                    className={clsx('hover:text-[var(--color-primary)', {
+                      'text-[var(--color-primary)]': i18n.language === path,
                       'cursor-pointer': i18n.language !== path,
                     })}
                   >
@@ -165,10 +165,10 @@ export default function Layout() {
         </div>
       </header>
       <div className="flex min-h-0 overflow-auto">
-        <div className="hidden sm:block py-2 px-2 lg:w-[280px] sm:w-[200px] max-h-[calc(100vh-56px)] overflow-auto">
+        <div className="hidden sm:block py-2 px-2 sm:w-[280px] max-h-[calc(100vh-56px)] overflow-auto">
           <Menu path={`/${secondPath}`} />
         </div>
-        <div className="flex min-h-0 overflow-auto flex-auto max-h-[calc(100vh-56px)]">
+        <div className="flex min-h-0 overflow-auto justify-center flex-auto max-h-[calc(100vh-56px)]">
           <div className="flex-grow overflow-auto prose prose-slate py-6 px-6">
             <Outlet />
           </div>

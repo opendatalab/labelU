@@ -19,7 +19,7 @@ export function MenuItem({
     return (
       <li>
         <details open>
-          <summary className="rounded-full pl-6">{title}</summary>
+          <summary className="pl-6 rounded">{title}</summary>
           {children}
         </details>
       </li>
@@ -29,8 +29,8 @@ export function MenuItem({
   return (
     <li>
       <Link
-        className={clsx('rounded-full pl-6', {
-          'bg-base-200': match,
+        className={clsx('pl-6 rounded active:bg-[#F7F7F7]', {
+          'bg-[#F7F7F7] text-[var(--color-primary)]': match,
         })}
         to={path}
       >
@@ -75,7 +75,7 @@ export function Menu({ path, top, routes = allRoutes }: { path: string; top?: st
   }
 
   return (
-    <ul className="menu flex-nowrap text-base h-full rounded-r-lg">
+    <ul className="menu flex-nowrap text-base h-full">
       {menu.map(({ handle, children, path: routePath, index }) => {
         const topPath = index ? path : `${path}/${routePath}`;
         const title = handle?.crumb() ?? 'unknown';

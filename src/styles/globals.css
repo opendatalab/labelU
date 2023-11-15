@@ -2,8 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #0d53de;
+}
+
+.menu :where(li ul):before {
+  display: none!important;
+}
+
 body {
   margin: 0;
+}
+
+.prose {
+  max-width: 90ch !important;
 }
 
 .prose pre {

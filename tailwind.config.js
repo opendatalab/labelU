@@ -9,7 +9,9 @@ module.exports = {
     },
   },
   daisyui: {
-    themes: ['winter'],
+    themes: [
+      'winter'
+    ],
   },
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   plugins: [require('@tailwindcss/typography'), require('daisyui')],
