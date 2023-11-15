@@ -78,11 +78,11 @@ export default function Layout() {
                         key={path}
                         to={path}
                         target={type === 'external' ? '_blank' : undefined}
-                        className={clsx('items-center gap-1 p-2 rounded-full flex', {
-                          'bg-primary text-white': location.pathname.startsWith(`/${path}`),
+                        className={clsx('items-center gap-1 p-2 flex', {
+                          'text-[var(--color-primary)': location.pathname.startsWith(`/${path}`),
                         })}
                       >
-                        {title} {icon}
+                        {icon} {title}
                       </Link>
                     ))}
                   </div>
