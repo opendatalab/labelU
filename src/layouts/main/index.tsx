@@ -169,7 +169,7 @@ export default function Layout() {
           <Menu path={`/${secondPath}`} />
         </div>
         <div className="flex min-h-0 overflow-auto justify-center flex-auto max-h-[calc(100vh-56px)]">
-          <div className="flex-grow overflow-auto prose prose-slate py-6 px-6">
+          <div className="flex-grow overflow-auto prose prose-slate py-16 px-6">
             <Outlet />
           </div>
         </div>
