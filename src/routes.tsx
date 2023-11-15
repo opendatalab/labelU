@@ -1,4 +1,4 @@
-import { Outlet, type NonIndexRouteObject } from 'react-router';
+import { Outlet, type NonIndexRouteObject, redirect } from 'react-router';
 import { MDXProvider } from '@mdx-js/react';
 
 import Layout from './layouts/main';
@@ -6,7 +6,18 @@ import NoMatch from './pages/no-match';
 import VideoSegmentSchema from './pages/schema.video.segment';
 import VideoFrameSchema from './pages/schema.video.frame';
 import i18n from './locale';
-import GettingStarted from './pages/getting-started';
+
+import Install from './pages/guide.install';
+import Introduction from './pages/guide.introduction';
+import Account from './pages/guide.account';
+import BasicConfig from './pages/guide.task-create.basic';
+import DataImport from './pages/guide.task-create.data-import';
+import AnnotationConfig from './pages/guide.task-create.annotation-config';
+import AnnotationImage from './pages/guide.task-annotation.image';
+import AnnotationVideo from './pages/guide.task-annotation.video';
+import AnnotationAudio from './pages/guide.task-annotation.audio';
+import TaskCheck from './pages/guide.task-check';
+import ResultExport from './pages/guide.export';
 import Schema from './pages/schema';
 import RectSchema from './pages/schema.image.rect';
 import PointSchema from './pages/schema.image.point';
@@ -39,57 +50,119 @@ const routes = [
         },
         children: [
           {
-            name: '开始',
-            index: true,
-            element: <GettingStarted />,
+            path: 'introduction',
+            element: <Introduction />,
             handle: {
               crumb: () => {
-                return i18n.t('getting started');
+                return i18n.t('guide.intro');
               },
             },
           },
           {
             name: '安装',
             path: 'install',
-            element: <Outlet />,
+            element: <Install />,
             handle: {
               crumb: () => {
                 return i18n.t('install');
               },
             },
-            children: [
-              {
-                path: 'windows',
-                name: 'Windows',
-                handle: {
-                  crumb: () => {
-                    return i18n.t('windows');
-                  },
-                },
-                element: <div>Windows</div>,
-              },
-              {
-                name: 'MacOS',
-                path: 'macos',
-                handle: {
-                  crumb: () => {
-                    return i18n.t('macos');
-                  },
-                },
-                element: <div>MacOS</div>,
-              },
-              {
-                name: 'Linux',
-                path: 'linux',
-                handle: {
-                  crumb: () => {
-                    return i18n.t('linux');
-                  },
-                },
-                element: <div>Linux</div>,
-              },
-            ],
           },
+          {
+            path: 'account',
+            element: <Account />,
+            handle: {
+              crumb: () => {
+                return i18n.t('guide.account');
+              },
+            },
+          },
+          {
+            path: 'task-create',
+            element: <Outlet />,
+            handle: {
+              crumb: () => {
+                return i18n.t('guide.task-create');
+              },
+            },
+            children: [{
+              path: 'basic',
+              element: <BasicConfig />,
+              handle: {
+                crumb: () => {
+                  return i18n.t('guide.task-create.basic');
+                },
+              },
+            }, {
+              path: 'data-import',
+              element: <DataImport />,
+              handle: {
+                crumb: () => {
+                  return i18n.t('guide.task-create.data-import');
+                },
+              },
+            }, {
+              path: 'annotation-config',
+              element: <AnnotationConfig />,
+              handle: {
+                crumb: () => {
+                  return i18n.t('guide.task-create.annotation-config');
+                },
+              },
+            }]
+          },
+          {
+            path: 'task-annotation',
+            element: <Outlet />,
+            handle: {
+              crumb: () => {
+                return i18n.t('guide.task-annotation');
+              },
+            },
+            children: [{
+              path: 'image',
+              element: <AnnotationImage />,
+              handle: {
+                crumb: () => {
+                  return i18n.t('guide.task-annotation.image');
+                },
+              },
+            }, {
+              path: 'video',
+              element: <AnnotationVideo />,
+              handle: {
+                crumb: () => {
+                  return i18n.t('guide.task-annotation.video');
+                },
+              },
+            }, {
+              path: 'audio',
+              element: <AnnotationAudio />,
+              handle: {
+                crumb: () => {
+                  return i18n.t('guide.task-annotation.audio');
+                },
+              },
+            }]
+          },
+          {
+            path: 'task-check',
+            element: <TaskCheck />,
+            handle: {
+              crumb: () => {
+                return i18n.t('guide.task-check');
+              },
+            },
+          },
+          {
+            path: 'export',
+            element: <ResultExport />,
+            handle: {
+              crumb: () => {
+                return i18n.t('guide.export');
+              },
+            },
+          }
         ],
       },
       {

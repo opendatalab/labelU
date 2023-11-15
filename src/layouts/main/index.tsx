@@ -52,8 +52,10 @@ export default function Layout() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    if (location.pathname === '/') {
-      navigate(`/guide`);
+    if (location.pathname === '/' || location.pathname === '/guide') {
+      navigate(`/guide/introduction`, {
+        replace: true,
+      });
     }
   }, [i18n.language, location.pathname, navigate]);
 

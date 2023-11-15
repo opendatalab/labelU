@@ -11,7 +11,7 @@ function code({ className, ...props }: React.DetailedHTMLProps<React.HTMLAttribu
       lineNumberStyle={{
         color: '#999',
       }}
-      showLineNumbers
+      showLineNumbers={match[1] !== 'bash'}
       language={match[1]}
       PreTag="div"
       // @ts-ignore
