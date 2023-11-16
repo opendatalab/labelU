@@ -142,12 +142,12 @@ export default function Layout() {
                   <li
                     key={path}
                     onClick={handleLangChange(path)}
-                    className={clsx('hover:text-[var(--color-primary)', {
-                      'text-[var(--color-primary)]': i18n.language === path,
-                      'cursor-pointer': i18n.language !== path,
-                    })}
+
                   >
-                    <a>{title}</a>
+                    <a className={clsx('px-4 py-2 hover:!text-[var(--color-primary)', {
+                      '!text-[var(--color-primary)]': i18n.language === path,
+                      'cursor-pointer': i18n.language !== path,
+                    })}>{title}</a>
                   </li>
                 ))}
               </ul>
