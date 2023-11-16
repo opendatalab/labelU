@@ -22,6 +22,10 @@ body {
   color: rgb(18 19 22 / 80%) !important;
 }
 
+.prose :where(a):not(:where([class~=not-prose],[class~=not-prose] *)) {
+  color: var(--color-primary) !important;
+}
+
 .prose :where(strong):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
   color: rgb(18 19 22 / 80%) !important;
 }
