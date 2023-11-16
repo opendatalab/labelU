@@ -14,8 +14,17 @@ body {
   margin: 0;
 }
 
+.prose h1, .prose  h2, .prose h3 {
+  color: #121316 !important;
+}
+
+.prose p {
+  color: rgb(18 19 22 / 80%) !important;
+}
+
 .prose {
   max-width: 90ch !important;
+  color: rgb(18 19 22 / 80%) !important;
 }
 
 .prose pre {

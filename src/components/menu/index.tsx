@@ -19,7 +19,7 @@ export function MenuItem({
     return (
       <li>
         <details open>
-          <summary className="pl-6 rounded">{title}</summary>
+          <summary className="pl-6 rounded focus:!text-[var(--color-primary)] active:!bg-[#F7F7F7] focus:!bg-[#F7F7F7] hover:!bg-[#F7F7F7]">{title}</summary>
           {children}
         </details>
       </li>
@@ -29,7 +29,7 @@ export function MenuItem({
   return (
     <li>
       <Link
-        className={clsx('pl-6 rounded focus:!text-[var(--color-primary)] active:!bg-[#F7F7F7]', {
+        className={clsx('pl-6 rounded focus:!text-[var(--color-primary)] active:!bg-[#F7F7F7] focus:!bg-[#F7F7F7] hover:!bg-[#F7F7F7]', {
           'bg-[#F7F7F7] text-[var(--color-primary)]': match,
         })}
         to={path}
