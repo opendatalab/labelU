@@ -7,95 +7,95 @@ import videoAttributeConfig from './annotation-config-attribute-video.png';
 import audioConfig from './annotation-config-audio.png';
 import audioAttributeConfig from './annotation-config-attribute-audio.png';
 
-## 标注配置
+## Annotation Configuration
 
-- 全局：通过分类和描述给媒体数据（如图片，视频，音频等）本身打标签
-- 标记：通过配置工具在媒体中绘制标记
+- Global: Label the media data (such as images, videos, audios, etc.) itself by classification and description.
+- Annotation: Draw annotations in the media with configuration tools.
 
-### 图片标注配置
+### Image Annotation Configuration
 
 <table>
   <thead>
     <tr>
-        <th style={{ whiteSpace: 'nowrap' }}>类别</th>
-        <th style={{ whiteSpace: 'nowrap' }}>工具</th>
-        <th>工具说明</th>
+        <th style={{ whiteSpace: 'nowrap' }}>Category</th>
+        <th style={{ whiteSpace: 'nowrap' }}>Tool</th>
+        <th>Tool Description</th>
     </tr>
     </thead>
     <tbody>
     <tr>
-        <td>全局</td>
-        <td style={{ whiteSpace: 'nowrap' }}>标签分类</td>
-        <td>用户可以对图像进行标签分类，以便于后续的图像识别和分类等任务。标签分类可以帮助用户快速将图像中的物体进行分类，并且可以用于图像检索、目标检测等任务。</td>
+        <td>Global</td>
+        <td style={{ whiteSpace: 'nowrap' }}>Label Classification</td>
+        <td>Users can classify and label images to facilitate subsequent image recognition and classification tasks. Label classification helps users quickly classify objects in images and can be used for tasks such as image retrieval and object detection.</td>
     </tr>
     <tr>
         <td></td>
-        <td>文本描述</td>
-        <td>用户可以将图像中的文字转换为文本，以便于后续的文本分析、识别等任务。文本转写可以帮助用户快速提取图像中的文字信息，并且可以用于文本检索、机器翻译等任务。</td>
+        <td>Text Description</td>
+        <td>Users can convert text in the image into text, facilitating subsequent text analysis and recognition tasks. Text transcription helps users quickly extract text information from images and can be used for tasks such as text retrieval and machine translation.</td>
     </tr>
     <tr>
-        <td>标记</td>
-        <td>拉框</td>
-        <td>用户可以在图像上绘制矩形框，用于框选图像中的目标。拉框可以帮助用户快速选择图像中的物体，并且可以用于图像识别、目标跟踪等任务。</td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>标点</td>
-        <td>用户可以在图像上绘制点，用于标注图像中的关键点。点可以帮助用户准确地标注图像中的关键信息，并且可以用于物体识别、场景分析等任务。</td>
+        <td>Annotation</td>
+        <td>Bounding Box</td>
+        <td>Users can draw rectangle boxes on the image to select targets in the image. Bounding boxes help users quickly select objects in images and can be used for tasks like image recognition and object tracking.</td>
     </tr>
     <tr>
         <td></td>
-        <td>多边形</td>
-        <td>用户可以在图像上绘制多边形，用于标注图像中的不规则形状。多边形可以帮助用户准确地标注不规则形状，并且可以用于物体识别、场景分析等任务。</td>
+        <td>Point</td>
+        <td>Users can draw points on the image to annotate the keypoints in the image. Points help users accurately annotate key information in images and can be used for tasks such as object recognition and scene analysis.</td>
     </tr>
     <tr>
         <td></td>
-        <td>标线</td>
-        <td>用户可以在图像上绘制直线，用于标注图像中的边缘和轮廓。线可以帮助用户准确地标注图像中的边缘和轮廓，并且可以用于物体识别、场景分析等任务。</td>
+        <td>Polygon</td>
+        <td>Users can draw polygons on the image to annotate irregular shapes in the image. Polygons help users accurately annotate irregular shapes and can be used for tasks such as object recognition and scene analysis.</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>Line</td>
+        <td>Users can draw lines on the image to annotate edges and contours in the image. Lines help users accurately annotate edges and contours in images and can be used for tasks such as object recognition and scene analysis.</td>
     </tr>
     </tbody>
 </table>
 
 
-点击「标注工具」框下拉工具，可选择「标签分类」，「文本描述」这些全局工具，以及「拉框」，「标点」，「多边形」，「标线」这些标记工具。配置说明如下：
+Click ‘Annotation Tools’ dropdown box, you can select global tools like 'Label Classification', 'Text Description', as well as annotation tools like 'Bounding Box', 'Point', 'Polygon', 'Line'. The configuration explanation is as follows:
 
 <table>
   <thead>
     <tr>
-        <th style={{ whiteSpace: 'nowrap' }}>类别</th>
-        <th style={{ whiteSpace: 'nowrap' }}>工具</th>
-        <th>配置说明</th>
+        <th style={{ whiteSpace: 'nowrap' }}>Category</th>
+        <th style={{ whiteSpace: 'nowrap' }}>Tool</th>
+        <th>Configuration Explanation</th>
     </tr>
     </thead>
     <tbody>
     <tr>
-        <td rowspan="2" style={{ verticalAlign: 'middle' }}>全局</td>
-        <td style={{ whiteSpace: 'nowrap' }}>标签分类</td>
-        <td>类别：分类描述中英文，选项：分类的具体选项中英文</td>
+        <td rowspan="2" style={{ verticalAlign: 'middle' }}>Global</td>
+        <td style={{ whiteSpace: 'nowrap' }}>Label Classification</td>
+        <td>Category: Description in both Chinese and English, Option: Specific options of the category in both Chinese and English</td>
     </tr>
     <tr>
-        <td>文本描述</td>
-        <td>文本列表：包括文本描述名称中英文，文本设置：包括最大字数和默认文本</td>
+        <td>Text Description</td>
+        <td>Text List: Including text description name in both Chinese and English, Text Setting: Including maximum number of words and default text</td>
     </tr>
     <tr>
-        <td>标记</td>
-        <td>拉框</td>
-        <td>最小尺寸：拉框最小宽度（W）和高度（H），标签配置：标注对象分类，包括中英文</td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>标点</td>
-        <td>上限点数：规定点数上限，超过不可画，标签配置：标注对象分类，包括中英文</td>
+        <td>Annotation</td>
+        <td>Bounding Box</td>
+        <td>Minimum Size: Minimum width (W) and height (H) of bounding box, Label Configuration: Object classification for annotation, including both Chinese and English</td>
     </tr>
     <tr>
         <td></td>
-        <td>多边形</td>
-        <td>线条类型，闭合点数，边缘吸附，标签配置：标注对象分类，包括中英文</td>
+        <td>Point</td>
+        <td>Maximum Number of Points: The upper limit of points, you can't draw more than this limit, Label Configuration: Object classification for annotation, including both Chinese and English</td>
     </tr>
     <tr>
         <td></td>
-        <td>标线</td>
-        <td>线条类型，闭合点数，边缘吸附，标签配置：标注对象分类，包括中英文</td>
+        <td>Polygon</td>
+        <td>Line Type, Closing Point Number, Edge Adsorption, Label Configuration: Object classification for annotation, including both Chinese and English</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>Line</td>
+        <td>Line Type, Closing Point Number, Edge Adsorption, Label Configuration: Object classification for annotation, including both Chinese and English</td>
     </tr>
     </tbody>
 </table>
@@ -103,160 +103,159 @@ import audioAttributeConfig from './annotation-config-attribute-audio.png';
 
 <img src={imageConfig} />
 
-同时，标记类工具可支持配置属性信息，如分类属性和文本属性。完成配置后点击右上角「保存」按钮即可。
+At the same time, annotation tools can support attribute configuration, such as classification attributes and text attributes. Click the 'Save' button in the upper right corner when the configuration is complete.
 
 <img src={attributeConfig} />
 
-**注：** 在配置过程中也可以点击右上角的「进入预览」按钮来预览配置好的标注页面。
+**Note：** During the configuration process, you can also click 'Enter Preview' in the upper right corner to preview the configured annotation page.
 
-### 视频标注配置
+### Video Annotation Configuration
 
 <table>
     <thead>
         <tr>
-            <th>类别</th>
-            <th>工具</th>
-            <th>工具说明</th>
+            <th>Category</th>
+            <th>Tool</th>
+            <th>Tool Description</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td style={{ whiteSpace: 'nowrap' }}>全局</td>
-            <td style={{ whiteSpace: 'nowrap' }}>标签分类</td>
-            <td>对视频进行分类和标签化。通常，用户需要先选择视频的分类，然后观看视频并对其进行标注。标注的内容可以是视频的主题、场景、人物等，可运用于视频检索、推荐和分类等任务。</td>
+            <td style={{ whiteSpace: 'nowrap' }}>Global</td>
+            <td style={{ whiteSpace: 'nowrap' }}>Label Classification</td>
+            <td>Classify and label videos. Usually, user needs to first select the classification of the video, then watch the video and annotate it. The content of annotation can be theme, scene, character, etc. of the video, suitable for tasks like video retrieval, recommendation and classification.</td>
         </tr>
         <tr>
             <td></td>
-            <td>文本描述</td>
-            <td>将视频中的语音内容转化为文字，便于用户进行文本分析和处理。用户可以通过观看视频并同时阅读转录文本来进行标注，可用于语音识别、语音转写和语音翻译等任务。</td>
+            <td>Text Description</td>
+            <td>Convert the speech content in the video into text for users to conduct text analysis and processing. Users can annotate by watching the video and reading the transcribed text at the same time, suitable for tasks such as speech recognition, transcription and translation.</td>
         </tr>
         <tr>
-            <td>标记</td>
-            <td>片段分割</td>
-            <td>从视频中截取特定的片段或场景进行标注。用户可以通过选择视频的起始和结束时间来截取需要标注的部分，并进行相应的标注。这种工具对于视频目标检测、行为识别和视频摘要等任务非常有用。</td>
+            <td>Annotation</td>
+            <td>Segment Segmentation</td>
+            <td>Extract specific segments or scenes from the video for annotation. Users can select the start and end time of the video to capture the part that needs to be annotated, and make corresponding annotations. This tool is very useful for tasks like video object detection, behavior recognition and video summary.</td>
         </tr>
         <tr>
             <td></td>
-            <td>时间戳</td>
-            <td>时间戳的功能是一种在视频播放器上显示特定时刻的方法，通常用于指向或标记视频中的特定部分。用户可以点击时间戳即可直接跳转到视频的那个部分。</td>
+            <td>Timestamp</td>
+            <td>The function of timestamp is a method to display a specific moment on the video player, usually used to point to or mark a specific part of the video. User can click the timestamp to jump directly to that part of the video.</td>
         </tr>
     </tbody>
 </table>
 
-点击「标注工具」框下拉工具，可下拉选择「标签分类」，「文本描述」这些全局工具，以及「片段分割」，「时间戳」这些标记工具。配置说明如下：
-
+Click 'Annotation Tools' dropdown box, you can select global tools like 'Label Classification', 'Text Description', as well as annotation tools like 'Segment Segmentation', 'Timestamp'. The configuration explanation is as follows:
 <table>
     <thead>
         <tr>
-            <th>类别</th>
-            <th>工具</th>
-            <th>配置说明</th>
+            <th>Category</th>
+            <th>Tool</th>
+            <th>Configuration Explanation</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>全局</td>
-            <td>标签分类</td>
-            <td>类别：分类描述中英文，选项：分类的具体选项中英文</td>
+            <td>Global</td>
+            <td>Label Classification</td>
+            <td>Category: Description in both Chinese and English, Option: Specific options of the category in both Chinese and English</td>
         </tr>
         <tr>
             <td></td>
-            <td>文本描述</td>
-            <td>文本列表：包括文本描述名称中英文，文本设置：包括最大字数和默认文本</td>
+            <td>Text Description</td>
+            <td>Text List: Including text description name in both Chinese and English, Text Setting: Including maximum number of words and default text</td>
         </tr>
         <tr>
-            <td>标记</td>
-            <td>片段分割</td>
-            <td>配置分类：中文和英文</td>
+            <td>Annotation</td>
+            <td>Segment Division</td>
+            <td>Classification Configuration: In both Chinese and English</td>
         </tr>
         <tr>
             <td></td>
-            <td>时间戳</td>
-            <td>配置分类：中文和英文</td>
+            <td>Timestamp</td>
+            <td>Classification Configuration: In both Chinese and English</td>
         </tr>
     </tbody>
 </table>
 
 <img src={videoConfig} />
 
-同时，标记类工具可支持配置属性信息，如分类属性和文本属性。完成配置后点击右上角「保存」按钮即可。
+At the same time, annotation tools can support attribute configuration, such as classification attributes and text attributes. Click the 'Save' button in the upper right corner when the configuration is complete.
 
 <img src={videoAttributeConfig} />
 
-**注：** 在配置过程中也可以点击右上角的「进入预览」按钮来预览配置好的标注页面。
+**Note：** During the configuration process, you can also click 'Enter Preview' in the upper right corner to preview the configured annotation page.
 
-### 音频标注配置
+### Audio Annotation Configuration
 
 <table>
     <thead>
         <tr>
-            <th>类别</th>
-            <th>工具</th>
-            <th>工具说明</th>
+            <th>Category</th>
+            <th>Tool</th>
+            <th>Tool Description</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td style={{ whiteSpace: 'nowrap' }}>全局</td>
-            <td style={{ whiteSpace: 'nowrap' }}>标签分类</td>
-            <td>用户可通过听取音频并选择合适的分类来进行标注。这些分类可以是音乐的流派、环境声音的类型、语音的情感等，适用于音频检索、音频推荐和音频分类等任务。</td>
+            <td style={{ whiteSpace: 'nowrap' }}>Global</td>
+            <td style={{ whiteSpace: 'nowrap' }}>Label Classification</td>
+            <td>Users can listen to the audio and select an appropriate category for annotation. These categories could be genres of music, types of ambient sounds, emotions in speech, etc., suitable for tasks such as audio retrieval, audio recommendation, and audio classification.</td>
         </tr>
         <tr>
             <td></td>
-            <td>文本描述</td>
-            <td>将音频中的语音内容转化为文字，便于用户进行文本分析和处理。用户可以通过听取音频并同时阅读转录文本来进行标注。这种工具对于语音识别、语音转写等任务非常有用，可以帮助用户更好地理解和处理语音内容。</td>
+            <td>Text Description</td>
+            <td>The spoken content in the audio is converted into text, facilitating users to perform text analysis and processing. Users can annotate by listening to the audio while reading the transcribed text. This tool is highly useful for tasks like speech recognition and transcription, helping users better understand and process voice content.</td>
         </tr>
         <tr>
-            <td>标记</td>
-            <td>片段分割</td>
-            <td>从音频中截取特定的片段进行标注。用户可以通过选择音频的起始和结束时间来截取需要标注的部分，并进行相应的标注。这种工具对于音频事件检测、语音识别和音频编辑等任务非常有用。</td>
+            <td>Annotation</td>
+            <td>Segment Division</td>
+            <td>Specific segments are extracted from the audio for annotation. Users can choose the start and end times of the audio to clip the part that needs to be annotated, and perform corresponding annotations. This tool is very beneficial for tasks such as audio event detection, speech recognition, and audio editing.</td>
         </tr>
         <tr>
             <td></td>
-            <td>时间戳</td>
-            <td>时间戳的功能是一种在音频播放器上显示特定时刻的方法，通常用于指向或标记音频中的特定部分。用户可以点击时间戳即可直接跳转到音频的那个部分。</td>
+            <td>Timestamps</td>
+            <td>The function of timestamps is to display specific moments on the audio player, usually used to point to or mark specific parts in the audio. Users can click the timestamp to immediately jump to that part of the audio.</td>
         </tr>
     </tbody>
 </table>
 
-点击「标注工具」框下拉工具，可下拉选择「标签分类」，「文本描述」这些全局工具，以及「片段分割」，「时间戳」，这些标记工具。配置说明如下：
+Click on the drop-down box under "Annotation Tools" to select global tools such as "Label Classification", "Text Description", as well as labeling tools like "Segment Division" and "Timestamps". Configuration instructions are as follows:
 
 <table>
     <thead>
         <tr>
-            <th>类别</th>
-            <th>工具</th>
-            <th>配置说明</th>
+            <th>Category</th>
+            <th>Tool</th>
+            <th>Configuration Instructions</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td style={{ whiteSpace: 'nowrap' }}>全局</td>
-            <td style={{ whiteSpace: 'nowrap' }}>标签分类</td>
-            <td>类别：分类描述中英文，选项：分类的具体选项中英文</td>
+            <td style={{ whiteSpace: 'nowrap' }}>Global</td>
+            <td style={{ whiteSpace: 'nowrap' }}>Label Classification</td>
+            <td>Category: Bilingual description of the category; Options: Bilingual specific options for classification</td>
         </tr>
         <tr>
             <td></td>
-            <td>文本描述</td>
-            <td>文本列表：包括文本描述名称中英文，文本设置：包括最大字数和默认文本</td>
+            <td>Text Description</td>
+            <td>Text List: Includes bilingual names of the text descriptions; Text Settings: Include maximum word count and default text</td>
         </tr>
         <tr>
-            <td>标记</td>
-            <td>片段分割</td>
-            <td>配置分类：中文和英文</td>
+            <td>Annotation</td>
+            <td>Segment Division</td>
+            <td>Configuration Category: In both Chinese and English</td>
         </tr>
         <tr>
             <td></td>
-            <td>时间戳</td>
-            <td>配置分类：中文和英文</td>
+            <td>Timestamps</td>
+            <td>Configuration Category: In both Chinese and English</td>
         </tr>
     </tbody>
 </table>
 
 <img src={audioConfig} />
 
-同时，标记类工具可支持配置属性信息，如分类属性和文本属性。完成配置后点击右上角「保存」按钮即可。
+At the same time, labeling tools can support attribute information configuration, such as category attributes and text attributes. After completing the configuration, click on the "Save" button at the top right corner.
 
 <img src={audioAttributeConfig} />
 
-**注：** 在配置过程中也可以点击右上角的「进入预览」按钮来预览配置好的标注页面。
+**Note：** During the configuration process, you can also click the "Enter Preview" button in the upper right corner to preview the configured annotation page.

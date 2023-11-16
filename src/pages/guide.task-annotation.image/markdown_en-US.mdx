@@ -1,55 +1,55 @@
 import global from './global.png';
 import tool from './tool.png';
 
-## 图片标注
+## Image Annotation
 
-标注流程说明：
+Annotation process description:
 
-1. 判断任务是否为无效，若无效点击跳过，进入下一张图片，若有效，有标注任务时（目标检测、语意分割、线标注、点标注），标注工具和配置的一致
-2. 在全局标签上，可以勾选预先配置好的「标签分类」来给整个图片打上标签，也可以在「文本描述」下对于图片进行文字说明
-3. 在具体标记上，首先点击左上角的「工具样式」来选择标记方式，在图中完成该样式的标记后同步在右方的标记栏中。对于该标签的名称等信息可以手动点击后进行修改
-4. 在右侧标签结果管理栏单击标签结果可选中图片中对应标记，工具栏中选中工具切换为标签结果的工具。点击「修改」详细信息可下拉选择标签名称，点击「隐藏」按钮可隐藏这一条标记信息，点击「删除」按钮可删除这一条标记信息
-5. 选择「下一页」，进入下一个图片
-6. 重复1~5，直到标注完成
+1. Determine whether the task is invalid; if so, click skip to proceed to the next image. If valid, when there are annotation tasks (object detection, semantic segmentation, line annotation, point annotation), the annotation tools and configuration are consistent.
+2. On the global labels, you can select the pre-configured "label classification" to tag the entire image or provide a text explanation for the image under "text description".
+3. For specific markings, first click the "tool style" in the upper left corner to select the marking method. After completing the style of the mark in the image, synchronize it in the label column on the right. The name of this label and other information can be modified manually by clicking on it.
+4. Click on the label result in the label result management column on the right to select the corresponding mark in the image. The selected tool in the toolbar switches to the label result tool. Click "modify" for detailed information to drop down and select the label name; click the "hide" button to hide this marking information; click the "delete" button to delete this marking information.
+5. Choose "Next", go to the next image.
+6. Repeat steps 1-5 until the annotation is complete.
 
-### 全局标签
+### Global labels
 
 <img src={global} />
 
 
-### 标记
+### Specific markings:
 
 <img src={tool} />
 
-### 工具介绍
+### Tool introduction
 
 <table>
 <thead>
     <tr>
-        <th>工具样式</th>
-        <th style={{ whiteSpace: 'nowrap' }}>使用方法</th>
+        <th>Tool Style</th>
+        <th style={{ whiteSpace: 'nowrap' }}>Usage Method</th>
     </tr>
     </thead>
     <tbody>
     <tr>
-        <td>拉框标注</td>
-        <td>1. 选中拉框工具并配置标签，如轿车、公交车。<br />2. 单击鼠标左键标注第一点，画出框的范围之后再次单击左键，即可绘制出框。<br />3. 右键选中框之后，可以调整框的大小、有效性，也可以删除已标注的框。</td>
+        <td>Draw-box annotation</td>
+        <td>1. Select the draw-box tool and configure the labels, such as cars, buses.<br />2. Click the left mouse button to annotate the first point, draw out the range of the box and click the left button again to draw the box. <br />3. After right-clicking to select the box, you can adjust the size and validity of the box or delete the annotated box.</td>
     </tr>
     <tr>
-        <td>标点标注</td>
-        <td>1. 选中标点工具并配置标签，如人体姿态14个关键点，包括头、脖子、左肩、右肩、左手肘、右手肘、左腕、右腕、左髋、右髋、左膝、右膝、左脚踝、右脚踝。<br />2. 单击鼠标左键标注指定关键点。<br />3. 右键选中点之后，可以调整点的位置、属性，也可以删除已标注的点。</td>
+        <td>Point annotation</td>
+        <td>1. Select the point tool and configure the labels, such as 14 key points of human posture, including head, neck, left shoulder, right shoulder, left elbow, right elbow, left wrist, right wrist, left hip, right hip, left knee, right knee, left ankle, right ankle. <br />2. Click the left mouse button to annotate the specified key points.<br />3. After right-clicking to select a point, you can adjust the position and attributes of the point or delete the annotated point.</td>
     </tr>
     <tr>
-        <td style={{ whiteSpace: 'nowrap' }}>多边形标注</td>
-        <td>1. 选中多边形工具并配置标签，如猫、狗。<br />2. 单击鼠标左键标注起始点，随后沿目标边缘多次单击左键，以此类推在围绕目标边缘右键连接最接近起始点后，即可绘制出多边形框。<br />3. 右键选中框之后，可以调整目标边缘关键点、线段、目标有效性，也可以删除已标注的多边形框。</td>
+        <td style={{ whiteSpace: 'nowrap' }}>Polygon annotation</td>
+        <td>1. Select the polygon tool and configure the labels, such as cats, dogs. <br />2.  Click the left mouse button to annotate the starting point, then click the left button multiple times along the target edge. After right-clicking close to the starting point around the target edge, you can draw a polygon frame. <br />3. After right-clicking to select the frame, you can adjust the key points of the target edge, line segments, target validity or delete the annotated polygon frame.</td>
     </tr>
     <tr>
-        <td>标线标注</td>
-        <td>1. 选中线条工具并配置标签，如车道线。<br />2. 单击鼠标左键标注起始点，再次点击1+N后右键为终止点。<br />3. 操作Shift+左键则为垂直或水平线。</td>
+        <td>Line annotation</td>
+        <td>1. Select the line tool and configure the labels, such as lane lines.<br />2. Click the left mouse button to annotate the starting point, then click again after 1+N for the end point. <br />3. Operating Shift + left button results in a vertical or horizontal line.</td>
     </tr>
     </tbody>
 </table>
 
 
-**注：** 在标记的过程中，可以点击「撤销」回退至上一步，也可以开启「显示顺序」按钮来看到标记的顺序，针对图片的调整也可以点击左下方的「图片调整」按钮来调整图片的饱和度，对比度，曝光度这些数值。
-以上操作都可以通过快捷键实现，具体的操作可以点击左上方「快捷键」按钮来进行查看。
+**Note：** In the process of marking, you can click "undo" to return to the previous step, you can also turn on the "display order" button to see the order of marking. For image adjustment, you can click the "image adjustment" button at the bottom left to adjust values such as saturation, contrast, and exposure.
+All of the above operations can be implemented through shortcut keys. The specific operation can be viewed by clicking the "shortcut" button in the upper left corner.
