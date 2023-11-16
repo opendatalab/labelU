@@ -168,8 +168,8 @@ export default function Layout() {
         <div className="hidden sm:block py-2 px-2 sm:w-[280px] max-h-[calc(100vh-64px)] overflow-auto">
           <Menu path={`/${secondPath}`} />
         </div>
-        <div className="flex min-h-0 overflow-auto justify-center flex-auto max-h-[calc(100vh-64px)]  py-16 px-6">
-          <div className="prose">
+        <div className="min-h-0 overflow-auto justify-center flex-auto max-h-[calc(100vh-64px)]  py-16 px-6">
+          <div className="mx-auto prose">
             <Outlet />
           </div>
         </div>
