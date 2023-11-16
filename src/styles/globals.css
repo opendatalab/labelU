@@ -18,12 +18,12 @@ body {
   color: #121316 !important;
 }
 
-.menu a {
-  color: rgb(18 19 22 / 80%) !important;
+a {
+  color: rgb(18 19 22 / 80%);
 }
 
 .menu li {
-  color: rgb(18 19 22 / 80%) !important;
+  color: rgb(18 19 22 / 80%);
 }
 
 .prose p {
