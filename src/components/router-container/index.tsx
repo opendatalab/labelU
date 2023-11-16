@@ -3,6 +3,7 @@
  * 见：https://reactrouter.com/en/main/routers/picking-a-router
  */
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RouteObject, UIMatch } from 'react-router-dom';
 import { createHashRouter, createRoutesFromElements, Route, RouterProvider, useMatches } from 'react-router-dom';
 
@@ -14,16 +15,17 @@ export type Match = UIMatch<any, { crumb: (data: any) => string }>;
 
 // 将对应的面包屑信息添加到页面标题中
 function RouteWithTitle({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const matches = useMatches() as Match[];
   const titles = useMemo(
     () => matches.filter((match) => Boolean(match.handle?.crumb)).map((match) => match.handle.crumb!(match.data)),
     [matches],
   );
 
-  const title = titles.length > 0 ? titles[titles.length - 1] : null;
+  const title = titles.length > 0 ? titles.join(' / ') : null;
 
   useEffect(() => {
-    document.title = title ? `${title} - LabelU` : 'LabelU';
+    document.title = title ? `${title} - ${t('site.title')}` : t('site.title');
   }, [title]);
 
   return <>{children}</>;
