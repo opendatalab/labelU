@@ -1,8 +1,8 @@
 import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { BiLinkExternal } from '@react-icons/all-files/bi/BiLinkExternal';
-import { BiBookOpen } from '@react-icons/all-files/bi/BiBookOpen';
-import { BiCodeCurly } from '@react-icons/all-files/bi/BiCodeCurly';
+import { BiBookBookmark } from '@react-icons/all-files/bi/BiBookBookmark';
+import { BiCodeBlock } from '@react-icons/all-files/bi/BiCodeBlock';
 import { AiOutlineGithub } from '@react-icons/all-files/ai/AiOutlineGithub';
 import { HiTranslate } from '@react-icons/all-files/hi/HiTranslate';
 import clsx from 'clsx';
@@ -18,12 +18,12 @@ const links = [
   {
     title: i18nLocale.t('guide'),
     path: 'guide',
-    icon: <BiBookOpen />,
+    icon: <BiBookBookmark />,
   },
   {
     title: i18nLocale.t('schema'),
     path: 'schema',
-    icon: <BiCodeCurly />,
+    icon: <BiCodeBlock />,
   },
   {
     title: 'LabelU-kit',
@@ -165,11 +165,11 @@ export default function Layout() {
         </div>
       </header>
       <div className="flex min-h-0 overflow-auto">
-        <div className="hidden sm:block py-2 px-2 sm:w-[280px] max-h-[calc(100vh-56px)] overflow-auto">
+        <div className="hidden sm:block py-2 px-2 sm:w-[280px] max-h-[calc(100vh-64px)] overflow-auto">
           <Menu path={`/${secondPath}`} />
         </div>
-        <div className="flex min-h-0 overflow-auto justify-center flex-auto max-h-[calc(100vh-56px)]">
-          <div className="flex-grow overflow-auto prose prose-slate py-16 px-6">
+        <div className="flex min-h-0 overflow-auto justify-center flex-auto max-h-[calc(100vh-64px)]  py-16 px-6">
+          <div className="prose">
             <Outlet />
           </div>
         </div>

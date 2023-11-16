@@ -29,7 +29,7 @@ export function MenuItem({
   return (
     <li>
       <Link
-        className={clsx('pl-6 rounded active:bg-[#F7F7F7]', {
+        className={clsx('pl-6 rounded focus:!text-[var(--color-primary)] active:!bg-[#F7F7F7]', {
           'bg-[#F7F7F7] text-[var(--color-primary)]': match,
         })}
         to={path}
