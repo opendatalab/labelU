@@ -6,7 +6,7 @@
   "guide.intro.features": "功能",
   "guide.intro.concepts": "概念",
   "guide.task-create": "创建任务",
-  "guide.task-create.basic": " 任务配置",
+  "guide.task-create.basic": " 基础配置",
   "guide.task-create.data-import": "数据导入",
   "guide.task-create.annotation-config": "标注配置",
   "guide.task-annotation": "任务标注",
