@@ -12,13 +12,17 @@
 
 ## 简介
 
-LabelU提供了多种标注工具和功能，支持图像、视频、音频标注。图像类的多功能图像处理工具，涵盖2D框、语义分割、多段线、关键点等多种标注工具，协助完成图像的标识、注释和分析。视频类标注具备强大视频处理能力，可实现视频分割、视频分类、视频信息提取等功能，为模型训练提供优质标注数据。音频类高效精准的音频分析工具，可实现音频分割、音频分类、音频信息提取等功能，将复杂的声音信息直观可视化。
+LabelU提供了多种标注工具和功能，支持图像、视频、音频标注。
+
+- 图像类的多功能图像处理工具，涵盖2D框、语义分割、多段线、关键点等多种标注工具，协助完成图像的标识、注释和分析。
+- 视频类标注具备强大视频处理能力，可实现视频分割、视频分类、视频信息提取等功能，为模型训练提供优质标注数据。
+- 音频类高效精准的音频分析工具，可实现音频分割、音频分类、音频信息提取等功能，将复杂的声音信息直观可视化。
 
 ## 特性
-简易，提供多种图像标注工具，通过简单可视化配置即可标注
-灵活，多种工具可自由组合使用，满足大部分图像，视频，音频的标注需求
-通用，支持导出多种数据格式，包括JSON,COCO,MASK
 
+- 简易，提供多种图像标注工具，通过简单可视化配置即可标注
+- 灵活，多种工具可自由组合使用，满足大部分图像，视频，音频的标注需求
+- 通用，支持导出多种数据格式，包括JSON,COCO,MASK
 
 ## 快速开始
 
@@ -52,7 +56,7 @@ conda activate labelu
 pip install labelu
 ```
 
-> 安装测试版本：`pip install --extra-index-url https://test.pypi.org/simple/ labelu==<测试版本号>`
+> 安装[测试版本](https://test.pypi.org/project/labelu/)：`pip install --extra-index-url https://test.pypi.org/simple/ labelu==<测试版本号>`
 
 5. 运行：
 
@@ -63,7 +67,8 @@ labelu
 6. 打开浏览器，访问 [http://localhost:8000/](http://localhost:8000/) 。
 
 ### 本地开发
-```
+
+```bash
 # 安装miniconda
 # https://docs.conda.io/en/latest/miniconda.html
 
@@ -86,11 +91,6 @@ uvicorn labelu.main:app --reload
 git submodule update --remote --merge
 ```
 
-## 特性
-
-- 统一，提供6种图像标注工具，通过简单可视化或Yaml配置即可标注
-- 灵活，多种工具可自由组合使用，满足大部分图像标注需求
-
 <p align="center">
 <img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
 </p>
@@ -109,11 +109,11 @@ git submodule update --remote --merge
 
 ## 快速上手
 
--  [使用说明](./docs/GUIDE.md) 
- 
+- [使用说明](https://opendatalab.github.io/labelU)
+
 ## 标注格式
 
--  [格式说明](./docs/annotation%20format/README.md)
+- [格式说明](https://opendatalab.github.io/labelU/#/schema)
 
 ## 技术交流
 
