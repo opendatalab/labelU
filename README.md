@@ -3,7 +3,7 @@
     <p align="center"><img width="300" src="https://user-images.githubusercontent.com/25022954/209616423-9ab056be-5d62-4eeb-b91d-3b20f64cfcf8.svg" /></p>
     <h1 style="width: 100%; text-align: center;"></h1>
     <p align="center">
-        简体中文 | <a href="./README.md" >English</a>
+        English | <a href="./README_zh-CN.md" >简体中文</a>
     </p>
 </article>
     
