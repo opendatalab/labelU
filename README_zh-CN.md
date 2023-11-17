@@ -18,6 +18,10 @@ LabelU提供了多种标注工具和功能，支持图像、视频、音频标�
 - 视频类标注具备强大视频处理能力，可实现视频分割、视频分类、视频信息提取等功能，为模型训练提供优质标注数据。
 - 音频类高效精准的音频分析工具，可实现音频分割、音频分类、音频信息提取等功能，将复杂的声音信息直观可视化。
 
+<p align="center">
+<img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
+</p>
+
 ## 特性
 
 - 简易，提供多种图像标注工具，通过简单可视化配置即可标注
@@ -90,10 +94,6 @@ uvicorn labelu.main:app --reload
 # 更新submodule
 git submodule update --remote --merge
 ```
-
-<p align="center">
-<img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
-</p>
 
 - 通用，支持导出多种数据格式，包括Labelbee、COCO、Mask
 
