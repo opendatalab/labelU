@@ -12,7 +12,13 @@
 
 ## 简介
 
-LabelU 是一款中文的开源数据标注工具。目前具备拉框、多边形、标点、标线、分类、描述等图像标注能力，能够支持目标检测、图像分类、实例分割、文本转写、轮廓线检测、关键点检测等计算机视觉任务场景，通过工具的自由组合即可自定义标注任务，支持COCO、MASK格式数据导出。
+LabelU提供了多种标注工具和功能，支持图像、视频、音频标注。图像类的多功能图像处理工具，涵盖2D框、语义分割、多段线、关键点等多种标注工具，协助完成图像的标识、注释和分析。视频类标注具备强大视频处理能力，可实现视频分割、视频分类、视频信息提取等功能，为模型训练提供优质标注数据。音频类高效精准的音频分析工具，可实现音频分割、音频分类、音频信息提取等功能，将复杂的声音信息直观可视化。
+
+## 特性
+简易，提供多种图像标注工具，通过简单可视化配置即可标注
+灵活，多种工具可自由组合使用，满足大部分图像，视频，音频的标注需求
+通用，支持导出多种数据格式，包括JSON,COCO,MASK
+
 
 ## 快速开始
 
@@ -20,23 +26,41 @@ LabelU 是一款中文的开源数据标注工具。目前具备拉框、多边�
     <button>体验在线版</button>
 </a>
 
-### 使用miniconda安装
-```
-# 安装miniconda
-# https://docs.conda.io/en/latest/miniconda.html
+### 本地部署
 
-# 创建虚拟环境(python = 3.7)
+1. 安装 [Miniconda](https://docs.conda.io/en/latest/miniconda.html)，选择对应的操作系统类型并下载安装。
+
+> **注：** 如果你的系统是 MacOS intel 芯片，请安装 [intel x86_64版本的Miniconda](https://repo.anaconda.com/miniconda/)。
+
+2. 安装完毕后，在终端运行以下命令（过程中的提示选择默认 `y` 即可）：
+
+```bash
 conda create -n labelu python=3.7
+```
 
-# 激活虚拟环境
+> **注：** Windows 平台可在 Anaconda Prompt 程序中运行以上命令。
+
+3. 激活环境：
+
+```bash
 conda activate labelu
+```
 
-# 安装 labelu
+4. 安装 LabelU：
+
+```bash
 pip install labelu
+```
 
-# 启动labelu, 默认访问地址: http://localhost:8000
+> 安装测试版本：`pip install --extra-index-url https://test.pypi.org/simple/ labelu==<测试版本号>`
+
+5. 运行：
+
+```bash
 labelu
 ```
+
+6. 打开浏览器，访问 [http://localhost:8000/](http://localhost:8000/) 。
 
 ### 本地开发
 ```
