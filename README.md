@@ -36,7 +36,7 @@ LabelU offers a variety of annotation tools and features, supporting image, vide
 
 ### Local deployment
 
-1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html)，choose the corresponding operating system type and download it for installation.
+1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), Choose the corresponding operating system type and download it for installation.
 
 > **Note：** If your system is MacOS with an Intel chip, please install [Miniconda of intel x86_64](https://repo.anaconda.com/miniconda/)。
 
