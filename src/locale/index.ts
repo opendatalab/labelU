@@ -14,12 +14,25 @@ const resources = {
   },
 };
 
+const validEnLangs = ['en-US', 'en', 'en-GB', 'en-AU', 'en-CA', 'en-NZ'];
+const validZhLangs = ['zh-CN', 'zh', 'zh-TW', 'zh-HK'];
+
+let initialLang = localStorage.getItem('i18nextLng') || navigator.language;
+
+if (validEnLangs.includes(initialLang)) {
+  initialLang = 'en-US';
+} else if (validZhLangs.includes(initialLang)) {
+  initialLang = 'zh-CN';
+} else {
+  initialLang = 'en-US';
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
     resources,
-    lng: localStorage.getItem('i18nextLng') || navigator.language || 'zh-CN',
+    lng: initialLang,
     interpolation: {
       escapeValue: false, // react already safes from xss
     },
