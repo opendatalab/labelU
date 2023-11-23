@@ -96,5 +96,5 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# ${{ steps.date.outputs.date }} \n\nLabelU [用户文档站点](${{ steps.deployment.outputs.page_url }})已更新 🎉"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# ${{ steps.date.outputs.date }} \n\nLabelU [用户文档站点](${{ steps.deployment.outputs.page_url }}) 已更新 🎉"}}'
 
