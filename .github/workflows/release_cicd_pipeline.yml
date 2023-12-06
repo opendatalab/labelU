@@ -1,4 +1,4 @@
-name: "release CI/CD Pipeline"
+name: 'release CI/CD Pipeline'
 
 on:
   push:
@@ -12,8 +12,8 @@ on:
         default: 'release'
         type: choice
         options:
-        - release
-        - alpha
+          - release
+          - alpha
       version:
         description: 'Current frontend version'
         required: true
@@ -35,7 +35,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.7]
-        poetry-version: ["1.2.2"]
+        poetry-version: ['1.2.2']
         node-version: [16]
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
@@ -53,7 +53,49 @@ jobs:
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
-          CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }} 
+          CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }}
+
+      - name: Inject backend info into frontend
+        uses: satackey/action-js-inline@v0.0.2
+        id: InjectBackend
+        with:
+          required-packages: '@iarna/toml'
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const toml = require('@iarna/toml');
+            const rootPath = path.join(process.cwd(), '');
+
+            console.log('rootPath', rootPath);
+
+            try {
+              const projectInfo = toml.parse(
+                fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8')
+              );
+              const backendInfo = {
+                  version: process.env.PROVIDED_VERSION || projectInfo.tool.poetry.version,
+                  name: projectInfo.tool.poetry.name || 'LabelU',
+                  build_time: new Date().toISOString(),
+                  commit: process.env.GITHUB_SHA,
+                };
+
+                const code = `
+                              (function () {
+                                window.__backend = ${JSON.stringify(backendInfo, null, 2)};
+                              })();
+                            `;
+
+                fs.writeFileSync(
+                  path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
+                  code,
+                  'utf-8'
+                );
+
+                console.log('Update backend_version.js success!');
+            } catch (e) {
+              console.error(e);
+              process.exit(1);
+            }
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
@@ -79,7 +121,7 @@ jobs:
       - name: Commit .VERSION to current branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update .VERSION [skip ci]"
+          commit_message: 'Update .VERSION [skip ci]'
           file_pattern: .VERSION
       - name: Webhook message
         uses: joelwmale/webhook-action@master
@@ -87,4 +129,3 @@ jobs:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
           body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(prod) is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n${{ inputs.changelog || github.event.head_commit.message }}"}}'
-
