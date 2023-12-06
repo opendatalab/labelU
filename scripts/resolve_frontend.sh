@@ -39,7 +39,7 @@ if [ $# -gt 1 ]; then
     echo "alpha_version: $alpha_version" >> .VERSION
   fi
 else
-  if [ "$CURRENT_BRANCH" = "main" ]; then
+  if [ "$CURRENT_BRANCH" = "main" ] || [[ "$CURRENT_BRANCH" = release/* ]]; then
     url=$release_assets_url
   else
     url=$alpha_assets_url
