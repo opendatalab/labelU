@@ -143,7 +143,7 @@ class Converter:
             category_id += 1
         tools_category = config.get("tools", [])
         for tool in tools_category:
-            for attr in tool.get("config", {}).get("attributeList", []):
+            for attr in tool.get("config", {}).get("attributes", []):
                 category = {
                     "id": category_id,
                     "name": attr.get("value", ""),
