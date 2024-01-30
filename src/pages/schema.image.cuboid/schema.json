@@ -9,6 +9,7 @@
     },
     "front": {
       "type": "object",
+      "description": "正面四个点坐标",
       "properties": {
         "tl": {
           "type": "object",
@@ -80,6 +81,7 @@
     },
     "back": {
       "type": "object",
+      "description": "背面四个点坐标",
       "properties": {
         "tl": {
           "type": "object",
