@@ -3,6 +3,29 @@
   "title": "Generated schema for Root",
   "type": "object",
   "properties": {
+    "lineType": {
+      "type": "string",
+      "description": "线条类型: line（直线），spline（曲线）",
+      "default": "line"
+    },
+    "controlPoints": {
+      "type": "array",
+      "description": "贝塞尔曲线控制点列表",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "x坐标"
+          },
+          "y": {
+            "type": "number",
+            "description": "y坐标"
+          }
+        },
+        "required": ["x", "y"]
+      }
+    },
     "pointList": {
       "type": "array",
       "description": "标注点列表",

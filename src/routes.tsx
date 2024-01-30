@@ -23,6 +23,7 @@ import RectSchema from './pages/schema.image.rect';
 import PointSchema from './pages/schema.image.point';
 import LineSchema from './pages/schema.image.line';
 import PolygonSchema from './pages/schema.image.polygon';
+import CuboidSchema from './pages/schema.image.cuboid';
 import AudioSegmentSchema from './pages/schema.audio.segment';
 import AudioFrameSchema from './pages/schema.audio.frame';
 
@@ -220,6 +221,15 @@ const routes = [
                 handle: {
                   crumb: () => {
                     return i18n.t('image.polygon');
+                  },
+                },
+              },
+              {
+                path: 'cuboid',
+                element: <CuboidSchema />,
+                handle: {
+                  crumb: () => {
+                    return i18n.t('image.cuboid');
                   },
                 },
               },
