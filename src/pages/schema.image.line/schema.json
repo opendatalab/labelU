@@ -52,9 +52,9 @@
       "type": "string",
       "description": "唯一标识"
     },
-    "valid": {
+    "visible": {
       "type": "boolean",
-      "description": "是否有效"
+      "description": "是否可见"
     },
     "attributes": {
       "type": "object",
@@ -76,5 +76,5 @@
       "description": "标注类别"
     }
   },
-  "required": ["pointList", "id", "valid", "order", "label"]
+  "required": ["pointList", "id", "", "order", "label"]
 }

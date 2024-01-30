@@ -43,9 +43,9 @@
         "required": ["x", "y"]
       }
     },
-    "valid": {
+    "visible": {
       "type": "boolean",
-      "description": "是否有效",
+      "description": "是否可见",
       "default": true
     },
     "attributes": {

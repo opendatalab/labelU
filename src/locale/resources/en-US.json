@@ -30,6 +30,7 @@
   "image.polygon": "Polygon",
   "image.point": "Point",
   "image.line": "Line",
+  "image.cuboid": "Cuboid",
   "video": "Video",
   "video.segment": "Segment",
   "video.frame": "Timestamp",

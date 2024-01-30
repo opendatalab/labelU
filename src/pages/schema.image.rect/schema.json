@@ -18,9 +18,9 @@
       "type": "number",
       "description": "拉框高度"
     },
-    "valid": {
+    "visible": {
       "type": "boolean",
-      "description": "是否有效",
+      "description": "是否可见",
       "default": true
     },
     "attributes": {

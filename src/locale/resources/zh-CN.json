@@ -30,6 +30,7 @@
   "image.polygon": "多边形",
   "image.point": "标点",
   "image.line": "标线",
+  "image.cuboid": "立体框",
   "video": "视频",
   "video.segment": "片断截取",
   "video.frame": "时间戳",
