@@ -2,46 +2,152 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "lineType": {
+    "direction": {
       "type": "string",
-      "description": "线条类型: line（直线），spline（曲线）",
-      "default": "line"
+      "description": "正面方向: front（前面），back（后面），left（左侧面），right（右侧面）",
+      "default": "front"
     },
-    "controlPoints": {
-      "type": "array",
-      "description": "贝塞尔曲线控制点列表",
-      "items": {
-        "type": "object",
-        "properties": {
-          "x": {
-            "type": "number",
-            "description": "x坐标"
+    "front": {
+      "type": "object",
+      "properties": {
+        "tl": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
           },
-          "y": {
-            "type": "number",
-            "description": "y坐标"
-          }
+          "required": [
+            "x",
+            "y"
+          ]
         },
-        "required": ["x", "y"]
-      }
+        "tr": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "br": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "bl": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        }
+      },
+      "required": [
+        "tl",
+        "tr",
+        "br",
+        "bl"
+      ]
     },
-    "pointList": {
-      "type": "array",
-      "description": "标注点列表",
-      "items": {
-        "type": "object",
-        "properties": {
-          "x": {
-            "type": "number",
-            "description": "x坐标"
+    "back": {
+      "type": "object",
+      "properties": {
+        "tl": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
           },
-          "y": {
-            "type": "number",
-            "description": "y坐标"
-          }
+          "required": [
+            "x",
+            "y"
+          ]
         },
-        "required": ["x", "y"]
-      }
+        "tr": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "br": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "bl": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        }
+      },
+      "required": [
+        "tl",
+        "tr",
+        "br",
+        "bl"
+      ]
     },
     "visible": {
       "type": "boolean",
