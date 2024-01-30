@@ -14,7 +14,7 @@
 
 LabelU offers a variety of annotation tools and features, supporting image, video, and audio annotation.
 
-- Image: Multifunctional image processing tools encompassing 2D frames, semantic segmentation, polylines, keypoints, and many other annotation tools, assist in completing image identification, annotation, and analysis.
+- Image: Multifunctional image processing tools encompassing 2D bounding box, cuboid, semantic segmentation, polylines, keypoints, and many other annotation tools, assist in completing image identification, annotation, and analysis.
 - Video: The video annotation has robust video processing capabilities, able to implement video segmentation, video classification, video information extraction, and other functions, providing high-quality annotated data for model training.
 - Audio: Highly efficient and accurate audio analysis tool can achieve audio segmentation, audio classification, audio information extraction, and other functions, making complex sound information visually intuitive.
 
@@ -105,6 +105,7 @@ git submodule update --remote --merge
 - Point Annotation: Points can help users accurately label key information in the image and can be used for object recognition, scene analysis tasks.
 - Polygon: Can help users accurately label irregular shapes and can be used for object recognition, scene analysis tasks.
 - Line Annotation: Lines can help users accurately label edges and contours in the image and can be used for object recognition, scene analysis tasks.
+- Cuboid: Cuboid can help users accurately label the size, shape, and location of objects within images, and can be used for object recognition, scene analysis tasks.
 
 ### Video
 
