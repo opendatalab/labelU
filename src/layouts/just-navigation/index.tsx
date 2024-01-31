@@ -120,7 +120,7 @@ export default function JustNavigation({ children }: React.PropsWithChildren<{}>
                   to={path}
                   target={type === 'external' ? '_blank' : undefined}
                   className={clsx('hidden items-center gap-1 px-4 py-2 rounded-full hover:text-[var(--color-primary)', {
-                    'text-[var(--color-primary)]': location.pathname.startsWith(`/${path}`),
+                    'text-[var(--color-primary)]': location.pathname.startsWith(`${path}`),
                     'xs:flex': type !== 'external',
                     'sm:flex': type === 'external',
                   })}
