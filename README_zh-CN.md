@@ -30,7 +30,11 @@ LabelU 提供了多种标注工具和功能，支持图像、视频、音频标�
 
 ## 快速开始
 
-<a href="https://labelu.shlab.tech/">
+- <a href="https://opendatalab.github.io/labelU-Kit/">
+    <button>体验标注工具</button>
+</a>
+
+- <a href="https://labelu.shlab.tech/">
     <button>体验在线版</button>
 </a>
 
