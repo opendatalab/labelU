@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
     "direction": {
       "type": "string",
       "description": "正面方向: front（前面），back（后面），left（左侧面），right（右侧面）",
@@ -166,10 +170,6 @@
           }
         ]
       }
-    },
-    "id": {
-      "type": "string",
-      "description": "唯一标识"
     },
     "order": {
       "type": "integer",

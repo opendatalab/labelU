@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
     "x": {
       "type": "number",
       "description": "x坐标"
@@ -25,10 +29,6 @@
           }
         ]
       }
-    },
-    "id": {
-      "type": "string",
-      "description": "唯一标识"
     },
     "order": {
       "type": "integer",

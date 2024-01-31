@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
     "lineType": {
       "type": "string",
       "description": "线条类型: line（直线），spline（曲线）",
@@ -59,10 +63,6 @@
         ]
       }
     },
-    "id": {
-      "type": "string",
-      "description": "唯一标识"
-    },
     "order": {
       "type": "integer",
       "description": "标注顺序",
@@ -74,5 +74,5 @@
       "default": "none"
     }
   },
-  "required": ["x", "y", "width", "height", "id", "order", "label"]
+  "required": ["lineType", "x", "y", "width", "height", "id", "order", "label"]
 }

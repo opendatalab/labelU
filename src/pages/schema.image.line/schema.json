@@ -3,6 +3,10 @@
   "title": "Generated schema for Root",
   "type": "object",
   "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
     "lineType": {
       "type": "string",
       "description": "线条类型: line（直线），spline（曲线）",
@@ -48,10 +52,6 @@
         "required": ["x", "y", "id"]
       }
     },
-    "id": {
-      "type": "string",
-      "description": "唯一标识"
-    },
     "visible": {
       "type": "boolean",
       "description": "是否可见"
@@ -76,5 +76,5 @@
       "description": "标注类别"
     }
   },
-  "required": ["pointList", "id", "", "order", "label"]
+  "required": ["lineType", "pointList", "id", "", "order", "label"]
 }
