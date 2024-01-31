@@ -182,5 +182,5 @@
       "default": "none"
     }
   },
-  "required": ["x", "y", "width", "height", "id", "order", "label"]
+  "required": ["direction", "front", "back", "x", "y", "width", "height", "id", "order", "label"]
 }

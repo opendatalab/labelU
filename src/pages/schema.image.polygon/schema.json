@@ -74,5 +74,5 @@
       "default": "none"
     }
   },
-  "required": ["lineType", "x", "y", "width", "height", "id", "order", "label"]
+  "required": ["lineType", "pointList", "x", "y", "width", "height", "id", "order", "label"]
 }
