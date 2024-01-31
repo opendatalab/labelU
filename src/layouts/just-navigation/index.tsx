@@ -18,17 +18,17 @@ import i18nLocale from '@/locale';
 const links = [
   {
     title: i18nLocale.t('guide'),
-    path: 'guide',
+    path: '/guide',
     icon: <BiBookBookmark />,
   },
   {
     title: i18nLocale.t('schema'),
-    path: 'schema',
+    path: '/schema',
     icon: <BiCodeBlock />,
   },
   {
     title: i18nLocale.t('playground'),
-    path: 'playground',
+    path: '/playground',
     icon: <BiCubeAlt />,
   },
   {
@@ -50,7 +50,7 @@ const langs = [
   },
 ];
 
-export default function Layout() {
+export default function JustNavigation({ children }: React.PropsWithChildren<{}>) {
   const location = useLocation();
   const navigate = useNavigate();
   const match = useMatch('/:path/*');
@@ -171,14 +171,7 @@ export default function Layout() {
         </div>
       </header>
       <div className="flex min-h-0 overflow-auto">
-        <div className="hidden sm:block py-2 px-2 sm:w-[280px] max-h-[calc(100vh-64px)] overflow-auto">
-          <Menu path={`/${secondPath}`} />
-        </div>
-        <div className="min-h-0 overflow-auto justify-center flex-auto max-h-[calc(100vh-64px)]  py-16 px-6">
-          <div className="mx-auto prose">
-            <Outlet />
-          </div>
-        </div>
+        {children}
       </div>
     </div>
   );
