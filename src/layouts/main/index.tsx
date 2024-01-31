@@ -27,11 +27,6 @@ const links = [
     icon: <BiCodeBlock />,
   },
   {
-    title: i18nLocale.t('playground'),
-    path: 'playground',
-    icon: <BiCubeAlt />,
-  },
-  {
     title: 'LabelU-kit',
     path: 'https://github.com/opendatalab/labelU-kit#readme',
     icon: null,

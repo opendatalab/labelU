@@ -26,8 +26,6 @@ import PolygonSchema from './pages/schema.image.polygon';
 import CuboidSchema from './pages/schema.image.cuboid';
 import AudioSegmentSchema from './pages/schema.audio.segment';
 import AudioFrameSchema from './pages/schema.audio.frame';
-import Playground from './pages/playground';
-import JustNavigation from './layouts/just-navigation';
 
 export interface RouteWithName extends NonIndexRouteObject {
   name?: string;
@@ -298,15 +296,6 @@ const routes = [
         ],
       },
     ],
-  },
-  {
-    path: '/playground',
-    element: <JustNavigation><Playground /></JustNavigation>,
-    handle: {
-      crumb: () => {
-        return i18n.t('playground');
-      },
-    },
   },
   {
     path: '*',
