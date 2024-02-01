@@ -48,7 +48,7 @@ a {
 }
 
 .prose pre {
-  padding: 0;
+  padding: .6rem .8rem;
   background: transparent;
   border: 1px solid #ebebeb;
   color: inherit !important;

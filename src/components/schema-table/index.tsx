@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 interface SchemaProp {
   [key: string]: {
+    required?: string[];
     type: string | string[];
     description?: string;
     default?: string | number | boolean;
@@ -48,7 +49,7 @@ const JsonSchemaTable: FC<JsonSchemaTableProps> = ({ schema }) => {
   };
 
   // Recursively generate rows
-  const generateRows = (properties: SchemaProp, requiredFields: string[], parentKey = '', isChild?: boolean) => {
+  const generateRows = (properties: SchemaProp, requiredFields: string[], parentKey = '', isChild?: boolean, depth = 0) => {
     return Object.entries(properties).flatMap(([key, value]) => {
       const fullKey = parentKey + key;
 
@@ -60,9 +61,9 @@ const JsonSchemaTable: FC<JsonSchemaTableProps> = ({ schema }) => {
           })}
         >
           <td
-            className={clsx({
-              'pl-14': isChild,
-            })}
+            style={{
+              paddingLeft: `${1 * (depth + 1)}rem`,
+            }}
           >
             <div className="flex items-center gap-2">
               {key}
@@ -99,7 +100,7 @@ const JsonSchemaTable: FC<JsonSchemaTableProps> = ({ schema }) => {
       ) {
         const nestedProperties = value.type === 'array' ? value.items!.properties : value.properties;
 
-        rows.push(...generateRows(nestedProperties!, requiredFields, `${fullKey}.`, true));
+        rows.push(...generateRows(nestedProperties!, value.required ?? [], `${fullKey}.`, true, depth + 1));
       }
 
       if (value.additionalProperties && expandedFields.includes(fullKey)) {
@@ -110,6 +111,7 @@ const JsonSchemaTable: FC<JsonSchemaTableProps> = ({ schema }) => {
               requiredFields,
               `${fullKey}.`,
               true,
+              depth + 1,
             ),
           );
         }

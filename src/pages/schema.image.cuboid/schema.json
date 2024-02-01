@@ -17,6 +17,7 @@
       "properties": {
         "tl": {
           "type": "object",
+          "description": "左上角坐标",
           "properties": {
             "x": {
               "type": "number"
@@ -32,6 +33,7 @@
         },
         "tr": {
           "type": "object",
+          "description": "右上角坐标",
           "properties": {
             "x": {
               "type": "number"
@@ -47,6 +49,7 @@
         },
         "br": {
           "type": "object",
+          "description": "右下角坐标",
           "properties": {
             "x": {
               "type": "number"
@@ -62,6 +65,7 @@
         },
         "bl": {
           "type": "object",
+          "description": "左下角坐标",
           "properties": {
             "x": {
               "type": "number"
@@ -89,6 +93,7 @@
       "properties": {
         "tl": {
           "type": "object",
+          "description": "左上角坐标",
           "properties": {
             "x": {
               "type": "number"
@@ -104,6 +109,7 @@
         },
         "tr": {
           "type": "object",
+          "description": "右上角坐标",
           "properties": {
             "x": {
               "type": "number"
@@ -119,6 +125,7 @@
         },
         "br": {
           "type": "object",
+          "description": "右下角坐标",
           "properties": {
             "x": {
               "type": "number"
@@ -134,6 +141,7 @@
         },
         "bl": {
           "type": "object",
+          "description": "左下角坐标",
           "properties": {
             "x": {
               "type": "number"
