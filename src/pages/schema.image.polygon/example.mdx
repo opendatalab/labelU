@@ -1,5 +1,6 @@
 import jsonschema from './schema.json';
 import JsonSchemaTable from '../../components/schema-table';
+import CodePreview from '../../components/code-preview';
 
 ## Polygon Schema
 
@@ -9,8 +10,8 @@ import JsonSchemaTable from '../../components/schema-table';
 
 ### Polygon
 
-```json
-{
+<CodePreview value={{
+  "toolName": "polygonTool",
   "result": [
     {
       "id": "FuzuAJ4q",
@@ -40,15 +41,12 @@ import JsonSchemaTable from '../../components/schema-table';
       "order": 6,
       "label": "label-1"
     }
-  ],
-  "toolName": "polygonTool"
-}
-```
+  ]
+}} />
 
 ### Close-Spline
 
-```json
-{
+<CodePreview value={{
     "toolName": "polygonTool",
     "result": [
         {
@@ -127,5 +125,4 @@ import JsonSchemaTable from '../../components/schema-table';
             ]
         }
     ]
-}
-```
+}} />

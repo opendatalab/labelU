@@ -1,5 +1,6 @@
 import jsonschema from './schema.json';
 import JsonSchemaTable from '../../components/schema-table';
+import CodePreview from '../../components/code-preview';
 
 ## Polygon Schema
 
@@ -7,8 +8,7 @@ import JsonSchemaTable from '../../components/schema-table';
 
 ## Example
 
-```json
-{
+<CodePreview value={{
     "toolName": "cuboidTool",
     "result": [
         {
@@ -102,5 +102,4 @@ import JsonSchemaTable from '../../components/schema-table';
             "attribute": "suv"
         }
     ]
-}
-```
+}} />

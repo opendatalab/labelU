@@ -1,5 +1,6 @@
 import jsonschema from './schema.json';
 import JsonSchemaTable from '../../components/schema-table';
+import CodePreview from '../../components/code-preview';
 
 ## Point Schema
 
@@ -7,8 +8,8 @@ import JsonSchemaTable from '../../components/schema-table';
 
 ## Example
 
-```json
-{
+<CodePreview value={{
+  "toolName": "pointTool",
   "result": [
     {
       "x": 134.5060975609757,
@@ -18,7 +19,5 @@ import JsonSchemaTable from '../../components/schema-table';
       "order": 3,
       "label": "label-1"
     }
-  ],
-  "toolName": "pointTool"
-}
-```
+  ]
+}} />

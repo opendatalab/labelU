@@ -1,5 +1,6 @@
 import jsonschema from './schema.json';
 import JsonSchemaTable from '../../components/schema-table';
+import CodePreview from '../../components/code-preview';
 
 ## Rect Schema
 
@@ -7,8 +8,8 @@ import JsonSchemaTable from '../../components/schema-table';
 
 ## Example
 
-```json
-{
+<CodePreview value={{
+  "toolName": "rectTool",
   "result": [
     {
       "x": 148.66463414634154,
@@ -30,7 +31,5 @@ import JsonSchemaTable from '../../components/schema-table';
       "order": 5,
       "label": "label-1"
     }
-  ],
-  "toolName": "rectTool"
-}
-```
+  ]
+}} />

@@ -1,5 +1,6 @@
 import jsonschema from './schema.json';
 import JsonSchemaTable from '../../components/schema-table';
+import CodePreview from '../../components/code-preview';
 
 ## Line Schema
 
@@ -9,8 +10,8 @@ import JsonSchemaTable from '../../components/schema-table';
 
 ### Line
 
-```json
-{
+<CodePreview value={{
+  "toolName": "lineTool",
   "result": [
     {
       "pointList": [
@@ -65,15 +66,12 @@ import JsonSchemaTable from '../../components/schema-table';
       "order": 2,
       "label": "noneAttribute"
     }
-  ],
-  "toolName": "lineTool"
-}
-```
+  ]
+}} />
 
 ### Spline
 
-```json
-{
+<CodePreview value={{
     "toolName": "lineTool",
     "result": [
         {
@@ -118,5 +116,4 @@ import JsonSchemaTable from '../../components/schema-table';
             ]
         }
     ]
-}
-```
+}} />
