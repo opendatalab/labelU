@@ -1,34 +1,10 @@
-name: 'release CI/CD Pipeline'
+name: 'release'
 
 on:
   push:
     branches:
-      - 'release/**'
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Frontend branch'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-          - release
-          - alpha
-      version:
-        description: 'Current frontend version'
-        required: true
-        type: string
-      name:
-        description: 'Frontend app name'
-        required: false
-      assets_url:
-        description: 'Frontend assets url'
-        required: true
-        type: string
-      changelog:
-        description: 'Frontend changelog'
-        required: false
-        type: string
+      - 'release'
+      - 'alpha'
 jobs:
   test:
     strategy:
@@ -36,24 +12,30 @@ jobs:
       matrix:
         python-version: [3.7]
         poetry-version: ['1.2.2']
-        node-version: [16]
+        node-version: [20.8.1]
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Resolve frontend
+
+      - name: Download frontend
         run: |
-          sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
-          echo "PROVIDED_VERSION=${GITHUB_REF##*/v}" >> $GITHUB_ENV
+          sh ./scripts/resolve_frontend.sh true
+
+        # ====================== release ======================
+
+      - name: Semantic release in dry-run mode
+        run: |
+          npm i -g semantic-release @semantic-release/github @semantic-release/changelog @semantic-release/git
+          echo "NEXT_VERSION=$(npx semantic-release --dry-run | grep -i 'the next release version is' | sed -E 's/.* ([0-9a-z.-]+)$/\1/')" >> $GITHUB_ENV
         env:
-          FRONTEND_VERSION: ${{ inputs.version }}
-          FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
-          CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Inject backend info into frontend
         uses: satackey/action-js-inline@v0.0.2
@@ -73,7 +55,7 @@ jobs:
                 fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8')
               );
               const backendInfo = {
-                  version: process.env.PROVIDED_VERSION || projectInfo.tool.poetry.version,
+                  version: process.env.NEXT_VERSION,
                   name: projectInfo.tool.poetry.name || 'LabelU',
                   build_time: new Date().toISOString(),
                   commit: process.env.GITHUB_SHA,
@@ -96,36 +78,40 @@ jobs:
               console.error(e);
               process.exit(1);
             }
+
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
+
       - name: Install dependencies
         run: poetry install --without dev
+
       - name: Run tests
         run: poetry run pytest --cov=./ --cov-report=xml
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: ./coverage.xml
           verbose: true
+
       - name: Manage version
         run: |
-          sed -i "s/^version[ ]*=.*/version = '${PROVIDED_VERSION}'/" pyproject.toml
+          sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
+
       - name: Publish
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
           poetry config pypi-token.pypi $PYPI_TOKEN
           poetry publish --build --skip-existing
-      - name: Commit .VERSION to current branch
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'Update .VERSION [skip ci]'
-          file_pattern: .VERSION
+
+      # ====================== post release ======================
+      
       - name: Webhook message
         uses: joelwmale/webhook-action@master
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.PROVIDED_VERSION }}(prod) is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.PROVIDED_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n${{ inputs.changelog || github.event.head_commit.message }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.NEXT_VERSION }} is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n${{ github.event.head_commit.message }}"}}'

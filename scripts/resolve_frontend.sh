@@ -39,7 +39,7 @@ if [ $# -gt 1 ]; then
     echo "alpha_version: $alpha_version" >> .VERSION
   fi
 else
-  if [ "$CURRENT_BRANCH" = "main" ]; then
+  if [ "$CURRENT_BRANCH" = "release" ]; then
     url=$release_assets_url
   else
     url=$alpha_assets_url
@@ -53,17 +53,20 @@ filename=$(basename $url)
 echo "final url: $url"
 echo "filename: $filename"
 
-# 下载zip文件
-wget $url
+# 如果第一个参数为true，则下载zip文件
+if [ "$1" = "true" ]; then
+  # 下载zip文件
+  wget $url
 
-# 解压zip文件
-unzip -o $filename
+  # 解压zip文件
+  unzip -o $filename
 
-# 删除下载的zip文件
-rm $filename
+  # 删除下载的zip文件
+  rm $filename
 
-# 移动到指定目录
-mv dist/* labelu/internal/statics
+  # 移动到指定目录
+  mv dist/* labelu/internal/statics
 
-# 删除空目录
-rm -rf dist
+  # 删除空目录
+  rm -rf dist
+fi

@@ -1,0 +1,76 @@
+name: 'Updating .version triggered from LabelU-Kit'
+
+on:
+  push:
+    branches:
+      - 'release'
+      - 'alpha'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Frontend branch'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - alpha
+      version:
+        description: 'Current frontend version'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type(fix, feat, breaking-change)'
+        required: true
+        type: choice
+        default: 'fix'
+        options:
+          - fix
+          - feat
+          - breaking-change
+      commit_message:
+        description: 'frontend commit message'
+        required: false
+      assets_url:
+        description: 'Frontend assets url'
+        required: true
+        type: string
+      changelog:
+        description: 'Frontend changelog'
+        required: false
+        type: string
+jobs:
+  update-frontend:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.8.1]
+        os: [ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm provenance
+
+    steps:
+      # ====================== frontend ======================
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      
+      - name: Update .VERSION file
+        run: |
+          sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
+
+        env:
+          FRONTEND_VERSION: ${{ inputs.version }}
+          FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
+          CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }}
+
+      - name: Commit .VERSION file
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: '${{ inputs.release_type }}: Update frontend from labelu-kit. See details in [release note](https://github.com/opendatalab/labelU-Kit/releases/tag/${{ inputs.version }})'
+          file_pattern: .VERSION
