@@ -54,6 +54,10 @@ jobs:
         run: |
           echo "PYPI_URL=https://pypi.org/project/labelu/#files" >> $GITHUB_ENV
 
+      - name: Show pypi url
+        run: |
+          echo $PYPI_URL
+
       # - name: Inject backend info into frontend
       #   uses: satackey/action-js-inline@v0.0.2
       #   id: InjectBackend
