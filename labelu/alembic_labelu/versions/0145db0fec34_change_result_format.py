@@ -37,7 +37,7 @@ class NewResult(BaseModel):
     textAttribute: Optional[str] = None
     order: Optional[int] = None
     attributes: Optional[dict] = None
-    pointList: Optional[list] = None
+    points: Optional[list] = None
     label: Optional[str] = None
     isReference: Optional[bool] = None
     disableDelete: Optional[bool] = None
@@ -58,7 +58,7 @@ class OldResult(BaseModel):
     textAttribute: Optional[str] = None
     order: Optional[int] = None
     result: Optional[dict] = None
-    pointList: Optional[list] = None
+    points: Optional[list] = None
     label: Optional[str] = None
     isReference: Optional[bool] = None
     disableDelete: Optional[bool] = None
@@ -77,7 +77,7 @@ class OldResult(BaseModel):
             sourceID=self.sourceID,
             textAttribute=self.textAttribute,
             order=self.order,
-            pointList=self.pointList,
+            points=self.points,
             label=self.label,
             isReference=self.isReference,
             disableDelete=self.disableDelete,
