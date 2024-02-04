@@ -1,4 +1,4 @@
-branches: [release, {name: dev, prerelease: alpha}]
+branches: [main, {name: dev, prerelease: alpha}]
 plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"

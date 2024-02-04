@@ -1,10 +1,6 @@
 name: 'Updating .version triggered from LabelU-Kit'
 
 on:
-  push:
-    branches:
-      - 'release'
-      - 'alpha'
   workflow_dispatch:
     inputs:
       branch:
@@ -41,7 +37,6 @@ on:
         type: string
 jobs:
   update-frontend:
-    if: github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
