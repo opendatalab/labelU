@@ -44,6 +44,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set test pip url
+        if: ${{ github.head_ref == 'alpha' }}
+        run: |
+          echo "PYPI_URL=https://test.pypi.org/project/labelu/#files" >> $GITHUB_ENV
+
+      - name: Set release pip url
+        if: ${{ github.head_ref == 'main' }}
+        run: |
+          echo "PYPI_URL=https://pypi.org/project/labelu/#files" >> $GITHUB_ENV
+
       # - name: Inject backend info into frontend
       #   uses: satackey/action-js-inline@v0.0.2
       #   id: InjectBackend
@@ -121,4 +131,4 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.NEXT_VERSION }} is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](https://pypi.org/project/labelu/#files) \n \n ## Changelog \n \n${{ github.event.head_commit.message }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.NEXT_VERSION }} is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }}) \n \n ## Changelog \n \n${{ ENV.RELEASE_NOTES }}"}}'

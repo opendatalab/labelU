@@ -31,10 +31,6 @@ on:
         description: 'Frontend assets url'
         required: true
         type: string
-      changelog:
-        description: 'Frontend changelog'
-        required: false
-        type: string
 jobs:
   update-frontend:
     strategy:
