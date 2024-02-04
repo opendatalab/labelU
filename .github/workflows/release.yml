@@ -44,6 +44,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Show current branch
+        run: |
+          echo ${{ github.head_ref }}
+
       - name: Set test pip url
         if: ${{ github.head_ref == 'alpha' }}
         run: |
