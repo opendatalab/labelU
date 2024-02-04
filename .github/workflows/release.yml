@@ -12,7 +12,6 @@ jobs:
       matrix:
         python-version: [3.7]
         poetry-version: ['1.2.2']
-        node-version: [20]
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     steps:
@@ -29,6 +28,11 @@ jobs:
           sh ./scripts/resolve_frontend.sh true
 
         # ====================== release ======================
+
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.8.1
 
       - name: Semantic release in dry-run mode
         run: |
