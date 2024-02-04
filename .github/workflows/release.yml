@@ -128,6 +128,18 @@ jobs:
           poetry config pypi-token.pypi $PYPI_TOKEN
           poetry publish --build --skip-existing
 
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          dry_run: true
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/exec
+            @semantic-release/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # ====================== post release ======================
       
       - name: Webhook message
