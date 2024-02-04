@@ -204,7 +204,7 @@ class Converter:
                     if tool.get("toolName") == "polygonTool":
                         x_coordinates = []
                         y_coordinates = []
-                        for point in tool_result.get("pointList", []):
+                        for point in tool_result.get("points", []):
                             segmentation.append(point.get("x"))
                             segmentation.append(point.get("y"))
                             x_coordinates.append(point.get("x"))
@@ -292,7 +292,7 @@ class Converter:
                 "result", []
             ):
                 polygon = []
-                for point in tool_result.get("pointList", []):
+                for point in tool_result.get("points", []):
                     polygon.append(point.get("x"))
                     polygon.append(point.get("y"))
                 polygons.append(polygon)
