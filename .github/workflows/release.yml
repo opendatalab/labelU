@@ -46,15 +46,15 @@ jobs:
 
       - name: Show current branch
         run: |
-          echo ${{ github.head_ref }}
+          echo ${{ github.ref_name }}
 
       - name: Set test pip url
-        if: ${{ github.head_ref == 'alpha' }}
+        if: ${{ github.ref_name == 'alpha' }}
         run: |
           echo "PYPI_URL=https://test.pypi.org/project/labelu/#files" >> $GITHUB_ENV
 
       - name: Set release pip url
-        if: ${{ github.head_ref == 'main' }}
+        if: ${{ github.ref_name == 'main' }}
         run: |
           echo "PYPI_URL=https://pypi.org/project/labelu/#files" >> $GITHUB_ENV
 
