@@ -41,6 +41,7 @@ on:
         type: string
 jobs:
   update-frontend:
+    if: github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
@@ -62,7 +63,7 @@ jobs:
       
       - name: Update .VERSION file
         run: |
-          sh ./scripts/resolve_frontend.sh release $FRONTEND_VERSION $FRONTEND_ASSET_URL
+          sh ./scripts/resolve_frontend.sh ${{ inputs.release_type }} $FRONTEND_VERSION $FRONTEND_ASSET_URL
 
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
