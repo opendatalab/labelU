@@ -67,6 +67,12 @@ jobs:
         with:
           commit_message: '${{ inputs.release_type }}: Update frontend from labelu-kit. See details in [release notes](https://github.com/opendatalab/labelU-Kit/releases/tag/${{ inputs.version }})'
           file_pattern: .VERSION
+
+      - name: Prepare changelog
+        id: set_changelog
+        run: |
+          echo "CHANGE_LOG=$(echo "${{ inputs.changelog }}" | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_ENV
+        
       
       - name: Trigger release workflow
         uses: benc-uk/workflow-dispatch@v1
@@ -74,6 +80,6 @@ jobs:
           workflow: release
           inputs: |
             {
-              "changelog": "${{ inputs.changelog }}"
+              "changelog": "${{ env.CHANGE_LOG }}"
             }
         
