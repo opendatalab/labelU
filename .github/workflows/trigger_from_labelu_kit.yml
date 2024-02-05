@@ -54,12 +54,12 @@ jobs:
       
       - name: Update .VERSION file
         run: |
-          sh ./scripts/resolve_frontend.sh ${{ inputs.release_type }} $FRONTEND_VERSION $FRONTEND_ASSET_URL
+          sh ./scripts/resolve_frontend.sh ${{ github.ref_name }} $FRONTEND_VERSION $FRONTEND_ASSET_URL
 
         env:
           FRONTEND_VERSION: ${{ inputs.version }}
           FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
-          CURRENT_BRANCH: ${{ github.head_ref || github.ref_name }}
+          CURRENT_BRANCH: ${{ github.ref_name }}
 
       - name: Commit .VERSION file
         uses: stefanzweifel/git-auto-commit-action@v4
