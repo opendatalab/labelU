@@ -156,11 +156,11 @@ jobs:
 
       # ====================== post release ======================
 
-      - name: Get release notes
+      - name: Send release notes
         id: get_notes
         run: |
           RELEASE_NOTES=$(gh release view v${{ env.NEXT_VERSION }} --json body -q '.body')
-          echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "::set-output name=RELEASE_NOTES::$RELEASE_NOTES"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
@@ -169,4 +169,4 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.NEXT_VERSION }} is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }}) \n \n${{ ENV.RELEASE_NOTES }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.NEXT_VERSION }} is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ steps.get_notes.outputs.RELEASE_NOTES }}](${{ env.PYPI_URL }}) \n \n${{ ENV.RELEASE_NOTES }}"}}'
