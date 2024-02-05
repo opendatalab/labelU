@@ -22,7 +22,7 @@
       "@semantic-release/exec",
       {
         "verifyReleaseCmd": "echo \"NEXT_VERSION=${nextRelease.version}\" >> $GITHUB_ENV",
-        "successCmd": "echo \"RELEASE_NOTES=$(echo \\\"${nextRelease.notes}\\\" | sed ':a;N;$!ba;s/\\n/\\\\n/g')\" >> $GITHUB_ENV"
+        "successCmd": "echo \"RELEASE_NOTES=$(echo '${nextRelease.notes}' | sed ':a;N;$!ba;s/\\n/\\\\n/g')\" >> $GITHUB_ENV"
       }
     ]
   ]
