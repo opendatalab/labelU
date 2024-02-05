@@ -159,7 +159,7 @@ jobs:
       - name: Get release notes
         id: get_notes
         run: |
-          RELEASE_NOTES=$(gh release view v${{ env.NEXT_VERSION }} --json notes -q '.notes')
+          RELEASE_NOTES=$(gh release view v${{ env.NEXT_VERSION }} --json notes -q '.body')
           echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
