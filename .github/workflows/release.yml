@@ -125,17 +125,19 @@ jobs:
           verbose: true
 
       - name: Manage version
+        if: ${{ env.NEXT_VERSION != '' }}
         run: |
           sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
 
       - name: Commit version change
+        if: ${{ env.NEXT_VERSION != '' }}
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'chore: Upgrade to v${{ env.NEXT_VERSION }} [skip ci]'
           file_pattern: pyproject.toml
 
       - name: Publish to TestPyPi
-        if: ${{ github.ref_name == 'alpha' }}
+        if: ${{ github.ref_name == 'alpha' && env.NEXT_VERSION != ''}}
         env:
           TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
@@ -143,7 +145,7 @@ jobs:
           poetry publish --build --skip-existing -r testpypi
 
       - name: Publish to PyPi
-        if: ${{ github.ref_name == 'main' }}
+        if: ${{ github.ref_name == 'main' && env.NEXT_VERSION != ''}}
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
@@ -164,6 +166,7 @@ jobs:
       # ====================== post release ======================
       
       - name: Send webhook message
+        if: ${{ env.RELEASE_NOTES != '' }}
         uses: joelwmale/webhook-action@master
         env:
           CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog \n{0}\n\n\n', github.event.inputs.changelog) || '' }}
