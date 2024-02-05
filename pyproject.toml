@@ -29,18 +29,15 @@ pillow = "^9.3.0"
 alembic = "^1.9.4"
 
 
-
 [[tool.poetry.source]]
 name = "testpypi"
 url = "https://test.pypi.org/legacy/"
 default = false
 secondary = false
 
-
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 flake8 = "^5.0.4"
-
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.0"
