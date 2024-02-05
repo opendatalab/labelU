@@ -62,12 +62,12 @@ jobs:
       - name: Set test pip url
         if: ${{ github.ref_name == 'alpha' }}
         run: |
-          echo "PYPI_URL=https://test.pypi.org/project/labelu/${{ needs.prepare.outputs.NEXT_VERSION }}" >> $GITHUB_ENV
+          echo "PYPI_URL=https://test.pypi.org/project/labelu/${{ needs.prepare.steps.dry-run.outputs.NEXT_VERSION }}" >> $GITHUB_ENV
 
       - name: Set release pip url
         if: ${{ github.ref_name == 'main' }}
         run: |
-          echo "PYPI_URL=https://pypi.org/project/labelu/${{ needs.prepare.outputs.NEXT_VERSION }}" >> $GITHUB_ENV
+          echo "PYPI_URL=https://pypi.org/project/labelu/${{ needs.prepare.steps.dry-run.outputs.NEXT_VERSION }}" >> $GITHUB_ENV
 
       - name: Show pypi url
         run: |
@@ -77,7 +77,7 @@ jobs:
         uses: satackey/action-js-inline@v0.0.2
         id: InjectBackend
         env:
-          NEXT_VERSION: ${{ needs.prepare.outputs.NEXT_VERSION }}
+          NEXT_VERSION: ${{ needs.prepare.steps.dry-run.outputs.NEXT_VERSION }}
         with:
           required-packages: '@iarna/toml'
           script: |
@@ -141,7 +141,7 @@ jobs:
       - name: Commit version change
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'chore: Upgrade to v${{ needs.prepare.outputs.NEXT_VERSION }} [skip ci]'
+          commit_message: 'chore: Upgrade to v${{ needs.prepare.steps.dry-run.outputs.NEXT_VERSION }} [skip ci]'
           file_pattern: pyproject.toml
 
       - name: Publish to TestPyPi
@@ -180,4 +180,4 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"${{ needs.prepare.outputs.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ needs.prepare.outputs.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"${{ needs.prepare.steps.dry-run.outputs.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ needs.prepare.steps.dry-run.outputs.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
