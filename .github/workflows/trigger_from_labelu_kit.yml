@@ -65,7 +65,7 @@ jobs:
       - name: Commit .VERSION file
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: '${{ inputs.release_type }}: Update frontend from labelu-kit. See details in [release note](https://github.com/opendatalab/labelU-Kit/releases/tag/${{ inputs.version }})'
+          commit_message: '${{ inputs.release_type }}: Update frontend from labelu-kit. See details in [release notes](https://github.com/opendatalab/labelU-Kit/releases/tag/${{ inputs.version }})'
           file_pattern: .VERSION
       
       - name: Trigger release workflow
