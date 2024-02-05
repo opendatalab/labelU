@@ -178,7 +178,7 @@ jobs:
       - name: Send webhook message
         uses: joelwmale/webhook-action@master
         env:
-          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog \n{0}\n\n\n', github.event.inputs.changelog) || '' }}
+          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog \n\n👇🏻{0}\n\n\n', github.event.inputs.changelog) || '' }}
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
