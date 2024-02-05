@@ -170,4 +170,4 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"${{ env.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"## LabelU changelog \n\n${{ env.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
