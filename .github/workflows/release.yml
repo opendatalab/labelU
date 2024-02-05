@@ -163,11 +163,11 @@ jobs:
 
       # ====================== post release ======================
       
-      - name: Webhook message from workflow_dispatch
+      - name: Send webhook message
         uses: joelwmale/webhook-action@master
         env:
-          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('{0}\n\n\n', github.event.inputs.changelog) || '' }}
+          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog \n{0}\n\n\n', github.event.inputs.changelog) || '' }}
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"${{ env.RELEASE_NOTES }}## Frontend changelog \n${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"${{ env.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
