@@ -15,6 +15,9 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    outputs:
+      NEXT_VERSION: ${{ steps.dry-run.outputs.NEXT_VERSION }}
+      RELEASE_NOTES: ${{ steps.dry-run.outputs.RELEASE_NOTES }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -52,7 +55,7 @@ jobs:
       - name: Get next version
         id: get-next-version
         run: |
-          echo "NEXT_VERSION=$(echo "${{ needs.prepare.steps.dry-run.outputs.NEXT_VERSION }}")" >> $GITHUB_ENV
+          echo "NEXT_VERSION=$(echo "${{ needs.prepare.outputs.NEXT_VERSION }}")" >> $GITHUB_ENV
 
       - uses: actions/setup-python@v4
         with:
@@ -185,4 +188,4 @@ jobs:
       #   with:
       #     url: ${{ secrets.WEBHOOK_URL }}
       #     headers: '{"Content-Type": "application/json"}'
-      #     body: '{"msgtype":"markdown","markdown":{"content":"${{ needs.prepare.steps.dry-run.outputs.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
+      #     body: '{"msgtype":"markdown","markdown":{"content":"${{ needs.prepare.outputs.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
