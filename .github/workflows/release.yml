@@ -161,6 +161,8 @@ jobs:
         run: |
           RELEASE_NOTES=$(gh release view v${{ env.NEXT_VERSION }} --json notes -q '.notes')
           echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Webhook message
         uses: joelwmale/webhook-action@master
