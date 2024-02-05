@@ -41,11 +41,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     permissions:
-      actions: write # to be able to trigger a release workflow
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-      id-token: write # to enable use of OIDC for npm provenance
+      actions: write 
+      contents: write 
+      issues: write 
+      pull-requests: write
+      id-token: write
 
     steps:
       # ====================== frontend ======================
