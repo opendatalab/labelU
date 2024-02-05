@@ -78,111 +78,111 @@ jobs:
         run: |
           echo $PYPI_URL
 
-      - name: Inject backend info into frontend
-        uses: satackey/action-js-inline@v0.0.2
-        id: InjectBackend
-        env:
-          NEXT_VERSION: ${{ env.NEXT_VERSION }}
-        with:
-          required-packages: '@iarna/toml'
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            const toml = require('@iarna/toml');
-            const rootPath = path.join(process.cwd(), '');
+      # - name: Inject backend info into frontend
+      #   uses: satackey/action-js-inline@v0.0.2
+      #   id: InjectBackend
+      #   env:
+      #     NEXT_VERSION: ${{ env.NEXT_VERSION }}
+      #   with:
+      #     required-packages: '@iarna/toml'
+      #     script: |
+      #       const fs = require('fs');
+      #       const path = require('path');
+      #       const toml = require('@iarna/toml');
+      #       const rootPath = path.join(process.cwd(), '');
 
-            console.log('rootPath', rootPath);
+      #       console.log('rootPath', rootPath);
 
-            try {
-              const projectInfo = toml.parse(
-                fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8')
-              );
-              const backendInfo = {
-                  version: process.env.NEXT_VERSION,
-                  name: projectInfo.tool.poetry.name || 'LabelU',
-                  build_time: new Date().toISOString(),
-                  commit: process.env.GITHUB_SHA,
-                };
+      #       try {
+      #         const projectInfo = toml.parse(
+      #           fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8')
+      #         );
+      #         const backendInfo = {
+      #             version: process.env.NEXT_VERSION,
+      #             name: projectInfo.tool.poetry.name || 'LabelU',
+      #             build_time: new Date().toISOString(),
+      #             commit: process.env.GITHUB_SHA,
+      #           };
 
-                const code = `
-                              (function () {
-                                window.__backend = ${JSON.stringify(backendInfo, null, 2)};
-                              })();
-                            `;
+      #           const code = `
+      #                         (function () {
+      #                           window.__backend = ${JSON.stringify(backendInfo, null, 2)};
+      #                         })();
+      #                       `;
 
-                fs.writeFileSync(
-                  path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
-                  code,
-                  'utf-8'
-                );
+      #           fs.writeFileSync(
+      #             path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
+      #             code,
+      #             'utf-8'
+      #           );
 
-                console.log('Update backend_version.js success!');
-            } catch (e) {
-              console.error(e);
-              process.exit(1);
-            }
+      #           console.log('Update backend_version.js success!');
+      #       } catch (e) {
+      #         console.error(e);
+      #         process.exit(1);
+      #       }
 
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: ${{ matrix.poetry-version }}
+      # - uses: abatilo/actions-poetry@v2
+      #   with:
+      #     poetry-version: ${{ matrix.poetry-version }}
 
-      - name: Install dependencies
-        run: poetry install --without dev
+      # - name: Install dependencies
+      #   run: poetry install --without dev
 
-      - name: Run tests
-        run: poetry run pytest --cov=./ --cov-report=xml
+      # - name: Run tests
+      #   run: poetry run pytest --cov=./ --cov-report=xml
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          files: ./coverage.xml
-          verbose: true
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+      #     files: ./coverage.xml
+      #     verbose: true
 
-      - name: Manage version
-        run: |
-          sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
+      # - name: Manage version
+      #   run: |
+      #     sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
 
-      - name: Commit version change
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'chore: Upgrade to v${{ env.NEXT_VERSION }} [skip ci]'
-          file_pattern: pyproject.toml
+      # - name: Commit version change
+      #   uses: stefanzweifel/git-auto-commit-action@v4
+      #   with:
+      #     commit_message: 'chore: Upgrade to v${{ env.NEXT_VERSION }} [skip ci]'
+      #     file_pattern: pyproject.toml
 
-      - name: Publish to TestPyPi
-        if: ${{ github.ref_name == 'alpha'}}
-        env:
-          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
-        run: |
-          poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
-          poetry publish --build --skip-existing -r testpypi
+      # - name: Publish to TestPyPi
+      #   if: ${{ github.ref_name == 'alpha'}}
+      #   env:
+      #     TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+      #   run: |
+      #     poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
+      #     poetry publish --build --skip-existing -r testpypi
 
-      - name: Publish to PyPi
-        if: ${{ github.ref_name == 'main'}}
-        env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          poetry config pypi-token.pypi $PYPI_TOKEN
-          poetry publish --build --skip-existing
+      # - name: Publish to PyPi
+      #   if: ${{ github.ref_name == 'main'}}
+      #   env:
+      #     PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      #   run: |
+      #     poetry config pypi-token.pypi $PYPI_TOKEN
+      #     poetry publish --build --skip-existing
 
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-            @semantic-release/release-notes-generator
-            @semantic-release/exec
-            @semantic-release/github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Semantic Release
+      #   uses: cycjimmy/semantic-release-action@v4
+      #   with:
+      #     extra_plugins: |
+      #       @semantic-release/commit-analyzer
+      #       @semantic-release/release-notes-generator
+      #       @semantic-release/exec
+      #       @semantic-release/github
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ====================== post release ======================
+      # # ====================== post release ======================
       
-      - name: Send webhook message
-        uses: joelwmale/webhook-action@master
-        env:
-          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog \n{0}\n\n\n', github.event.inputs.changelog) || '' }}
-        with:
-          url: ${{ secrets.WEBHOOK_URL }}
-          headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"${{ needs.prepare.steps.dry-run.outputs.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
+      # - name: Send webhook message
+      #   uses: joelwmale/webhook-action@master
+      #   env:
+      #     CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog \n{0}\n\n\n', github.event.inputs.changelog) || '' }}
+      #   with:
+      #     url: ${{ secrets.WEBHOOK_URL }}
+      #     headers: '{"Content-Type": "application/json"}'
+      #     body: '{"msgtype":"markdown","markdown":{"content":"${{ needs.prepare.steps.dry-run.outputs.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
