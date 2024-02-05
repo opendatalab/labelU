@@ -27,7 +27,7 @@
       "@semantic-release/exec",
       {
         "verifyReleaseCmd": "echo \"NEXT_VERSION=${nextRelease.version}\" >> $GITHUB_OUTPUT",
-        "successCmd": "echo \"RELEASE_NOTES<<EOF\n${nextRelease.notes}\nEOF\" >> $GITHUB_OUTPUT"
+        "successCmd": "echo \"RELEASE_NOTES<<EOF\n${nextRelease.notes}\nEOF\" >> $GITHUB_ENV"
       }
     ]
   ]
