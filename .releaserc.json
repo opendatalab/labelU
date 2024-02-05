@@ -10,11 +10,16 @@
     ],
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    "@semantic-release/github",
+    [
+      "@semantic-release/github",
+      {
+        "assets": [{ "path": "./*.whl", "label": "labelu-${nextRelease.version}-py3.whl" }]
+      }
+    ],
     [
       "@semantic-release/git",
       {
-        "assets": ["package.json"],
+        "assets": ["pyproject.toml"],
         "message": "chore(release): ${nextRelease.version} [skip ci] \n\n${nextRelease.notes}"
       }
     ],
