@@ -71,4 +71,5 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: release
+          token: ${{ secrets.GITHUB_TOKEN }}
           inputs: '{ "changelog": "${{ inputs.changelog }}" }'
