@@ -160,7 +160,8 @@ jobs:
         id: get_notes
         run: |
           RELEASE_NOTES=$(gh release view v${{ env.NEXT_VERSION }} --json body -q '.body')
-          echo "::set-output name=RELEASE_NOTES::$RELEASE_NOTES"
+          echo $RELEASE_NOTES
+          echo "{RELEASE_NOTES}={$RELEASE_NOTES}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
@@ -169,4 +170,4 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"# LabelU@${{ env.NEXT_VERSION }} is Released 🎉\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }}) \n \n${{ steps.get_notes.outputs.RELEASE_NOTES }}"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"${{ steps.get_notes.outputs.RELEASE_NOTES }}\n \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
