@@ -112,6 +112,7 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
 
       - name: Install dependencies
+        if: ${{ env.NEXT_VERSION != '' }}
         run: poetry install --without dev
 
       - name: Run tests
