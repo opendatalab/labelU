@@ -24,8 +24,8 @@ on:
           - fix
           - feat
           - breaking-change
-      commit_message:
-        description: 'frontend commit message'
+      changelog:
+        description: 'Frontend changelog'
         required: false
       assets_url:
         description: 'Frontend assets url'
@@ -66,4 +66,9 @@ jobs:
         with:
           commit_message: '${{ inputs.release_type }}: Update frontend from labelu-kit. See details in [release note](https://github.com/opendatalab/labelU-Kit/releases/tag/${{ inputs.version }})'
           file_pattern: .VERSION
-          push_options: '--force'
+      
+      - name: Trigger release workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: release
+          inputs: '{ "changelog": "${{ inputs.changelog }}" }'
