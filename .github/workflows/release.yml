@@ -169,10 +169,10 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'
-          body: '{"msgtype":"markdown","markdown":{"content":"${{ env.RELEASE_NOTES }}## Frontend changelog \n${{ inputs.changelog }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
+          body: '{"msgtype":"markdown","markdown":{"content":"${{ env.RELEASE_NOTES }}## Frontend changelog \n${{ inputs.changelog }}  \nCheck it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'
 
       - name: Webhook message from release
-        if: ${{ github.ref_name == 'main' || github.ref_name == 'alpha'}}
+        if: ${{ github.event_name != 'workflow_dispatch'}}
         uses: joelwmale/webhook-action@master
         with:
           url: ${{ secrets.WEBHOOK_URL }}
