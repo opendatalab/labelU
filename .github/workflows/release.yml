@@ -155,16 +155,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ====================== post release ======================
-
-      - name: Get release notes
-        id: get_notes
-        run: |
-          RELEASE_NOTES=$(gh release view v${{ env.NEXT_VERSION }} --json body -q '.body')
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo "${RELEASE_NOTES}"
-          EOF
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Webhook message
         uses: joelwmale/webhook-action@master
