@@ -1,0 +1,185 @@
+name: 'release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      changelog:
+        type: string
+        description: 'The frontend changelog'
+        required: true
+
+  push:
+    branches:
+      - 'main'
+      - 'alpha'
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      NEXT_VERSION: ${{ steps.dry-run.outputs.NEXT_VERSION }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.8.1
+
+      - name: Semantic Release dry-run
+        id: dry-run
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          dry_run: true
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/exec
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.NEXT_VERSION != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7]
+        poetry-version: ['1.2.2']
+        os: [ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Get next version
+        id: get-next-version
+        run: |
+          echo "NEXT_VERSION=$(echo "${{ needs.prepare.outputs.NEXT_VERSION }}")" >> $GITHUB_ENV
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download frontend
+        run: |
+          sh ./scripts/resolve_frontend.sh true
+
+        # ====================== release ======================
+
+      - name: Set test pip url
+        if: ${{ github.ref_name == 'alpha' }}
+        run: |
+          echo "PYPI_URL=https://test.pypi.org/project/labelu/${{ env.NEXT_VERSION }}" >> $GITHUB_ENV
+
+      - name: Set release pip url
+        if: ${{ github.ref_name == 'main' }}
+        run: |
+          echo "PYPI_URL=https://pypi.org/project/labelu/${{ env.NEXT_VERSION }}" >> $GITHUB_ENV
+
+      - name: Show pypi url
+        run: |
+          echo $PYPI_URL
+
+      - name: Inject backend info into frontend
+        uses: satackey/action-js-inline@v0.0.2
+        id: InjectBackend
+        env:
+          NEXT_VERSION: ${{ env.NEXT_VERSION }}
+        with:
+          required-packages: '@iarna/toml'
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const toml = require('@iarna/toml');
+            const rootPath = path.join(process.cwd(), '');
+
+            console.log('rootPath', rootPath);
+
+            try {
+              const projectInfo = toml.parse(
+                fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8')
+              );
+              const backendInfo = {
+                  version: process.env.NEXT_VERSION,
+                  name: projectInfo.tool.poetry.name || 'LabelU',
+                  build_time: new Date().toISOString(),
+                  commit: process.env.GITHUB_SHA,
+                };
+
+                const code = `
+                              (function () {
+                                window.__backend = ${JSON.stringify(backendInfo, null, 2)};
+                              })();
+                            `;
+
+                fs.writeFileSync(
+                  path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
+                  code,
+                  'utf-8'
+                );
+
+                console.log('Update backend_version.js success!');
+            } catch (e) {
+              console.error(e);
+              process.exit(1);
+            }
+
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Install dependencies
+        run: poetry install --without dev
+
+      - name: Run tests
+        run: poetry run pytest --cov=./ --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./coverage.xml
+          verbose: true
+
+      - name: Manage version
+        run: |
+          sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
+
+      - name: Publish to TestPyPi
+        if: ${{ github.ref_name == 'alpha'}}
+        env:
+          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: |
+          poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
+          poetry publish --build --skip-existing -r testpypi
+
+      - name: Publish to PyPi
+        if: ${{ github.ref_name == 'main'}}
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          poetry config pypi-token.pypi $PYPI_TOKEN
+          poetry publish --build --skip-existing
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/exec
+            @semantic-release/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ====================== post release ======================
+      
+      - name: Send webhook message
+        uses: joelwmale/webhook-action@master
+        env:
+          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog👇🏻 \n\n{0}\n\n\n', github.event.inputs.changelog) || '' }}
+        with:
+          url: ${{ secrets.WEBHOOK_URL }}
+          headers: '{"Content-Type": "application/json"}'
+          body: '{"msgtype":"markdown","markdown":{"content":"${{ env.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}'

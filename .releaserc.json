@@ -1,0 +1,34 @@
+{
+  "branches": ["main", { "name": "alpha", "prerelease": true }],
+  "plugins": [
+    [
+      {
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+        }
+      }
+    ],
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/github",
+      {
+        "assets": [{ "path": "./dist/*.whl", "label": "labelu-${nextRelease.version}-py3.whl" }, { "path": "./dist/*.gz", "label": "labelu-${nextRelease.version}.tar.gz" }]
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["pyproject.toml"],
+        "message": "chore(release): ${nextRelease.version} [skip ci] \n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "verifyReleaseCmd": "echo \"NEXT_VERSION=${nextRelease.version}\" >> $GITHUB_OUTPUT",
+        "successCmd": "echo \"RELEASE_NOTES<<EOF\n${nextRelease.notes}\nEOF\" >> $GITHUB_ENV"
+      }
+    ]
+  ]
+}
