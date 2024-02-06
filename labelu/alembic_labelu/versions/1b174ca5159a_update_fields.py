@@ -20,15 +20,15 @@ def update_fields(sample_data: dict) -> dict:
     annotated_result = json.loads(annotated_result)
     # update the field pointList to points
     for sample_tool, sample_tool_results in annotated_result.items():
-        if sample_tool.endswith("Tool"):
+        if sample_tool.endswith("Tool") and isinstance(sample_tool_results, dict):
             for sample_tool_result in sample_tool_results.get("result", []):
                 keys = sample_tool_result.keys()
                 # replace pointList to points
                 if "pointList" in keys:
                     sample_tool_result["points"] = sample_tool_result.pop("pointList")
                 # replace attribute to label
-                # if "attribute" in keys:
-                #     sample_tool_result["label"] = sample_tool_result.pop("attribute")
+                if "attribute" in keys:
+                    sample_tool_result["label"] = sample_tool_result.pop("attribute")
     return annotated_result
 
 
@@ -45,7 +45,7 @@ def upgrade() -> None:
     bind = op.get_bind()
     # Reflect ORM models from the database
     Base.prepare(autoload_with=bind, reflect=True)
-    task = Base.classes.task
+    task_sample = Base.classes.task_sample
     # make a session
     Session = sessionmaker(bind=bind)
     session = Session()

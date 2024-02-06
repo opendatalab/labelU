@@ -73,9 +73,7 @@ class Converter:
                             # 视频文件的标注结果已经保存了 label 键的值，不需要再做转换
                             if "label" not in tool_result:
                                 tool_result["label"] = tool_result.pop("attribute", "")
-                            tool_result["attribute"] = tool_result.pop(
-                                "textAttribute", ""
-                            )
+
                             tool_result.pop("sourceID", None)
 
                             if tool == "tagTool" or tool == "textTool":
@@ -133,7 +131,7 @@ class Converter:
         # result catetory
         category_id = 0
         logger.info("get categories")
-        for attr in config.get("attribute", []):
+        for attr in config.get("attributes", []):
             category = {
                 "id": category_id,
                 "name": attr.get("value", ""),
@@ -182,7 +180,7 @@ class Converter:
                 "height": annotation_result.get("height", 0),
                 "valid": False
                 if sample.get("state", "") == "SKIPPED"
-                else annotation_result.get("valid", False),
+                else annotation_result.get("valid", True),
                 "rotate": annotation_result.get("rotate", 0),
             }
             result["images"].append(image)
@@ -209,7 +207,7 @@ class Converter:
                             segmentation.append(point.get("y"))
                             x_coordinates.append(point.get("x"))
                             y_coordinates.append(point.get("y"))
-                        logger.info("fffffe")
+
                         bbox = [
                             min(x_coordinates),
                             max(y_coordinates),
@@ -241,7 +239,7 @@ class Converter:
                         "area": polygon_area,
                         "bbox": bbox,
                         "category_id": category_name_map_id.get(
-                            tool_result.get("attribute", ""), -1
+                            tool_result.get("label", ""), -1
                         ),
                         "order": tool_result.get("order", 0),
                     }
@@ -296,7 +294,7 @@ class Converter:
                     polygon.append(point.get("x"))
                     polygon.append(point.get("y"))
                 polygons.append(polygon)
-                polygon_attribute.append(tool_result.get("attribute", ""))
+                polygon_attribute.append(tool_result.get("label", ""))
 
             width = annotation_result.get("width")
             height = annotation_result.get("height")
