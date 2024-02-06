@@ -13,7 +13,33 @@ on:
       - 'main'
       - 'alpha'
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      NEXT_VERSION: ${{ steps.dry-run.outputs.NEXT_VERSION }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.8.1
+
+      - name: Semantic Release dry-run
+        id: dry-run
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          dry_run: true
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/exec
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   release:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.NEXT_VERSION != '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -26,6 +52,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Get next version
+        id: get-next-version
+        run: |
+          echo "NEXT_VERSION=$(echo "${{ needs.prepare.outputs.NEXT_VERSION }}")" >> $GITHUB_ENV
+
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -35,21 +66,6 @@ jobs:
           sh ./scripts/resolve_frontend.sh true
 
         # ====================== release ======================
-
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.8.1
-
-      - name: Semantic Release dry-run
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          dry_run: true
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-            @semantic-release/exec
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set test pip url
         if: ${{ github.ref_name == 'alpha' }}
@@ -68,6 +84,8 @@ jobs:
       - name: Inject backend info into frontend
         uses: satackey/action-js-inline@v0.0.2
         id: InjectBackend
+        env:
+          NEXT_VERSION: ${{ env.NEXT_VERSION }}
         with:
           required-packages: '@iarna/toml'
           script: |
@@ -125,19 +143,11 @@ jobs:
           verbose: true
 
       - name: Manage version
-        if: ${{ env.NEXT_VERSION != '' }}
         run: |
           sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
 
-      - name: Commit version change
-        if: ${{ env.NEXT_VERSION != '' }}
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'chore: Upgrade to v${{ env.NEXT_VERSION }} [skip ci]'
-          file_pattern: pyproject.toml
-
       - name: Publish to TestPyPi
-        if: ${{ github.ref_name == 'alpha' && env.NEXT_VERSION != ''}}
+        if: ${{ github.ref_name == 'alpha'}}
         env:
           TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
@@ -145,7 +155,7 @@ jobs:
           poetry publish --build --skip-existing -r testpypi
 
       - name: Publish to PyPi
-        if: ${{ github.ref_name == 'main' && env.NEXT_VERSION != ''}}
+        if: ${{ github.ref_name == 'main'}}
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
@@ -166,10 +176,9 @@ jobs:
       # ====================== post release ======================
       
       - name: Send webhook message
-        if: ${{ env.RELEASE_NOTES != '' }}
         uses: joelwmale/webhook-action@master
         env:
-          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog \n{0}\n\n\n', github.event.inputs.changelog) || '' }}
+          CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog👇🏻 \n\n{0}\n\n\n', github.event.inputs.changelog) || '' }}
         with:
           url: ${{ secrets.WEBHOOK_URL }}
           headers: '{"Content-Type": "application/json"}'

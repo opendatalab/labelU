@@ -41,11 +41,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     permissions:
-      actions: write # to be able to trigger a release workflow
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-      id-token: write # to enable use of OIDC for npm provenance
+      actions: write 
+      contents: write 
+      issues: write 
+      pull-requests: write
+      id-token: write
 
     steps:
       # ====================== frontend ======================
@@ -67,9 +67,19 @@ jobs:
         with:
           commit_message: '${{ inputs.release_type }}: Update frontend from labelu-kit. See details in [release notes](https://github.com/opendatalab/labelU-Kit/releases/tag/${{ inputs.version }})'
           file_pattern: .VERSION
+
+      - name: Prepare changelog
+        id: set_changelog
+        run: |
+          echo "CHANGE_LOG=$(echo "${{ inputs.changelog }}" | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_ENV
+        
       
       - name: Trigger release workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: release
-          inputs: '{ "changelog": `${{ inputs.changelog }}` }'
+          inputs: |
+            {
+              "changelog": "${{ env.CHANGE_LOG }}"
+            }
+        
