@@ -29,7 +29,7 @@
         "required": ["x", "y"]
       }
     },
-    "pointList": {
+    "points": {
       "type": "array",
       "description": "标注点列表",
       "items": {
@@ -74,5 +74,5 @@
       "default": "none"
     }
   },
-  "required": ["lineType", "pointList", "x", "y", "width", "height", "id", "order", "label"]
+  "required": ["lineType", "points", "x", "y", "width", "height", "id", "order", "label"]
 }
