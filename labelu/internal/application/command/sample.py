@@ -16,6 +16,14 @@ class ExportType(str, Enum):
 
 
 class CreateSampleCommand(BaseModel):
+    media_id: int = Field(
+        gt=0,
+        description="description: attachment file id",
+    )
+    pre_annotation_id: Union[int, None] = Field(
+        default=None,
+        description="description: pre annotation file id",
+    )
     attachement_ids: List[int] = Field(
         min_items=1,
         gt=0,

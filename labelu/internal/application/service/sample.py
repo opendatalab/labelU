@@ -26,7 +26,7 @@ from labelu.internal.application.response.base import UserResp
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.sample import SampleResponse
-
+from labelu.internal.application.response.attachment import AttachmentResponse
 
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
@@ -96,6 +96,7 @@ async def list_by(
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
+            media=AttachmentResponse(id=sample.media.id, filename=sample.media.filename, url=sample.media.url),
             created_at=sample.created_at,
             created_by=UserResp(
                 id=sample.owner.id,
@@ -126,12 +127,23 @@ async def get(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+
+    # Parse jsonl file
+    
+    def parse_jsonl_file(file_path: str):
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            # TODO: define the jsonl file format
+            return [json.loads(line) for line in lines]
+        
     # response
     return SampleResponse(
         id=sample.id,
         inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
+        media=AttachmentResponse(id=sample.media.id, filename=sample.media.filename, url=sample.media.url),
+        pre_annotation=parse_jsonl_file(sample.pre_annotation.url) if sample.pre_annotation else None,
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
         created_by=UserResp(

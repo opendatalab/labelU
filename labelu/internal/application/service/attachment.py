@@ -101,12 +101,15 @@ async def create(
         )
 
     attachment_url_path = attachment_relative_path.replace("\\", "/")
+    attachment_api_url = f"{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}"
     # add a task file record
     with db.begin():
         attachment = crud_attachment.create(
             db=db,
             attachment=TaskAttachment(
                 path=attachment_url_path,
+                url=attachment_api_url,
+                filename=cmd.file.filename,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 task_id=task_id,
@@ -116,7 +119,7 @@ async def create(
     # response
     return AttachmentResponse(
         id=attachment.id,
-        url=f"{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}",
+        url=attachment_api_url,
     )
 
 

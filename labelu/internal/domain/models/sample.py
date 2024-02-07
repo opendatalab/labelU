@@ -24,7 +24,8 @@ class TaskSample(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     inner_id = Column(Integer, comment="sample id in a task")
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
-    task_attachment_ids = Column(String(255), comment="task sample attachment ids")
+    media_id = Column(Integer, ForeignKey("task_attachment.id"), index=True)
+    pre_annotation_id = Column(Integer, ForeignKey("task_attachment.id"), index=True)
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
     updated_by = Column(Integer, ForeignKey("user.id"))
     created_at = Column(
@@ -49,6 +50,9 @@ class TaskSample(Base):
     )
     deleted_at = Column(DateTime, index=True, comment="Task delete time")
 
+    # 由旧的data里的fileNames和urls中的唯一一个，迁移到media中
+    media = relationship("TaskAttachment", foreign_keys=[media_id])
+    pre_annotation = relationship("TaskAttachment", foreign_keys=[pre_annotation_id])
     task = relationship("Task", foreign_keys=[task_id])
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])

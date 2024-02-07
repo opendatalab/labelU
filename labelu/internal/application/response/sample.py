@@ -19,9 +19,15 @@ class SampleResponse(BaseModel):
         default=None,
         description="description: sample file state, NEW is has not start yet, DONE is completed, SKIPPED is skipped",
     )
-    data: Union[dict, None] = Field(
+    data: Union[object, None] = Field(
         default=None,
         description="description: sample data, include filename, file url, or result",
+    )
+    media: Union[object, None] = Field(
+        default=None, description="description: attachment file"
+    )
+    pre_annotation: Union[object, None] = Field(
+        default=None, description="description: pre annotation file"
     )
     annotated_count: Union[int, None] = Field(
         default=0, description="description: annotate result count"

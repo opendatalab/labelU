@@ -10,6 +10,8 @@ class TaskAttachment(Base):
     __tablename__ = "task_attachment"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    filename = Column(String(256), comment="file name")
+    url = Column(String(256), comment="file url")
     path = Column(String(256), comment="file storage path")
     task_id = Column(Integer, ForeignKey("task.id"), index=True)
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
