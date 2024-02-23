@@ -19,10 +19,13 @@ def table_exist(table_name):
     )
     insp = reflection.Inspector.from_engine(engine)
     table_exist = False
+    
     for table in insp.get_table_names():
         if table_name not in table:
             continue
         table_exist = True
+        break
+    
     return table_exist
 
 def column_exist_in_table(table_name, column_name):

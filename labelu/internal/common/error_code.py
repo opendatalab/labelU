@@ -82,6 +82,10 @@ class ErrorCode(Enum):
         TASK_INIT_CODE + 5002,
         "Sample result format error",
     )
+    CODE_55002_SAMPLE_NAME_EXISTS = (
+        TASK_INIT_CODE + 5003,
+        "Sample name exists",
+    )
 
 
 class LabelUException(HTTPException):

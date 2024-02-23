@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 
 from pathlib import Path
 from loguru import logger
@@ -22,6 +22,23 @@ from labelu.internal.application.response.pre_annotation import CreatePreAnnotat
 from labelu.internal.application.response.pre_annotation import PreAnnotationResponse
 from labelu.internal.application.response.attachment import AttachmentResponse
 
+def read_jsonl_file(db: Session, file_id: int) -> List[dict]:
+    attachment = crud_attachment.get(db, file_id)
+    if attachment is None:
+        raise LabelUException(status_code=404, code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND)
+
+    attachment_path = attachment.path
+    file_full_path = settings.MEDIA_ROOT.joinpath(attachment_path.lstrip("/"))
+
+    try:
+        with open(file_full_path, "r", encoding="utf-8") as f:
+            data = f.readlines()
+    except FileNotFoundError:
+        raise LabelUException(status_code=404, code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND)
+
+    parsed_data = [json.loads(line) for line in data]
+    return parsed_data
+
 async def create(
     db: Session, task_id: int, cmd: List[CreatePreAnnotationCommand], current_user: User
 ) -> CreatePreAnnotationResponse:
@@ -36,7 +53,39 @@ async def create(
             )
 
         # TODO: Check if there are any duplicated sample_name exists, if so, raise an error
+        def validate_sample_name_exists(file_id: int, pre_annotations_dict: Dict[str, List[TaskPreAnnotation]]) -> List[dict]:
+            jsonl_content = read_jsonl_file(db, file_id)
+            
+            for item in jsonl_content:
+                sample_name = item.get("sample_name")
+                pre_annotations = pre_annotations_dict.get(sample_name, [])
+                
+                if len(pre_annotations) > 0:
+                    raise LabelUException(
+                        code=ErrorCode.CODE_55002_SAMPLE_NAME_EXISTS,
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                    )
+        
+        # Get all pre_annotations in one query
+        query_pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id(db=db, task_id=task_id, owner_id=current_user.id)
+        
+        pre_annotations_dict = {}
+        for pre_annotation in query_pre_annotations:
+            jsonl_content = read_jsonl_file(db, pre_annotation.file_id)
+            
+            for item in jsonl_content:
+                sample_name = item.get("sample_name")
 
+                # 如果字典中已经有这个 sample_name，就添加到列表中
+                if sample_name in pre_annotations_dict:
+                    pre_annotations_dict[sample_name].append(pre_annotation)
+                # 否则，创建一个新的列表
+                else:
+                    pre_annotations_dict[sample_name] = [pre_annotation]
+        
+        for pre_annotation in cmd:
+            validate_sample_name_exists(pre_annotation.file_id, pre_annotations_dict)
+        
         pre_annotations = [
             TaskPreAnnotation(
                 task_id=task_id,
@@ -44,12 +93,12 @@ async def create(
                 created_by=current_user.id,
                 updated_by=current_user.id,
             )
-            for i, pre_annotation in enumerate(cmd)
+            for pre_annotation in cmd
         ]
-        new_samples = crud_pre_annotation.batch(db=db, pre_annotations=pre_annotations)
+        new_pre_annotations = crud_pre_annotation.batch(db=db, pre_annotations=pre_annotations)
 
     # response
-    ids = [s.id for s in new_samples]
+    ids = [s.id for s in new_pre_annotations]
     return CreatePreAnnotationResponse(ids=ids)
 
 
@@ -79,26 +128,13 @@ async def list_by(
     total = crud_pre_annotation.count(db=db, task_id=task_id, owner_id=current_user.id)
 
     def parse_jsonl_file(file_id: int, sample_name: str) -> List[dict]:
-        attachment = crud_attachment.get(db, file_id)
-        if attachment is None:
-            raise LabelUException(status_code=404, code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND)
-
-        attachment_path = attachment.path
-        file_full_path = settings.MEDIA_ROOT.joinpath(attachment_path.lstrip("/"))
-
-        try:
-            with open(file_full_path, "r", encoding="utf-8") as f:
-                data = f.readlines()
-        except FileNotFoundError:
-            raise LabelUException(status_code=404, code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND)
-
+        jsonl_content = read_jsonl_file(db, file_id)
         # Filter by sample_name
-        parsed_data = []
-        for line in data:
-            line_data = json.loads(line)
-            if sample_name is None or line_data.get("sample_name") == sample_name:
-                parsed_data.append(line_data)
-        return parsed_data
+        result = []
+        for item in jsonl_content:
+            if sample_name is None or item.get("sample_name") == sample_name:
+                result.append(item)
+        return result
     
     real_sample_name = sample_name[9:] if sample_name else None
     parsed_data_list = [parse_jsonl_file(pre_annotation.file_id, real_sample_name) for pre_annotation in pre_annotations]

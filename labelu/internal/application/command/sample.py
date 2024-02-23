@@ -29,7 +29,6 @@ class CreateSampleCommand(BaseModel):
 class DeleteSampleCommand(BaseModel):
     sample_ids: List[int] = Field(
         min_items=1,
-        gt=0,
         description="description: attachment file id",
     )
 
