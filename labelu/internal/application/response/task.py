@@ -17,7 +17,7 @@ class TaskResponse(BaseModel):
         default=None, description="description: task config content"
     )
     media_type: Union[str, None] = Field(
-        default=None, description="description: task media type: IMAGE, VIDEO"
+        default=None, description="description: task media type: IMAGE, VIDEO, AUDIO"
     )
     status: Union[str, None] = Field(
         default=None,

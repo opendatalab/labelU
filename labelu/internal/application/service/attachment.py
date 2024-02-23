@@ -109,7 +109,7 @@ async def create(
             attachment=TaskAttachment(
                 path=attachment_url_path,
                 url=attachment_api_url,
-                filename=cmd.file.filename,
+                filename=filename,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 task_id=task_id,
@@ -120,6 +120,7 @@ async def create(
     return AttachmentResponse(
         id=attachment.id,
         url=attachment_api_url,
+        filename=filename,
     )
 
 

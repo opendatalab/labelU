@@ -16,22 +16,13 @@ class ExportType(str, Enum):
 
 
 class CreateSampleCommand(BaseModel):
-    media_id: int = Field(
-        gt=0,
-        description="description: attachment file id",
-    )
-    pre_annotation_id: Union[int, None] = Field(
-        default=None,
-        description="description: pre annotation file id",
-    )
-    attachement_ids: List[int] = Field(
-        min_items=1,
+    file_id: int = Field(
         gt=0,
         description="description: attachment file id",
     )
     data: Union[dict, None] = Field(
         default=None,
-        description="description: sample data, include filename, file url, or result",
+        description="description: annotation result of sample",
     )
 
 
@@ -46,7 +37,7 @@ class DeleteSampleCommand(BaseModel):
 class PatchSampleCommand(BaseModel):
     data: Union[dict, None] = Field(
         default=None,
-        description="description: sample data, include filename, file url, or result",
+        description="description: sample data, include result",
     )
     annotated_count: Union[int, None] = Field(
         default=0, description="description: annotate result count"

@@ -46,7 +46,7 @@ async def create(
             TaskSample(
                 inner_id=task.last_sample_inner_id + i + 1,
                 task_id=task_id,
-                task_attachment_ids=str(sample.attachement_ids),
+                file_id=sample.file_id,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 data=json.dumps(sample.data, ensure_ascii=False),
@@ -96,7 +96,7 @@ async def list_by(
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
-            media=AttachmentResponse(id=sample.media.id, filename=sample.media.filename, url=sample.media.url),
+            file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
             created_at=sample.created_at,
             created_by=UserResp(
                 id=sample.owner.id,
@@ -127,23 +127,13 @@ async def get(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-
-    # Parse jsonl file
-    
-    def parse_jsonl_file(file_path: str):
-        with open(file_path, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-            # TODO: define the jsonl file format
-            return [json.loads(line) for line in lines]
-        
     # response
     return SampleResponse(
         id=sample.id,
         inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
-        media=AttachmentResponse(id=sample.media.id, filename=sample.media.filename, url=sample.media.url),
-        pre_annotation=parse_jsonl_file(sample.pre_annotation.url) if sample.pre_annotation else None,
+        file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url),
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
         created_by=UserResp(
