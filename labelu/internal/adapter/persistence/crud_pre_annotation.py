@@ -58,6 +58,7 @@ def list_by(
 def list_by_task_id_and_owner_id(db: Session, task_id: int, owner_id: int) -> Dict[str, List[TaskPreAnnotation]]:
     pre_annotations = db.query(TaskPreAnnotation).filter(
         TaskPreAnnotation.task_id == task_id,
+        TaskPreAnnotation.deleted_at == None,
         TaskPreAnnotation.created_by == owner_id
     ).all()
     

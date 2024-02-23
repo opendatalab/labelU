@@ -52,7 +52,6 @@ async def create(
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-        # TODO: Check if there are any duplicated sample_name exists, if so, raise an error
         def validate_sample_name_exists(file_id: int, pre_annotations_dict: Dict[str, List[TaskPreAnnotation]]) -> List[dict]:
             jsonl_content = read_jsonl_file(db, file_id)
             
