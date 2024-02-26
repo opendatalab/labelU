@@ -32,4 +32,5 @@ class TaskPreAnnotation(Base):
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])
 
-    Index("idx_sample_id_deleted_at", id, deleted_at)
+    Index("idx_pre_annotation_id_deleted_at", id, deleted_at)
+
