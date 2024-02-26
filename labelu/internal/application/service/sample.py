@@ -133,7 +133,7 @@ async def get(
         inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
-        file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url),
+        file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
         created_by=UserResp(
