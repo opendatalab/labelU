@@ -6,28 +6,20 @@ from pydantic import BaseModel, Field
 from labelu.internal.application.response.base import UserResp
 
 
-class CreateSampleResponse(BaseModel):
+class CreatePreAnnotationResponse(BaseModel):
     ids: Union[List[int], None] = Field(
         default=None, description="description: attachment ids"
     )
 
 
-class SampleResponse(BaseModel):
+class PreAnnotationResponse(BaseModel):
     id: Union[int, None] = Field(default=None, description="description: annotation id")
-    inner_id: Union[int, None] = Field(default=None, description="description: inner id of a sample in task")
-    state: Union[str, None] = Field(
-        default=None,
-        description="description: sample file state, NEW is has not start yet, DONE is completed, SKIPPED is skipped",
+    file: Union[object, None] = Field(
+        default=None, description="description: media attachment file"
     )
     data: Union[object, None] = Field(
         default=None,
         description="description: sample data, include filename, file url, or result",
-    )
-    file: Union[object, None] = Field(
-        default=None, description="description: media attachment file"
-    )
-    annotated_count: Union[int, None] = Field(
-        default=0, description="description: annotate result count"
     )
     created_at: Union[datetime, None] = Field(
         default=None, description="description: task created at time"
