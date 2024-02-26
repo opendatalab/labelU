@@ -26,6 +26,13 @@ import PolygonSchema from './pages/schema.image.polygon';
 import CuboidSchema from './pages/schema.image.cuboid';
 import AudioSegmentSchema from './pages/schema.audio.segment';
 import AudioFrameSchema from './pages/schema.audio.frame';
+import GeneralTagSchema from './pages/schema.tag';
+import GeneralTextSchema from './pages/schema.text';
+import PreAnnotationImage from './pages/schema.pre-annotation.image';
+import PreAnnotationAudio from './pages/schema.pre-annotation.audio';
+import PreAnnotationVideo from './pages/schema.pre-annotation.video';
+import TextAttributeRef from './pages/schema.reference.text-attribute';
+import TagAttributeRef from './pages/schema.reference.tag-attribute';
 
 export interface RouteWithName extends NonIndexRouteObject {
   name?: string;
@@ -180,6 +187,24 @@ const routes = [
         ),
         children: [
           {
+            path: 'text',
+            handle: {
+              crumb: () => {
+                return i18n.t('general.text');
+              },
+            },
+            element: <GeneralTextSchema />,
+          },
+          {
+            path: 'tag',
+            handle: {
+              crumb: () => {
+                return i18n.t('general.tag');
+              },
+            },
+            element: <GeneralTagSchema />,
+          },
+          {
             path: 'image',
             element: <Outlet />,
             handle: {
@@ -290,6 +315,73 @@ const routes = [
                   },
                 },
                 element: <VideoFrameSchema />,
+              },
+            ],
+          },
+          {
+            path: 'pre-annotation',
+            element: <Outlet />,
+            handle: {
+              crumb: () => {
+                return i18n.t('pre-annotation');
+              },
+            },
+            children: [
+              {
+                path: 'image',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('guide.task-annotation.image');
+                  },
+                },
+                element: <PreAnnotationImage />,
+              },
+              {
+                path: 'audio',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('guide.task-annotation.audio');
+                  },
+                },
+                element: <PreAnnotationAudio />,
+              },
+              {
+                path: 'video',
+                handle: {
+                  crumb: () => {
+                    return i18n.t('guide.task-annotation.video');
+                  },
+                },
+                element: <PreAnnotationVideo />,
+              },
+            ],
+          },
+          {
+            path: 'reference',
+            element: <Outlet />,
+            handle: {
+              crumb: () => {
+                return i18n.t('reference');
+              },
+            },
+            children: [
+              {
+                path: 'text-attribute',
+                handle: {
+                  crumb: () => {
+                    return 'TextAttribute';
+                  },
+                },
+                element: <TextAttributeRef />,
+              },
+              {
+                path: 'enum-attribute',
+                handle: {
+                  crumb: () => {
+                    return 'TagAttribute';
+                  },
+                },
+                element: <TagAttributeRef />,
               },
             ],
           },

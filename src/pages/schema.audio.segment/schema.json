@@ -21,8 +21,7 @@
     },
     "label": {
       "type": "string",
-      "description": "标注类别",
-      "default": "none"
+      "description": "标注类别"
     },
     "attributes": {
       "type": "object",

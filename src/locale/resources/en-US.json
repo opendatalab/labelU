@@ -38,11 +38,17 @@
   "audio": "Audio",
   "audio.segment": "Segment",
   "audio.frame": "Timestamp",
+  "general": "Text and tag",
+  "general.text": "Text",
+  "general.tag": "Tag",
   "field": "Field",
   "type": "Type",
   "description": "Description",
   "default": "Default",
   "required": "Required",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "reference": "Reference",
+  "guide.reference.attribute": "Attribute",
+  "pre-annotation": "Pre-annotation"
 }

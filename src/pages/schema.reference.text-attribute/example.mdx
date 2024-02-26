@@ -1,0 +1,19 @@
+import jsonschema from './schema.json';
+import JsonSchemaTable from '../../components/schema-table';
+import CodePreview from '../../components/code-preview';
+
+## Text attribute config Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+<CodePreview value={{
+    "key": "标签-1",
+    "value": "text-label-1",
+    "required": true,
+    "type": "string",
+    "maxLength": 1000,
+    "stringType": "text",
+    "defaultValue": ""
+}} />

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
+    "type": {
+      "type": "string",
+      "const": "text",
+      "default": "text"
+    },
+    "value": {
+      "type": "object",
+      "description": "文本内容",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          }
+        ]
+      }
+    }
+
+  },
+  "required": ["id", "type"]
+}

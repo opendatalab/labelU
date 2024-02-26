@@ -1,0 +1,23 @@
+
+import jsonschema from './schema.json';
+import JsonSchemaTable from '../../components/schema-table';
+import CodePreview from '../../components/code-preview';
+
+## Tag attribute config Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+<CodePreview value={{
+        "key": "标签-1",
+        "value": "tag-label-1",
+        "required": true,
+        "type": "enum",
+        "options": [
+            {
+                "key": "标签-1-1",
+                "value": "tag-label-1-1"
+            }
+        ]
+    }} />

@@ -38,11 +38,16 @@
   "audio": "音频",
   "audio.segment": "片断截取",
   "audio.frame": "时间戳",
+  "general.text": "文本描述",
+  "general.tag": "标签分类",
   "field": "字段",
   "type": "类型",
   "description": "描述",
   "default": "默认值",
   "required": "必填",
   "yes": "是",
-  "no": "否"
+  "no": "否",
+  "reference": "类型引用",
+  "guide.reference.attribute": "Attribute",
+  "pre-annotation": "预标注"
 }
