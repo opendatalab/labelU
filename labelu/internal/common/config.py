@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     UPLOAD_FILE_MAX_SIZE = 200_000_000  # ~200MB
     THUMBNAIL_HEIGH_PIXEL = 120
 
-    DATABASE_URL: str = f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite"
+    DATABASE_URL: str = f"sqlite:///{BASE_DATA_DIR}/labelu_test.sqlite"
 
     PASSWORD_SECRET_KEY = (
         "e5b7d00a59aaa2a5ea86a7c4d72f856b20bafa1b8d0e66124082ada81f6340bd"

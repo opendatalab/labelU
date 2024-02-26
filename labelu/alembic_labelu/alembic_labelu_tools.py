@@ -4,6 +4,29 @@ from alembic import op
 from sqlalchemy import engine_from_config
 from sqlalchemy.engine import reflection
 
+def table_exist(table_name):
+    """check table is not exist
+
+    Args:
+        table_name (string): the name of table
+
+    Returns:
+        bool: true or false, whether the table_name exists
+    """
+    config = op.get_context().config
+    engine = engine_from_config(
+        config.get_section(config.config_ini_section), prefix="sqlalchemy."
+    )
+    insp = reflection.Inspector.from_engine(engine)
+    table_exist = False
+    
+    for table in insp.get_table_names():
+        if table_name not in table:
+            continue
+        table_exist = True
+        break
+    
+    return table_exist
 
 def column_exist_in_table(table_name, column_name):
     """check column is not exist in table

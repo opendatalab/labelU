@@ -26,7 +26,7 @@ from labelu.internal.application.response.base import UserResp
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.sample import SampleResponse
-
+from labelu.internal.application.response.attachment import AttachmentResponse
 
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
@@ -46,7 +46,7 @@ async def create(
             TaskSample(
                 inner_id=task.last_sample_inner_id + i + 1,
                 task_id=task_id,
-                task_attachment_ids=str(sample.attachement_ids),
+                file_id=sample.file_id,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 data=json.dumps(sample.data, ensure_ascii=False),
@@ -96,6 +96,7 @@ async def list_by(
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
+            file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
             created_at=sample.created_at,
             created_by=UserResp(
                 id=sample.owner.id,
@@ -132,6 +133,7 @@ async def get(
         inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
+        file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url),
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
         created_by=UserResp(
