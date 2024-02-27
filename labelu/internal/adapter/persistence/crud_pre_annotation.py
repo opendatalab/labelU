@@ -64,21 +64,6 @@ def list_by_task_id_and_owner_id(db: Session, task_id: int, owner_id: int) -> Di
     
     return pre_annotations
 
-    # # 创建一个字典，其中键是 sample_name，值是 PreAnnotation 对象的列表
-    # pre_annotations_dict = {}
-    # for pre_annotation in pre_annotations:
-    #     # 获取 sample_name
-    #     sample_name = pre_annotation
-
-    #     # 如果字典中已经有这个 sample_name，就添加到列表中
-    #     if sample_name in pre_annotations_dict:
-    #         pre_annotations_dict[sample_name].append(pre_annotation)
-    #     # 否则，创建一个新的列表
-    #     else:
-    #         pre_annotations_dict[sample_name] = [pre_annotation]
-
-    # return pre_annotations_dict
-
 def get(db: Session, pre_annotation_id: int) -> TaskPreAnnotation:
     return (
         db.query(TaskPreAnnotation)

@@ -166,7 +166,7 @@ async def list_by(
 
 
 async def get(
-    db: Session, task_id: int, pre_annotation_id: int, sample_id: int, current_user: User
+    db: Session, task_id: int, pre_annotation_id: int, current_user: User
 ) -> PreAnnotationResponse:
     pre_annotation = crud_pre_annotation.get(
         db=db,
@@ -183,7 +183,7 @@ async def get(
     # response
     return PreAnnotationResponse(
         id=pre_annotation.id,
-        file=AttachmentResponse(id=pre_annotation.file.id, filename=pre_annotation.file.filename, url=pre_annotation.file.url),
+        file=AttachmentResponse(id=pre_annotation.file.id, filename=pre_annotation.file.filename, url=pre_annotation.file.url) if pre_annotation.file else None,
         created_at=pre_annotation.created_at,
         created_by=UserResp(
             id=pre_annotation.owner.id,
