@@ -41,5 +41,5 @@
       }
     }
   },
-  "required": ["x", "y", "width", "height", "id", "order", "label"]
+  "required": ["start", "end", "id", "order", "label"]
 }

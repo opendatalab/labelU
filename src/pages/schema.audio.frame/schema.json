@@ -37,5 +37,5 @@
       }
     }
   },
-  "required": ["x", "y", "width", "height", "id", "order", "label"]
+  "required": ["time", "id", "order", "label"]
 }
