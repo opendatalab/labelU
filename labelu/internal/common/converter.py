@@ -57,7 +57,8 @@ class Converter:
         results = []
         for sample in input_data:
             data = json.loads(sample.get("data"))
-
+            file = sample.get("file", {})
+            
             # change skipped result is invalid
             annotated_result = json.loads(data.get("result"))
             if annotated_result and sample.get("state") == "SKIPPED":
@@ -91,14 +92,8 @@ class Converter:
                 {
                     "id": sample.get("id"),
                     "result": annotated_result_str,
-                    "urls": data.get("urls"),
-                    "fileNames": next(
-                        (
-                            url.split("/")[-1] if url.split("/") else ""
-                            for url in data.get("urls", {}).values()
-                        ),
-                        "",
-                    ),
+                    "url": file.get("url"),
+                    "fileName": file.get("filename"),
                 }
             )
 
@@ -162,6 +157,7 @@ class Converter:
         # for every annotation media
         for sample in input_data:
             annotation_data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
             logger.info("data is: {}", sample)
 
             # annotation result
@@ -170,13 +166,7 @@ class Converter:
             # coco image
             image = {
                 "id": sample.get("id"),
-                "fileNames": next(
-                    (
-                        url.split("/")[-1] if url.split("/") else ""
-                        for url in annotation_data.get("urls", {}).values()
-                    ),
-                    "",
-                ),
+                "fileName": file.get("filename"),
                 "width": annotation_result.get("width", 0),
                 "height": annotation_result.get("height", 0),
                 "valid": False
@@ -269,13 +259,14 @@ class Converter:
         export_files = []
         color_list = []
         for sample in input_data:
+            file = sample.get("file", {})
             if sample.get("state") != "DONE":
                 continue
             annotation_data = json.loads(sample.get("data"))
             logger.info("data is: {}", sample)
-            filenames = list(annotation_data.get("urls", {}).values())
-            if filenames and filenames[0].split("/")[-1]:
-                file_relative_path_base_name = filenames[0].split("/")[-1].split(".")[0]
+            filename = file.get("filename")
+            if filename and filename.split("/")[-1]:
+                file_relative_path_base_name = filename.split("/")[-1].split(".")[0]
             else:
                 file_relative_path_base_name = "result"
 
