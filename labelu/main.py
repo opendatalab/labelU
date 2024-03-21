@@ -56,7 +56,7 @@ tags_metadata = [
     },
     {
         "name": "tasks",
-        "description": "Task manangement.",
+        "description": "Task management.",
     },
     {
         "name": "attachments",
@@ -64,7 +64,7 @@ tags_metadata = [
     },
     {
         "name": "samples",
-        "description": "Task sample manangement.",
+        "description": "Task sample management.",
     },
 ]
 

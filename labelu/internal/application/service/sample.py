@@ -26,7 +26,7 @@ from labelu.internal.application.response.base import UserResp
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.sample import SampleResponse
-
+from labelu.internal.application.response.attachment import AttachmentResponse
 
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
@@ -46,7 +46,7 @@ async def create(
             TaskSample(
                 inner_id=task.last_sample_inner_id + i + 1,
                 task_id=task_id,
-                task_attachment_ids=str(sample.attachement_ids),
+                file_id=sample.file_id,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 data=json.dumps(sample.data, ensure_ascii=False),
@@ -96,6 +96,7 @@ async def list_by(
             state=sample.state,
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
+            file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
             created_at=sample.created_at,
             created_by=UserResp(
                 id=sample.owner.id,
@@ -132,6 +133,7 @@ async def get(
         inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
+        file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
         created_by=UserResp(
@@ -242,7 +244,14 @@ async def export(
 
     task = crud_task.get(db=db, task_id=task_id)
     samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
-    data = [sample.__dict__ for sample in samples]
+    data = []
+    for sample in samples:
+       data_dict = sample.__dict__.get('data')
+       if data_dict is None:
+           data_dict = {}
+       file_dict = sample.file.__dict__ if hasattr(sample.file, '__dict__') else {}
+       data.append({ **sample.__dict__, 'file': file_dict})
+       
 
     # output data path
     out_data_dir = Path(settings.MEDIA_ROOT).joinpath(

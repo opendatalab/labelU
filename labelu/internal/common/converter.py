@@ -57,7 +57,8 @@ class Converter:
         results = []
         for sample in input_data:
             data = json.loads(sample.get("data"))
-
+            file = sample.get("file", {})
+            
             # change skipped result is invalid
             annotated_result = json.loads(data.get("result"))
             if annotated_result and sample.get("state") == "SKIPPED":
@@ -73,15 +74,14 @@ class Converter:
                             # 视频文件的标注结果已经保存了 label 键的值，不需要再做转换
                             if "label" not in tool_result:
                                 tool_result["label"] = tool_result.pop("attribute", "")
-                            tool_result["attribute"] = tool_result.pop(
-                                "textAttribute", ""
-                            )
+
                             tool_result.pop("sourceID", None)
 
                             if tool == "tagTool" or tool == "textTool":
                                 tool_result.pop("label")
 
-                            tool_result.pop("attribute")
+                            if "attribute" in tool_result:
+                                tool_result.pop("attribute")
 
                         annotations.append(tool_results)
 
@@ -92,14 +92,8 @@ class Converter:
                 {
                     "id": sample.get("id"),
                     "result": annotated_result_str,
-                    "urls": data.get("urls"),
-                    "fileNames": next(
-                        (
-                            url.split("/")[-1] if url.split("/") else ""
-                            for url in data.get("urls", {}).values()
-                        ),
-                        "",
-                    ),
+                    "url": file.get("url"),
+                    "fileName": file.get("filename"),
                 }
             )
 
@@ -133,7 +127,7 @@ class Converter:
         # result catetory
         category_id = 0
         logger.info("get categories")
-        for attr in config.get("attribute", []):
+        for attr in config.get("attributes", []):
             category = {
                 "id": category_id,
                 "name": attr.get("value", ""),
@@ -163,6 +157,7 @@ class Converter:
         # for every annotation media
         for sample in input_data:
             annotation_data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
             logger.info("data is: {}", sample)
 
             # annotation result
@@ -171,18 +166,12 @@ class Converter:
             # coco image
             image = {
                 "id": sample.get("id"),
-                "fileNames": next(
-                    (
-                        url.split("/")[-1] if url.split("/") else ""
-                        for url in annotation_data.get("urls", {}).values()
-                    ),
-                    "",
-                ),
+                "fileName": file.get("filename"),
                 "width": annotation_result.get("width", 0),
                 "height": annotation_result.get("height", 0),
                 "valid": False
                 if sample.get("state", "") == "SKIPPED"
-                else annotation_result.get("valid", False),
+                else annotation_result.get("valid", True),
                 "rotate": annotation_result.get("rotate", 0),
             }
             result["images"].append(image)
@@ -204,12 +193,12 @@ class Converter:
                     if tool.get("toolName") == "polygonTool":
                         x_coordinates = []
                         y_coordinates = []
-                        for point in tool_result.get("pointList", []):
+                        for point in tool_result.get("points", []):
                             segmentation.append(point.get("x"))
                             segmentation.append(point.get("y"))
                             x_coordinates.append(point.get("x"))
                             y_coordinates.append(point.get("y"))
-                        logger.info("fffffe")
+
                         bbox = [
                             min(x_coordinates),
                             max(y_coordinates),
@@ -241,7 +230,7 @@ class Converter:
                         "area": polygon_area,
                         "bbox": bbox,
                         "category_id": category_name_map_id.get(
-                            tool_result.get("attribute", ""), -1
+                            tool_result.get("label", ""), -1
                         ),
                         "order": tool_result.get("order", 0),
                     }
@@ -270,13 +259,14 @@ class Converter:
         export_files = []
         color_list = []
         for sample in input_data:
+            file = sample.get("file", {})
             if sample.get("state") != "DONE":
                 continue
             annotation_data = json.loads(sample.get("data"))
             logger.info("data is: {}", sample)
-            filenames = list(annotation_data.get("urls", {}).values())
-            if filenames and filenames[0].split("/")[-1]:
-                file_relative_path_base_name = filenames[0].split("/")[-1].split(".")[0]
+            filename = file.get("filename")
+            if filename and filename.split("/")[-1]:
+                file_relative_path_base_name = filename.split("/")[-1].split(".")[0]
             else:
                 file_relative_path_base_name = "result"
 
@@ -292,11 +282,11 @@ class Converter:
                 "result", []
             ):
                 polygon = []
-                for point in tool_result.get("pointList", []):
+                for point in tool_result.get("points", []):
                     polygon.append(point.get("x"))
                     polygon.append(point.get("y"))
                 polygons.append(polygon)
-                polygon_attribute.append(tool_result.get("attribute", ""))
+                polygon_attribute.append(tool_result.get("label", ""))
 
             width = annotation_result.get("width")
             height = annotation_result.get("height")

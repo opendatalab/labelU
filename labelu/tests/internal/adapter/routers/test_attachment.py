@@ -28,19 +28,31 @@ class TestClassTaskAttachmentRouter:
 
         # run
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
-            new_res = client.post(
+            png_res = client.post(
                 f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
                 headers=testuser_token_headers,
                 files={"file": ("test.png", f, "image/png")},
             )
-
         # check
-        json = new_res.json()
-        assert new_res.status_code == 201
-
+        json = png_res.json()
+        assert png_res.status_code == 201
+        
         parts = json["data"]["url"].split("/")[-3:]
         assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
         parts[-1] = parts[-1][:8] + "-test-thumbnail.png"
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+    
+        with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
+            jsonl_res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": ("test.jsonl", f, "application/json")},
+            )
+            
+        json = jsonl_res.json()
+        assert jsonl_res.status_code == 201
+        
+        parts = json["data"]["url"].split("/")[-3:]
         assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
 
     def test_upload_file_when_task_finished(

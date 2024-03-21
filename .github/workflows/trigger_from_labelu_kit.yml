@@ -1,0 +1,85 @@
+name: 'Updating .version triggered from LabelU-Kit'
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Frontend branch'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - alpha
+      version:
+        description: 'Current frontend version'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type(fix, feat, breaking-change)'
+        required: true
+        type: choice
+        default: 'fix'
+        options:
+          - fix
+          - feat
+          - breaking-change
+      changelog:
+        description: 'Frontend changelog'
+        required: false
+      assets_url:
+        description: 'Frontend assets url'
+        required: true
+        type: string
+jobs:
+  update-frontend:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.8.1]
+        os: [ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      actions: write 
+      contents: write 
+      issues: write 
+      pull-requests: write
+      id-token: write
+
+    steps:
+      # ====================== frontend ======================
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      
+      - name: Update .VERSION file
+        run: |
+          sh ./scripts/resolve_frontend.sh ${{ github.ref_name }} $FRONTEND_VERSION $FRONTEND_ASSET_URL
+
+        env:
+          FRONTEND_VERSION: ${{ inputs.version }}
+          FRONTEND_ASSET_URL: ${{ inputs.assets_url }}
+          CURRENT_BRANCH: ${{ github.ref_name }}
+
+      - name: Commit .VERSION file
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: '${{ inputs.release_type }}: Upgrade frontend to ${{ inputs.version }}. See the details in [release notes](https://github.com/opendatalab/labelU-Kit/releases/tag/${{ inputs.version }})'
+          file_pattern: .VERSION
+
+      - name: Prepare changelog
+        id: set_changelog
+        run: |
+          echo "CHANGE_LOG=$(echo "${{ inputs.changelog }}" | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_ENV
+        
+      
+      - name: Trigger release workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: release
+          inputs: |
+            {
+              "changelog": "${{ env.CHANGE_LOG }}"
+            }
+        

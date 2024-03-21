@@ -9,3 +9,7 @@ class AttachmentResponse(BaseModel):
     url: Union[str, None] = Field(
         default=None, description="description: upload file url"
     )
+    filename: Union[str, None] = Field(
+        default=None, description="description: upload file name"
+    )
+    

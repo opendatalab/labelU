@@ -43,7 +43,7 @@ class Task(Base):
     config = Column(Text, comment="task config yaml")
     media_type = Column(
         String(32),
-        comment="task media type: image, video",
+        comment="task media type: image, video, audio",
     )
     status = Column(String(32), default=TaskStatus.DRAFT.value, comment="task status")
     created_by = Column(Integer, ForeignKey(column="user.id"), index=True)
