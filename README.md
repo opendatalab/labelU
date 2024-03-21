@@ -30,7 +30,11 @@ LabelU offers a variety of annotation tools and features, supporting image, vide
 
 ## Getting started
 
-<a href="https://labelu.shlab.tech/">
+- <a href="https://opendatalab.github.io/labelU-Kit/">
+    <button>Try LabelU annotation toolkit</button>
+</a>
+
+- <a href="https://labelu.shlab.tech/">
     <button>Try LabelU online</button>
 </a>
 
