@@ -13,7 +13,8 @@
     [
       "@semantic-release/github",
       {
-        "assets": [{ "path": "./dist/*.whl", "label": "labelu-${nextRelease.version}-py3.whl" }, { "path": "./dist/*.gz", "label": "labelu-${nextRelease.version}.tar.gz" }]
+        "assets": [{ "path": "./dist/*.whl", "label": "labelu-${nextRelease.version}-py3.whl" }, { "path": "./dist/*.gz", "label": "labelu-${nextRelease.version}.tar.gz" }],
+        "successComment": false
       }
     ],
     [
