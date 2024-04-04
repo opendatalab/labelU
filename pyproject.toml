@@ -14,7 +14,6 @@ labelu = "labelu.main:cli"
 [tool.poetry.dependencies]
 python = "^3.7"
 fastapi = "^0.86.0"
-imp = "^3.11.8"
 loguru = "^0.6.0"
 sqlalchemy = "^1.4.43"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
