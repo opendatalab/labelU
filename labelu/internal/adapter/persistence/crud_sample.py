@@ -51,6 +51,9 @@ def list_by(
                     query = query.order_by(sort_logic.desc())
             else:
                 query = query.order_by(text(f"{sort_key[0]} {sort_key[1]}"))
+    else:
+        # Default order by created_at in descending order
+        query = query.order_by(TaskSample.created_at.desc())
 
     # default order by id, before need select last items
     if before:
