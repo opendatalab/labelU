@@ -138,7 +138,7 @@ class TestClassTaskSampleRouter:
         json = r.json()
         assert r.status_code == 200
         assert len(json["data"]) == 10
-        assert json["data"][0]["id"] == 14
+        assert json["data"][0]["id"] == 1
         assert json["meta_data"]["total"] == 14
 
     def test_sample_list_by_before(
@@ -233,8 +233,8 @@ class TestClassTaskSampleRouter:
         json = r.json()
         assert r.status_code == 200
         assert len(json["data"]) == 9
-        assert json["data"][0]["id"] == 14
-        assert json["data"][8]["id"] == 6
+        assert json["data"][0]["id"] == 6
+        assert json["data"][8]["id"] == 14
         assert json["meta_data"]["total"] == 14
 
     def test_sample_list_with_sort(
