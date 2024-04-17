@@ -93,7 +93,7 @@ class Converter:
                     "id": sample.get("id"),
                     "result": annotated_result_str,
                     "url": file.get("url"),
-                    "fileName": file.get("filename"),
+                    "fileName": file.get("filename", "")[9:],
                 }
             )
 
@@ -166,7 +166,7 @@ class Converter:
             # coco image
             image = {
                 "id": sample.get("id"),
-                "fileName": file.get("filename"),
+                "fileName": file.get("filename", "")[9:],
                 "width": annotation_result.get("width", 0),
                 "height": annotation_result.get("height", 0),
                 "valid": False
@@ -266,7 +266,7 @@ class Converter:
             logger.info("data is: {}", sample)
             filename = file.get("filename")
             if filename and filename.split("/")[-1]:
-                file_relative_path_base_name = filename.split("/")[-1].split(".")[0]
+                file_relative_path_base_name = filename.split("/")[-1].split(".")[0][9:]
             else:
                 file_relative_path_base_name = "result"
 
