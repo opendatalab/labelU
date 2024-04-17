@@ -1,6 +1,7 @@
+from typing import Any
 import uvicorn
 from typer import Typer
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.adapter.routers import add_router
@@ -93,12 +94,27 @@ add_exception_handler(app=app)
 add_router(app=app)
 add_middleware(app=app)
 
-app.mount("", StaticFiles(packages=["labelu.internal"], html=True))
+class NoCacheStaticFiles(StaticFiles):
+    def __init__(self, *args: Any, **kwargs: Any):
+        self.cachecontrol = "max-age=0, no-cache, no-store, , must-revalidate"
+        self.pragma = "no-cache"
+        self.expires = "0"
+        super().__init__(*args, **kwargs)
+
+    def file_response(self, *args: Any, **kwargs: Any) -> Response:
+        resp = super().file_response(*args, **kwargs)
+        resp.headers.setdefault("Cache-Control", self.cachecontrol)
+        resp.headers.setdefault("Pragma", self.pragma)
+        resp.headers.setdefault("Expires", self.expires)
+        return resp
+
+app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))
 
 
 @app.middleware("http")
 async def add_correct_content_type(request: Request, call_next):
     response = await call_next(request)
+    
     if request.url.path.endswith(".js"):
         response.headers["content-type"] = "application/javascript"
     return response
