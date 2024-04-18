@@ -62,6 +62,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Download frontend
+        env:
+          CURRENT_BRANCH: ${{ github.ref_name }}
         run: |
           sh ./scripts/resolve_frontend.sh true
 
