@@ -65,7 +65,7 @@ async def list_by(
     pageNo: Union[int, None] = Query(default=None, ge=0),
     pageSize: Union[int, None] = 100,
     sort: Union[str, None] = Query(
-        default=None, regex="(annotated_count|state):(desc|asc)"
+        default=None, regex="(annotated_count|state|inner_id|updated_at):(desc|asc)"
     ),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
