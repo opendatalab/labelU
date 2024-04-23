@@ -208,16 +208,13 @@ class Converter:
                         polygon_area = _polygonArea(x_coordinates, y_coordinates)
                     elif tool.get("toolName") == "rectTool":
                         # rect
-                        if (
-                            tool_result.get("x")
-                            and tool_result.get("y")
-                            and tool_result.get("width")
-                            and tool_result.get("height")
-                        ):
-                            bbox.append(tool_result.get("x"))
-                            bbox.append(tool_result.get("y"))
-                            bbox.append(tool_result.get("width"))
-                            bbox.append(tool_result.get("height"))
+                        x = tool_result.get("x")
+                        y = tool_result.get("y")
+                        width = tool_result.get("width")
+                        height = tool_result.get("height")
+                        
+                        if x is not None and y is not None and width is not None and height is not None:
+                            bbox.extend([x, y, width, height])
                         polygon_area = tool_result.get("width", 0) * tool_result.get(
                             "height", 0
                         )
