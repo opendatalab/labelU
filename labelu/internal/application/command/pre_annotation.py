@@ -3,9 +3,14 @@ from pydantic import BaseModel, Field
 
 
 class CreatePreAnnotationCommand(BaseModel):
-    file_id: int = Field(
-        gt=0,
-        description="description: attachment file id",
+    filename: str = Field(
+        min_length=1,
+        max_length=255,
+        description="description: pre annotation filename",
+    )
+    data: str = Field(
+        min_length=1,
+        description="description: pre annotation result",
     )
 
 class DeletePreAnnotationCommand(BaseModel):

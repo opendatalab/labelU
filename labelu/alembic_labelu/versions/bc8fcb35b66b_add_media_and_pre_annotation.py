@@ -38,7 +38,7 @@ alembic_labelu_tools = imp.load_source(
 def upgrade() -> None:
     bind = op.get_bind()
     Base.prepare(autoload_with=bind, reflect=True)
-    task_sample = Base.classes.task_sample
+    # task_sample = Base.classes.task_sample
     # make a session
     Session = sessionmaker(bind=bind)
     session = Session()

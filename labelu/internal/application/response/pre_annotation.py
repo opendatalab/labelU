@@ -14,8 +14,8 @@ class CreatePreAnnotationResponse(BaseModel):
 
 class PreAnnotationResponse(BaseModel):
     id: Union[int, None] = Field(default=None, description="description: annotation id")
-    file: Union[object, None] = Field(
-        default=None, description="description: media attachment file"
+    filename: Union[str, None] = Field(
+        default=None, description="description: annotation file name"
     )
     data: Union[object, None] = Field(
         default=None,
@@ -26,10 +26,4 @@ class PreAnnotationResponse(BaseModel):
     )
     created_by: Union[UserResp, None] = Field(
         default=None, description="description: task created by"
-    )
-    updated_at: Union[datetime, None] = Field(
-        default=None, description="description: task updated at time"
-    )
-    updated_by: Union[UserResp, None] = Field(
-        default=None, description="description: task updated by"
     )

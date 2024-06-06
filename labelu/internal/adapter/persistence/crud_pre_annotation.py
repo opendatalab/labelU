@@ -1,14 +1,11 @@
 from datetime import datetime
-import json
 from typing import Any, Dict, List, Union
 
 
-from sqlalchemy import case, text
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
 from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
-from labelu.internal.adapter.persistence import crud_attachment
 
 
 def batch(db: Session, pre_annotations: List[TaskPreAnnotation]) -> List[TaskPreAnnotation]:
