@@ -5,6 +5,7 @@ from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
+from labelu.internal.application.response.pre_annotation_detail import PreAnnotationDetailResponse
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
 from labelu.internal.adapter.persistence import crud_task
@@ -70,51 +71,48 @@ async def create(
 async def list_by(
     db: Session,
     task_id: Optional[int],
-    sample_name: Optional[str],
     after: Optional[int],
     before: Optional[int],
     pageNo: Optional[int],
     pageSize: int,
-    sorting: Optional[str],
     current_user: User,
 ) -> Tuple[List[PreAnnotationResponse], int]:
-    real_sample_name = sample_name[9:] if sample_name else None
     
     try:
     
-        # 指定 sample_name 查询时，需要对所有的 pre_annotation 进行查询
-        details = []
-        if sample_name:
-            detail = crud_pre_annotation_detail.list_by_task_id_and_sample_name(
-                db=db,
-                task_id=task_id,
-                sample_name=real_sample_name,
-            )
-        else:
-            details = crud_pre_annotation_detail.list_by_task_id(
-                db=db,
-                task_id=task_id,
-                after=after,
-                before=before,
-                pageNo=pageNo,
-                pageSize=pageSize,
-            )
+        results = crud_pre_annotation.list_by(
+            db=db,
+            task_id=task_id,
+            after=after,
+            before=before,
+            pageNo=pageNo,
+            pageSize=pageSize,
+            owner_id=current_user.id,
+        )
         total = crud_pre_annotation.count(db=db, task_id=task_id, owner_id=current_user.id)
 
         filtered_pre_annotations = []
         
-        for i, detail in enumerate(details):
-            pre_annotation = detail.pre_annotation
+        for i, item in enumerate(results):
             
             filtered_pre_annotations.append(
                 PreAnnotationResponse(
-                    id=detail.id,
-                    filename=pre_annotation.filename,
-                    created_at=pre_annotation.created_at,
-                    data=json.dumps(detail.data),
+                    id=item.id,
+                    filename=item.filename,
+                    created_at=item.created_at,
+                    details=[
+                        PreAnnotationDetailResponse(
+                            id=detail.id,
+                            sample_name=detail.sample_name,
+                            data=detail.data,
+                            task_id=detail.task_id,
+                            pre_annotation_id=detail.pre_annotation_id, 
+                        )
+                        for detail in item.details
+                        ],
                     created_by=UserResp(
-                        id=pre_annotation.owner.id,
-                        username=pre_annotation.owner.username,
+                        id=item.owner.id,
+                        username=item.owner.username,
                     ),
                 )
             )

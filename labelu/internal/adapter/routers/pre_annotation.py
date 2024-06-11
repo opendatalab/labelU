@@ -56,14 +56,10 @@ async def create(
 )
 async def list_by(
     task_id: int,
-    sample_name: str = Query(default=None, min_length=1, max_length=255),
     after: Union[int, None] = Query(default=None, gt=0),
     before: Union[int, None] = Query(default=None, gt=0),
     pageNo: Union[int, None] = Query(default=None, ge=0),
     pageSize: Union[int, None] = 100,
-    sort: Union[str, None] = Query(
-        default=None, regex="(annotated_count|state):(desc|asc)"
-    ),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db.get_db),
     current_user: User = Depends(get_current_user),
@@ -78,21 +74,22 @@ async def list_by(
             code=ErrorCode.CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR,
         )
 
-    # business logic
-    data, total = await service.list_by(
-        db=db,
-        task_id=task_id,
-        sample_name=sample_name,
-        after=after,
-        before=before,
-        pageNo=pageNo,
-        pageSize=pageSize,
-        sorting=sort,
-        current_user=current_user,
-    )
+    try:
+        # business logic
+        data, total = await service.list_by(
+            db=db,
+            task_id=task_id,
+            after=after,
+            before=before,
+            pageNo=pageNo,
+            pageSize=pageSize,
+            current_user=current_user,
+        )
 
-    # response
-    meta_data = MetaData(total=total, page=pageNo, size=len(data))
+        # response
+        meta_data = MetaData(total=total, page=pageNo, size=len(data))
+    except Exception as e:
+        print(e)
     return OkRespWithMeta[List[PreAnnotationResponse]](meta_data=meta_data, data=data)
 
 

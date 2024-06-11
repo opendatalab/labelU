@@ -86,6 +86,20 @@ class ErrorCode(Enum):
         TASK_INIT_CODE + 5003,
         "Sample name exists",
     )
+    
+    # pre annotation error code
+    CODE_56000_PRE_ANNOTATION_NOT_FOUND = (
+        TASK_INIT_CODE + 6000,
+        "Pre annotation not found",
+    )
+    CODE_56001_PRE_ANNOTATION_DETAIL_NOT_FOUND = (
+        TASK_INIT_CODE + 6001,
+        "Pre annotation detail not found",
+    )
+    CODE_56002_PRE_ANNOTATION_DETAIL_EXISTS = (
+        TASK_INIT_CODE + 6002,
+        "Pre annotation detail exists",
+    )
 
 
 class LabelUException(HTTPException):

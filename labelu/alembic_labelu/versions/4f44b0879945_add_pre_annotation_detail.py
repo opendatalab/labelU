@@ -15,12 +15,10 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import MetaData, Table
 
 
 from datetime import datetime
 import json
-from labelu.alembic_labelu import alembic_labelu_tools
 from labelu.internal.common.config import settings
 
 
@@ -43,7 +41,7 @@ def upgrade() -> None:
     session = Session()
     
     task_pre_annotations = session.execute(
-        'SELECT id, file_id, created_by FROM task_pre_annotation WHERE deleted_at IS NULL'
+        'SELECT id, file_id, task_id, created_by FROM task_pre_annotation WHERE deleted_at IS NULL'
     ).fetchall()
     attachments = session.execute('SELECT id, path, filename FROM task_attachment WHERE deleted_at IS NULL').fetchall()
     attachments_dict = {item.id: item for item in attachments}
@@ -64,11 +62,12 @@ def upgrade() -> None:
 
         for line in data:
             item = json.loads(line)
+            
             detail = {
-                'task_id': pre_item.id,
+                'task_id': pre_item.task_id,
                 'pre_annotation_id': pre_item.id,
                 'sample_name': item.get('sample_name'),
-                'data': line,
+                'data': json.dumps(item),
                 'created_by': pre_item.created_by,
                 'created_at': datetime.now(),
             }

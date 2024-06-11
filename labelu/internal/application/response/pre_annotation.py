@@ -14,16 +14,15 @@ class CreatePreAnnotationResponse(BaseModel):
 
 class PreAnnotationResponse(BaseModel):
     id: Union[int, None] = Field(default=None, description="description: annotation id")
-    filename: Union[str, None] = Field(
-        default=None, description="description: annotation file name"
+    details: Union[object, None] = Field(
+        default=None, description="description: pre annotation details"
     )
-    data: Union[object, None] = Field(
-        default=None,
-        description="description: sample data, include filename, file url, or result",
+    filename: Union[str, None] = Field(
+        default=None, description="description: pre annotation file name"
     )
     created_at: Union[datetime, None] = Field(
-        default=None, description="description: task created at time"
+        default=None, description="description: created at time"
     )
     created_by: Union[UserResp, None] = Field(
-        default=None, description="description: task created by"
+        default=None, description="description: created by"
     )

@@ -20,6 +20,13 @@ def create(db: Session, task_id: int, pre_annotation_id: int, sample_name: str, 
     db.refresh(detail)
     return detail
 
+def get(db: Session, sample_name: str, task_id: int) -> TaskPreAnnotationDetail:
+    return db.query(TaskPreAnnotationDetail).filter(
+        TaskPreAnnotationDetail.sample_name == sample_name,
+        TaskPreAnnotationDetail.task_id == task_id,
+        TaskPreAnnotationDetail.deleted_at == None
+    ).first()
+
 def list_by_task_id(db: Session,
                     task_id: int,
                     after: Union[int, None],
@@ -66,12 +73,9 @@ def list_by_task_id_and_sample_name(
     
     return results
 
-def delete(db: Session, detail_ids: List[int]) -> None:
-    db.query(TaskPreAnnotationDetail).filter(TaskPreAnnotationDetail.id.in_(detail_ids)).update(
-        {TaskPreAnnotationDetail.deleted_at: datetime.now()}
-    )
-    
-def delete_by_pre_annotation_ids(db: Session, ids: List[int]) -> None:
-    db.query(TaskPreAnnotationDetail).filter(TaskPreAnnotationDetail.task_id.in_(ids)).update(
+def delete_by_pre_annotation_id(db: Session, id: int) -> None:
+    db.query(TaskPreAnnotationDetail).filter(
+        TaskPreAnnotationDetail.pre_annotation_id == id
+        ).update(
         {TaskPreAnnotationDetail.deleted_at: datetime.now()}
     )

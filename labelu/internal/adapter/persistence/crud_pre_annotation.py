@@ -21,7 +21,6 @@ def list_by(
     before: Union[int, None],
     pageNo: Union[int, None],
     pageSize: int,
-    sorting: Union[str, None],
 ) -> List[TaskPreAnnotation]:
 
     # query filter
