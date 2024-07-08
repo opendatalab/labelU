@@ -155,6 +155,7 @@ def upgrade() -> None:
                         f"UPDATE task_sample SET file_id={file_id} WHERE id={task_sample_id}"
                     )
         
+        session.commit()
     
 
 def downgrade() -> None:
