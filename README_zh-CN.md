@@ -47,7 +47,7 @@ LabelU 提供了多种标注工具和功能，支持图像、视频、音频标�
 2. 安装完毕后，在终端运行以下命令（过程中的提示选择默认 `y` 即可）：
 
 ```bash
-conda create -n labelu python=3.7
+conda create -n labelu python=3.11
 ```
 
 > **注：** Windows 平台可在 Anaconda Prompt 程序中运行以上命令。
@@ -80,8 +80,8 @@ labelu
 # 安装miniconda
 # https://docs.conda.io/en/latest/miniconda.html
 
-# 创建虚拟环境(python = 3.7)
-conda create -n labelu python=3.7
+# 创建虚拟环境(python = 3.11)
+conda create -n labelu python=3.11
 
 # 激活虚拟环境
 conda activate labelu

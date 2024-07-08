@@ -47,7 +47,7 @@ LabelU offers a variety of annotation tools and features, supporting image, vide
 2. After the installation is complete, run the following command in the terminal (you can choose the default 'y' for prompts during the process):
 
 ```bash
-conda create -n labelu python=3.7
+conda create -n labelu python=3.11
 ```
 
 > **Note：** For Windows platform, you can run the above command in Anaconda Prompt.
@@ -80,8 +80,8 @@ labelu
 # Download and Install miniconda
 # https://docs.conda.io/en/latest/miniconda.html
 
-# Create virtual environment(python = 3.7)
-conda create -n labelu python=3.7
+# Create virtual environment(python = 3.11)
+conda create -n labelu python=3.11
 
 # Activate virtual environment
 conda activate labelu
