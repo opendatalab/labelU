@@ -112,17 +112,25 @@ async def list_by(
     sorting: Optional[str],
     current_user: User,
 ) -> Tuple[List[PreAnnotationResponse], int]:
+    
+    pre_annotations = []
+    
+    # 指定 sample_name 查询时，需要对所有的 pre_annotation 进行查询
+    # TODO 优化查询逻辑：将上传的jsonl中的每个预标注提取并存储到单独的表（PreAnnotationDetail）中
+    if sample_name:
+        pre_annotations = db.query(TaskPreAnnotation).all()
+    else:
+        pre_annotations = crud_pre_annotation.list_by(
+            db=db,
+            task_id=task_id,
+            owner_id=current_user.id,
+            after=after,
+            before=before,
+            pageNo=pageNo,
+            pageSize=None if sample_name else pageSize,
+            sorting=sorting,
+        )
 
-    pre_annotations = crud_pre_annotation.list_by(
-        db=db,
-        task_id=task_id,
-        owner_id=current_user.id,
-        after=after,
-        before=before,
-        pageNo=pageNo,
-        pageSize=pageSize,
-        sorting=sorting,
-    )
 
     total = crud_pre_annotation.count(db=db, task_id=task_id, owner_id=current_user.id)
 

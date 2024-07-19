@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "labelu"
-version = '1.0.5'
+version = '1.0.6-alpha.3'
 description = ""
 license = "Apache-2.0"
 authors = ["pengjinhu <pengjinhu@pjlab.org.cn>"]
@@ -12,7 +12,7 @@ packages = [{include = "labelu"}]
 labelu = "labelu.main:cli"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.11"
 fastapi = "^0.86.0"
 loguru = "^0.6.0"
 sqlalchemy = "^1.4.43"
