@@ -143,7 +143,9 @@ Welcome to the OpenDataLab official WeChat group！
 
 ## Links
 
-- [LabelU-kit](https://github.com/opendatalab/labelU-Kit) (LabelU is developed using LabelU-kit.)
+- [LabelU-kit](https://github.com/opendatalab/labelU-Kit) Web front-end annotation kit (LabelU is based on this JavaScript kit)
+- [LabelLLM](https://github.com/opendatalab/LabelLLM) An Open-source LLM Dialogue Annotation Platform
+- [Miner U](https://github.com/opendatalab/MinerU) A One-stop Open-source High-quality Data Extraction Tool
 
 ## License
 
