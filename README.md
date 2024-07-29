@@ -133,14 +133,6 @@ git submodule update --remote --merge
 
 - [Documentation](https://opendatalab.github.io/labelU/#/schema)
 
-## Communication
-
-Welcome to the OpenDataLab official WeChat group！
-
-<p align="center">
-<img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
-</p>
-
 ## Citation
 
 ```bibtex
@@ -151,6 +143,15 @@ Welcome to the OpenDataLab official WeChat group！
   year={2024}
 }
 ```
+
+## Communication
+
+Welcome to the OpenDataLab official WeChat group！
+
+<p align="center">
+<img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
+</p>
+
 
 ## Links
 
