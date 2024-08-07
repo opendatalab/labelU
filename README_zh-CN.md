@@ -27,7 +27,7 @@ LabelU为图像标注提供了全面的工具集，包括2D框、语义分割、
 
 <div align="center">
   <a href="https://www.youtube.com/watch?v=4oeehP-rqtU">
-    <img src="https://img.youtube.com/vi/4oeehP-rqtU/0.jpg" alt="Watch the video">
+    <img src="https://img.youtube.com/vi/4oeehP-rqtU/0.jpg" alt="Watch the video" width="700">
   </a>
 </div>
 
