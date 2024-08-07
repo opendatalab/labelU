@@ -24,9 +24,12 @@ LabelU为图像标注提供了全面的工具集，包括2D框、语义分割、
 
 ### 高效的音频标注工具
 音频标注工具是LabelU的另一大特色。该工具具备高效、精准的音频分析能力，支持音频分割、音频分类和音频信息提取。通过将复杂的声音信息直观化展示，LabelU简化了音频数据的处理流程，助力更准确的模型开发。
-<p align="center">
-<img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
-</p>
+
+<div align="center">
+  <a href="[](https://youtu.be/4oeehP-rqtU)">
+    <img src="https://img.youtube.com/vi/4oeehP-rqtU/maxresdefault.jpg" alt="Watch the video" />
+  </a>
+</div>
 
 ## 特性
 
