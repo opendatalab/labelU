@@ -111,29 +111,42 @@ git submodule update --remote --merge
 
 ## Supported Scenarios
 
-### Image
+### Image 
 
-- Label Classification: Can help users quickly classify objects in images and can be used for image retrieval, object detection tasks.
-- Text Description: Text transcription can help users quickly extract text information in images and can be used for text retrieval, machine translation tasks.
-- Bounding Box: Can help users quickly select objects in images and can be used for image recognition, object tracking tasks.
-- Point Annotation: Points can help users accurately label key information in the image and can be used for object recognition, scene analysis tasks.
-- Polygon: Can help users accurately label irregular shapes and can be used for object recognition, scene analysis tasks.
-- Line Annotation: Lines can help users accurately label edges and contours in the image and can be used for object recognition, scene analysis tasks.
-- Cuboid: Cuboid can help users accurately label the size, shape, and location of objects within images, and can be used for object recognition, scene analysis tasks.
+- **Label Classification**: The label classification feature enables users to quickly categorize objects within images. This functionality supports image retrieval and object detection tasks, making the identification process more efficient.
+
+- **Text Transcription**: The text transcription tool extracts textual information from images. This is particularly useful for tasks requiring text retrieval or machine translation, helping users quickly access critical information within images.
+
+- **Bounding Box**: The bounding box tool allows users to quickly select objects within images, ideal for image recognition and object tracking tasks. This feature simplifies the annotation process, boosting workflow efficiency.
+
+- **Point Annotation**: Point annotation helps users accurately mark key points within an image, useful for object recognition and scene analysis. This precision is especially important for analyzing complex images.
+
+- **Polygon Annotation**: The polygon tool is designed to annotate irregularly shaped objects, making it ideal for object recognition and scene analysis. It ensures accurate annotation of various complex shapes.
+
+- **Line Annotation**: The line annotation tool is used to precisely mark edges and contours within images, aiding in object recognition and scene analysis. It helps users capture fine details in images.
+
+- **3D Bounding Box**: The 3D bounding box tool allows users to accurately annotate the three-dimensional shape, position, and size of objects within images, which is essential for tasks requiring precise localization and shape analysis.
 
 ### Video
 
-- Label Classification: Classifying and labeling videos can be used for video retrieval, recommendation, and classification tasks.
-- Text Description: Converting speech content in videos into text can be used for voice recognition, transcription, and translation tasks.
-- Segment Segmentation: Extracting specific clips or scenes from the video for annotation is very useful for video object detection, action recognition, and video summary tasks.
-- Timestamps: Point to or mark specific parts of the video; users can click on timestamps to jump directly to that part of the video.
+- **Label Classification**: Classify and label video content, which can be used for video retrieval, recommendation, and categorization tasks, helping users manage and organize video content effectively.
+
+- **Text Transcription**: Convert spoken content within videos into text, supporting speech recognition, transcription, and translation tasks, facilitating the processing and understanding of audio information within videos.
+
+- **Segment Splitting**: Extract specific segments or scenes from videos for annotation, making it ideal for tasks such as object detection, behavior recognition, and video summarization, enhancing the precision of video analysis.
+
+- **Timestamping**: The timestamping feature allows users to mark specific parts of a video, enabling quick navigation to the relevant segment by clicking on the timestamp, improving the ease of browsing and processing video content.
 
 ### Audio
 
-- Label Classification: By listening to the audio and selecting the appropriate classification for annotation, it's applicable for audio retrieval, recommendations, and classification tasks.
-- Text Description: Converting speech content in audio into text makes it easier for users to analyze and process text. It's very useful for voice recognition, transcription tasks, and can help users better understand and process voice content.
-- Segment Segmentation: Extracting specific clips from audio for annotation is very useful for audio event detection, voice recognition, and audio editing tasks.
-- Timestamps: Used to point to or mark specific parts of the audio; users can click on timestamps to jump directly to that part of the audio.
+- **Label Classification**: Through the label classification feature, users can listen to audio and choose appropriate categories, useful for audio retrieval, recommendation, and classification tasks, helping to organize audio data effectively.
+
+- **Text Transcription**: Convert speech content in audio files into text for easier analysis and processing. This feature is particularly useful for speech recognition and transcription tasks, helping users better understand and handle audio content.
+
+- **Segment Splitting**: Extract specific segments from audio for annotation, ideal for tasks like audio event detection, speech recognition, and audio editing, enhancing flexibility in audio processing.
+
+- **Timestamping**: The timestamping feature marks specific sections within audio, allowing users to jump directly to those parts by clicking on the timestamp, greatly improving the efficiency of navigating and processing audio content.
+
 
 ## Quick start
 
