@@ -17,13 +17,13 @@ LabelU is a comprehensive data annotation platform designed for handling multimo
 ## Key Features
 
 ### Versatile Image Annotation Tools
-LabelU provides a robust set of image annotation tools, including 2D bounding boxes, semantic segmentation, polylines, and keypoints. These tools are adaptable to a wide range of image processing tasks, enabling users to efficiently complete image labeling, annotation, and analysis.
+LabelU provides a comprehensive set of tools for image annotation, including 2D bounding boxes, semantic segmentation, polylines, and keypoints. These tools can flexibly address a variety of image processing tasks, such as object detection, scene analysis, image recognition, and machine translation, helping users efficiently identify, annotate, and analyze images.
 
 ### Powerful Video Annotation Capabilities
-For video annotation, LabelU offers strong processing capabilities, supporting video segmentation, video classification, and video information extraction. Users can easily manage long-duration videos and extract key information, providing high-quality annotated data for subsequent model training.
+In the realm of video annotation, LabelU showcases impressive processing capabilities, supporting video segmentation, video classification, and video information extraction. It is highly suitable for applications such as video retrieval, video summarization, and action recognition, enabling users to easily handle long-duration videos, accurately extract key information, and support complex scene analysis, providing high-quality annotated data for subsequent model training.
 
 ### Efficient Audio Annotation Tools
-LabelU also features powerful audio annotation tools with efficient and precise audio analysis capabilities. These tools support audio segmentation, audio classification, and audio information extraction. By visualizing complex sound information, LabelU simplifies the audio data processing workflow, facilitating more accurate model development.
+Audio annotation tools are another key feature of LabelU. These tools possess efficient and precise audio analysis capabilities, supporting audio segmentation, audio classification, and audio information extraction. By visualizing complex sound information, LabelU simplifies the audio data processing workflow, aiding in the development of more accurate models.
 
 <div align="center">
   <a href="https://www.youtube.com/watch?v=4oeehP-rqtU">
@@ -109,44 +109,6 @@ uvicorn labelu.main:app --reload
 # Update submodule
 git submodule update --remote --merge
 ```
-
-## Supported Scenarios
-
-### Image 
-
-- **Label Classification**: The label classification feature enables users to quickly categorize objects within images. This functionality supports image retrieval and object detection tasks, making the identification process more efficient.
-
-- **Text Transcription**: The text transcription tool extracts textual information from images. This is particularly useful for tasks requiring text retrieval or machine translation, helping users quickly access critical information within images.
-
-- **Bounding Box**: The bounding box tool allows users to quickly select objects within images, ideal for image recognition and object tracking tasks. This feature simplifies the annotation process, boosting workflow efficiency.
-
-- **Point Annotation**: Point annotation helps users accurately mark key points within an image, useful for object recognition and scene analysis. This precision is especially important for analyzing complex images.
-
-- **Polygon Annotation**: The polygon tool is designed to annotate irregularly shaped objects, making it ideal for object recognition and scene analysis. It ensures accurate annotation of various complex shapes.
-
-- **Line Annotation**: The line annotation tool is used to precisely mark edges and contours within images, aiding in object recognition and scene analysis. It helps users capture fine details in images.
-
-- **3D Bounding Box**: The 3D bounding box tool allows users to accurately annotate the three-dimensional shape, position, and size of objects within images, which is essential for tasks requiring precise localization and shape analysis.
-
-### Video
-
-- **Label Classification**: Classify and label video content, which can be used for video retrieval, recommendation, and categorization tasks, helping users manage and organize video content effectively.
-
-- **Text Transcription**: Convert spoken content within videos into text, supporting speech recognition, transcription, and translation tasks, facilitating the processing and understanding of audio information within videos.
-
-- **Segment Splitting**: Extract specific segments or scenes from videos for annotation, making it ideal for tasks such as object detection, behavior recognition, and video summarization, enhancing the precision of video analysis.
-
-- **Timestamping**: The timestamping feature allows users to mark specific parts of a video, enabling quick navigation to the relevant segment by clicking on the timestamp, improving the ease of browsing and processing video content.
-
-### Audio
-
-- **Label Classification**: Through the label classification feature, users can listen to audio and choose appropriate categories, useful for audio retrieval, recommendation, and classification tasks, helping to organize audio data effectively.
-
-- **Text Transcription**: Convert speech content in audio files into text for easier analysis and processing. This feature is particularly useful for speech recognition and transcription tasks, helping users better understand and handle audio content.
-
-- **Segment Splitting**: Extract specific segments from audio for annotation, ideal for tasks like audio event detection, speech recognition, and audio editing, enhancing flexibility in audio processing.
-
-- **Timestamping**: The timestamping feature marks specific sections within audio, allowing users to jump directly to those parts by clicking on the timestamp, greatly improving the efficiency of navigating and processing audio content.
 
 
 ## Quick start
