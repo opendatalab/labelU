@@ -27,6 +27,7 @@ appdirs = "^1.4.4"
 aiofiles = "^22.1.0"
 pillow = "^9.3.0"
 alembic = "^1.9.4"
+httpx = "^0.27.0"
 
 
 [[tool.poetry.source]]
