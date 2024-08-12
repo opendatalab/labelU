@@ -76,7 +76,7 @@ conda activate labelu
 pip install labelu
 ```
 
-> To install the test version：`pip install --extra-index-url https://test.pypi.org/simple/ labelu==<test revision>`
+> To install the test version：`pip install labelu==<test revision> --pre`
 
 5. Run LabelU：
 

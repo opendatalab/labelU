@@ -73,7 +73,7 @@ conda activate labelu
 pip install labelu
 ```
 
-> 安装[测试版本](https://test.pypi.org/project/labelu/)：`pip install --extra-index-url https://test.pypi.org/simple/ labelu==<测试版本号>`
+> 安装测试版本：`pip install labelu==<测试版本号> --pre`
 
 5. 运行：
 

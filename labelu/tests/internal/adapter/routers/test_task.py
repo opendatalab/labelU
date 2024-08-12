@@ -296,7 +296,7 @@ class TestClassTaskRouter:
         )
 
         # run
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}", headers=testuser_token_headers
         )
 
@@ -312,7 +312,7 @@ class TestClassTaskRouter:
         # prepare data
 
         # run
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/0", headers=testuser_token_headers
         )
 
@@ -338,7 +338,7 @@ class TestClassTaskRouter:
         )
 
         # run
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}", headers=testuser_token_headers
         )
 

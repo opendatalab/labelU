@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "labelu"
-version = '1.0.6-alpha.3'
+version = '1.0.6-alpha.5'
 description = ""
 license = "Apache-2.0"
-authors = ["pengjinhu <pengjinhu@pjlab.org.cn>"]
+authors = ["shenguanlin <shenguanlin@pjlab.org.cn>"]
 readme = "README.md"
 repository = "https://github.com/opendatalab/labelU"
 packages = [{include = "labelu"}]
@@ -13,7 +13,7 @@ labelu = "labelu.main:cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.86.0"
+fastapi = "^0.90.0"
 loguru = "^0.6.0"
 sqlalchemy = "^1.4.43"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
@@ -27,6 +27,7 @@ appdirs = "^1.4.4"
 aiofiles = "^22.1.0"
 pillow = "^9.3.0"
 alembic = "^1.9.4"
+httpx = "^0.27.0"
 
 
 [[tool.poetry.source]]
