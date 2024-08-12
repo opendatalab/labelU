@@ -69,13 +69,13 @@ jobs:
 
         # ====================== release ======================
 
-      # - name: Set test pip url
-      #   if: ${{ github.ref_name == 'alpha' }}
-      #   run: |
-      #     echo "PYPI_URL=https://test.pypi.org/project/labelu/${{ env.NEXT_VERSION }}" >> $GITHUB_ENV
+      - name: Set test pip url
+        if: ${{ github.ref_name == 'alpha' }}
+        run: |
+          echo "PYPI_URL=https://test.pypi.org/project/labelu/${{ env.NEXT_VERSION }}" >> $GITHUB_ENV
 
       - name: Set release pip url
-        if: ${{ github.ref_name == 'main' || github.ref_name == 'alpha' }}
+        if: ${{ github.ref_name == 'main' }}
         run: |
           echo "PYPI_URL=https://pypi.org/project/labelu/${{ env.NEXT_VERSION }}" >> $GITHUB_ENV
 
@@ -148,8 +148,16 @@ jobs:
         run: |
           sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
 
+      - name: Publish to TestPyPi
+        if: ${{ github.ref_name == 'alpha'}}
+        env:
+          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: |
+          poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
+          poetry publish --build --skip-existing -r testpypi
+
       - name: Publish to PyPi
-        if: ${{ github.ref_name == 'main' || github.ref_name == 'alpha' }}
+        if: ${{ github.ref_name == 'main'}}
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
