@@ -10,17 +10,29 @@
    
 </div>
 
-## Introduction
+## Product Introduction
 
-LabelU offers a variety of annotation tools and features, supporting image, video, and audio annotation.
+LabelU is a comprehensive data annotation platform designed for handling multimodal data. It offers a range of advanced annotation tools and efficient workflows, making it easier for users to tackle annotation tasks involving images, videos, and audio. LabelU is tailored to meet the demands of complex data analysis and model training.
 
-- Image: Multifunctional image processing tools encompassing 2D bounding box, cuboid, semantic segmentation, polylines, keypoints, and many other annotation tools, assist in completing image identification, annotation, and analysis.
-- Video: The video annotation has robust video processing capabilities, able to implement video segmentation, video classification, video information extraction, and other functions, providing high-quality annotated data for model training.
-- Audio: Highly efficient and accurate audio analysis tool can achieve audio segmentation, audio classification, audio information extraction, and other functions, making complex sound information visually intuitive.
+## Key Features
 
-<p align="center">
-<img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
-</p>
+### Versatile Image Annotation Tools
+LabelU provides a comprehensive set of tools for image annotation, including 2D bounding boxes, semantic segmentation, polylines, and keypoints. These tools can flexibly address a variety of image processing tasks, such as object detection, scene analysis, image recognition, and machine translation, helping users efficiently identify, annotate, and analyze images.
+
+### Powerful Video Annotation Capabilities
+In the realm of video annotation, LabelU showcases impressive processing capabilities, supporting video segmentation, video classification, and video information extraction. It is highly suitable for applications such as video retrieval, video summarization, and action recognition, enabling users to easily handle long-duration videos, accurately extract key information, and support complex scene analysis, providing high-quality annotated data for subsequent model training.
+
+### Efficient Audio Annotation Tools
+Audio annotation tools are another key feature of LabelU. These tools possess efficient and precise audio analysis capabilities, supporting audio segmentation, audio classification, and audio information extraction. By visualizing complex sound information, LabelU simplifies the audio data processing workflow, aiding in the development of more accurate models.
+
+#### Artificial Intelligence Assisted Labelling
+LabelLLM supports one-click loading of pre-annotated data, which can be refined and adjusted according to actual needs. This feature improves the efficiency and accuracy of annotation.
+
+
+https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
+
+
+
 
 ## Features
 
@@ -99,31 +111,6 @@ uvicorn labelu.main:app --reload
 git submodule update --remote --merge
 ```
 
-## Supported Scenarios
-
-### Image
-
-- Label Classification: Can help users quickly classify objects in images and can be used for image retrieval, object detection tasks.
-- Text Description: Text transcription can help users quickly extract text information in images and can be used for text retrieval, machine translation tasks.
-- Bounding Box: Can help users quickly select objects in images and can be used for image recognition, object tracking tasks.
-- Point Annotation: Points can help users accurately label key information in the image and can be used for object recognition, scene analysis tasks.
-- Polygon: Can help users accurately label irregular shapes and can be used for object recognition, scene analysis tasks.
-- Line Annotation: Lines can help users accurately label edges and contours in the image and can be used for object recognition, scene analysis tasks.
-- Cuboid: Cuboid can help users accurately label the size, shape, and location of objects within images, and can be used for object recognition, scene analysis tasks.
-
-### Video
-
-- Label Classification: Classifying and labeling videos can be used for video retrieval, recommendation, and classification tasks.
-- Text Description: Converting speech content in videos into text can be used for voice recognition, transcription, and translation tasks.
-- Segment Segmentation: Extracting specific clips or scenes from the video for annotation is very useful for video object detection, action recognition, and video summary tasks.
-- Timestamps: Point to or mark specific parts of the video; users can click on timestamps to jump directly to that part of the video.
-
-### Audio
-
-- Label Classification: By listening to the audio and selecting the appropriate classification for annotation, it's applicable for audio retrieval, recommendations, and classification tasks.
-- Text Description: Converting speech content in audio into text makes it easier for users to analyze and process text. It's very useful for voice recognition, transcription tasks, and can help users better understand and process voice content.
-- Segment Segmentation: Extracting specific clips from audio for annotation is very useful for audio event detection, voice recognition, and audio editing tasks.
-- Timestamps: Used to point to or mark specific parts of the audio; users can click on timestamps to jump directly to that part of the audio.
 
 ## Quick start
 
@@ -133,6 +120,17 @@ git submodule update --remote --merge
 
 - [Documentation](https://opendatalab.github.io/labelU/#/schema)
 
+## Citation
+
+```bibtex
+@article{he2024opendatalab,
+  title={Opendatalab: Empowering general artificial intelligence with open datasets},
+  author={He, Conghui and Li, Wei and Jin, Zhenjiang and Xu, Chao and Wang, Bin and Lin, Dahua},
+  journal={arXiv preprint arXiv:2407.13773},
+  year={2024}
+}
+```
+
 ## Communication
 
 Welcome to the OpenDataLab official WeChat group！
@@ -140,6 +138,7 @@ Welcome to the OpenDataLab official WeChat group！
 <p align="center">
 <img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
 </p>
+
 
 ## Links
 
