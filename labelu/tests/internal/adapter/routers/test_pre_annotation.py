@@ -440,7 +440,7 @@ class TestClassTaskPreAnnotationRouter:
 
         # run
         data = {"pre_annotation_ids": [pre_annotations[0].id]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
             json=data,
@@ -467,7 +467,7 @@ class TestClassTaskPreAnnotationRouter:
 
         # run
         data = {"pre_annotation_ids": [1, 2]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
             json=data,

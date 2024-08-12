@@ -221,7 +221,7 @@ class TestClassTaskAttachmentRouter:
 
         # run
         data = {"attachment_ids": [attachment_id]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
             headers=testuser_token_headers,
             json=data,
@@ -242,7 +242,7 @@ class TestClassTaskAttachmentRouter:
 
         # run
         data = {"attachment_ids": [1]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/0/attachments",
             headers=testuser_token_headers,
             json=data,
@@ -270,7 +270,7 @@ class TestClassTaskAttachmentRouter:
 
         # run
         data = {"attachment_ids": [1]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
             headers=testuser_token_headers,
             json=data,

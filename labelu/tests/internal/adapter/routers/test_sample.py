@@ -572,7 +572,7 @@ class TestClassTaskSampleRouter:
 
         # run
         data = {"sample_ids": [samples[0].id]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
             json=data,
@@ -599,7 +599,7 @@ class TestClassTaskSampleRouter:
 
         # run
         data = {"sample_ids": [1, 2]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
             json=data,

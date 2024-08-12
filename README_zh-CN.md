@@ -80,8 +80,8 @@ labelu
 # 安装miniconda
 # https://docs.conda.io/en/latest/miniconda.html
 
-# 创建虚拟环境(python = 3.8)
-conda create -n labelu python=3.8
+# 创建虚拟环境(python = 3.11)
+conda create -n labelu python=3.11
 
 # 激活虚拟环境
 conda activate labelu
