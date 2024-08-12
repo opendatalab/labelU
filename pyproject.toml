@@ -3,7 +3,7 @@ name = "labelu"
 version = '1.0.6-alpha.3'
 description = ""
 license = "Apache-2.0"
-authors = ["pengjinhu <pengjinhu@pjlab.org.cn>"]
+authors = ["shenguanlin <shenguanlin@pjlab.org.cn>"]
 readme = "README.md"
 repository = "https://github.com/opendatalab/labelU"
 packages = [{include = "labelu"}]
