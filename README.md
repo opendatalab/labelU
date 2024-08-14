@@ -25,8 +25,8 @@ In the realm of video annotation, LabelU showcases impressive processing capabil
 ### Efficient Audio Annotation Tools
 Audio annotation tools are another key feature of LabelU. These tools possess efficient and precise audio analysis capabilities, supporting audio segmentation, audio classification, and audio information extraction. By visualizing complex sound information, LabelU simplifies the audio data processing workflow, aiding in the development of more accurate models.
 
-#### Artificial Intelligence Assisted Labelling
-LabelLLM supports one-click loading of pre-annotated data, which can be refined and adjusted according to actual needs. This feature improves the efficiency and accuracy of annotation.
+### Artificial Intelligence Assisted Labelling
+LabelU supports one-click loading of pre-annotated data, which can be refined and adjusted according to actual needs. This feature improves the efficiency and accuracy of annotation.
 
 
 https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
