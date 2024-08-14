@@ -54,7 +54,7 @@ https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
 
 1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), Choose the corresponding operating system type and download it for installation.
 
-> **Note：** If your system is MacOS with an Intel chip, please install [Miniconda of intel x86_64](https://repo.anaconda.com/miniconda/)。
+> **Note：** If your system is MacOS with an Intel chip, please install [Miniconda of intel x86_64](https://repo.anaconda.com/miniconda/).
 
 2. After the installation is complete, run the following command in the terminal (you can choose the default 'y' for prompts during the process):
 
