@@ -25,10 +25,14 @@ from labelu.internal.application.response.attachment import AttachmentResponse
 def read_jsonl_file(db: Session, file_id: int) -> List[dict]:
     attachment = crud_attachment.get(db, file_id)
     if attachment is None:
-        raise LabelUException(status_code=404, code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND)
+        return []
 
     attachment_path = attachment.path
     file_full_path = settings.MEDIA_ROOT.joinpath(attachment_path.lstrip("/"))
+    
+    # check if the file exists
+    if not file_full_path.exists() or not attachment.filename.endswith('.jsonl'):
+        return []
 
     try:
         with open(file_full_path, "r", encoding="utf-8") as f:
