@@ -101,11 +101,11 @@ conda activate labelu
 # 安装所有依赖包
 poetry install
 
-# 启动labelu, 默认访问地址: http://localhost:8000
-uvicorn labelu.main:app --reload
-
 # 从 LabelU-kit 下载前端资源
 sh ./scripts/resolve_frontend.sh true
+
+# 启动labelu, 默认访问地址: http://localhost:8000
+uvicorn labelu.main:app --reload
 ```
 
 ## 快速上手
