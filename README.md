@@ -104,11 +104,11 @@ conda activate labelu
 # Install all package dependencies
 poetry install
 
+# Download the frontend statics from labelu-kit repo
+sh ./scripts/resolve_frontend.sh true
+
 # Start labelu, server: http://localhost:8000
 uvicorn labelu.main:app --reload
-
-# Update submodule
-git submodule update --remote --merge
 ```
 
 
