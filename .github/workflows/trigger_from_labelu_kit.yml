@@ -71,7 +71,7 @@ jobs:
       - name: Prepare changelog
         id: set_changelog
         run: |
-          echo "CHANGE_LOG=$(echo "${{ inputs.changelog }}" | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_ENV
+          echo "CHANGE_LOG=$(echo '${{ inputs.changelog }}' | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_ENV
         
       
       - name: Trigger release workflow
