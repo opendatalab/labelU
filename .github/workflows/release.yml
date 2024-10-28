@@ -189,19 +189,33 @@ jobs:
           NEXT_VERSION: ${{ env.NEXT_VERSION }}
           PYPI_URL: ${{ env.PYPI_URL }}
         run: |
-          curl -v POST $WEBHOOK_URL \
-            -H "Content-Type: application/json" \
-            -d '{
-                  "msg_type": "interactive",
-                  "card": {
-                    "elements": [
-                      {
-                        "tag": "div",
-                        "text": {
-                          "tag": "lark_md",
-                          "content": "'"${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"'"
-                        }
-                      }
-                    ]
+          echo '{
+              "msg_type": "interactive",
+              "card": {
+                "elements": [
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "'"${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"'"
+                    }
                   }
-                }'
+                ]
+              }
+            }'
+          # curl -v POST $WEBHOOK_URL \
+          #   -H "Content-Type: application/json" \
+          #   -d '{
+          #         "msg_type": "interactive",
+          #         "card": {
+          #           "elements": [
+          #             {
+          #               "tag": "div",
+          #               "text": {
+          #                 "tag": "lark_md",
+          #                 "content": "'"${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"'"
+          #               }
+          #             }
+          #           ]
+          #         }
+          #       }'
