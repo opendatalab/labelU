@@ -189,7 +189,8 @@ jobs:
           NEXT_VERSION: ${{ env.NEXT_VERSION }}
           PYPI_URL: ${{ env.PYPI_URL }}
         run: |
-          echo '{
+          REQUEST_BODY=$(cat <<EOF
+            {
               "msg_type": "interactive",
               "card": {
                 "elements": [
@@ -197,25 +198,15 @@ jobs:
                     "tag": "div",
                     "text": {
                       "tag": "lark_md",
-                      "content": "'"${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"'"
+                      "content": "${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"
                     }
                   }
                 ]
               }
-            }'
-          # curl -v POST $WEBHOOK_URL \
-          #   -H "Content-Type: application/json" \
-          #   -d '{
-          #         "msg_type": "interactive",
-          #         "card": {
-          #           "elements": [
-          #             {
-          #               "tag": "div",
-          #               "text": {
-          #                 "tag": "lark_md",
-          #                 "content": "'"${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"'"
-          #               }
-          #             }
-          #           ]
-          #         }
-          #       }'
+            }
+            EOF
+            )
+          echo "$REQUEST_BODY"
+          curl -v POST $WEBHOOK_URL \
+            -H "Content-Type: application/json" \
+            -d "$REQUEST_BODY"
