@@ -190,22 +190,22 @@ jobs:
           PYPI_URL: ${{ env.PYPI_URL }}
         run: |
           REQUEST_BODY=$(cat <<EOF
-            {
-              "msg_type": "interactive",
-              "card": {
-                "elements": [
-                  {
-                    "tag": "div",
-                    "text": {
-                      "tag": "lark_md",
-                      "content": "${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"
-                    }
+          {
+            "msg_type": "interactive",
+            "card": {
+              "elements": [
+                {
+                  "tag": "div",
+                  "text": {
+                    "tag": "lark_md",
+                    "content": "${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"
                   }
-                ]
-              }
+                }
+              ]
             }
-            EOF
-            )
+          }
+          EOF
+          )
           echo "$REQUEST_BODY"
           curl -v POST $WEBHOOK_URL \
             -H "Content-Type: application/json" \
