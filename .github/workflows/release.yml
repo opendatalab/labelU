@@ -177,11 +177,24 @@ jobs:
 
       # ====================== post release ======================
       
-      - name: Send webhook message
-        uses: joelwmale/webhook-action@master
+      - name: Send http post request
         env:
           CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog👇🏻 \n\n{0}\n\n\n', github.event.inputs.changelog) || '' }}
-        with:
-          url: ${{ secrets.WEBHOOK_URL }}
-          headers: '{"Content-Type": "application/json"}'
-          body: '{"msg_type":"interactive","card":{"elements":[{"tag":"div","text":{"tag":"lark_md","content":"${{ env.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"}}]}}'
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          curl -X POST $WEBHOOK_URL \
+            -H "Content-Type: application/json" \
+            -d '{
+                  "msg_type": "interactive",
+                  "card": {
+                    "elements": [
+                      {
+                        "tag": "div",
+                        "text": {
+                          "tag": "lark_md",
+                          "content": "'"${{ env.RELEASE_NOTES }}${{ env.CHANGELOG }}Check it out now \ud83d\udc49\ud83c\udffb  [v${{ env.NEXT_VERSION }}](${{ env.PYPI_URL }})"'"
+                        }
+                      }
+                    ]
+                  }
+                }'
