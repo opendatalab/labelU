@@ -189,7 +189,7 @@ jobs:
           NEXT_VERSION: ${{ env.NEXT_VERSION }}
           PYPI_URL: ${{ env.PYPI_URL }}
         run: |
-          curl -X POST $WEBHOOK_URL \
+          curl -v -X POST $WEBHOOK_URL \
             -H "Content-Type: application/json" \
             -d '{
                   "msg_type": "interactive",
