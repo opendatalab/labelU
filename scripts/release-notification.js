@@ -27,11 +27,12 @@ async function main() {
   const pypiUrl = process.env.PYPI_URL
 
   console.log('url', botUrl)
+  const frontendContent = frontendChangelog ? `\n\n**Frontend Changelog**\n${format(frontendChangelog)}` : ''
 
   try {
     const payload = makeLarkMessage(
       `LabelU@v${releaseTag}`,
-      `${format(releaseNotes)}\n\n**Frontend Changelog**\n${format(frontendChangelog)}`,
+      `${format(releaseNotes)}${frontendContent}`,
       '点击访问',
       pypiUrl,
     )
