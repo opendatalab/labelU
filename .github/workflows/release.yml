@@ -46,6 +46,7 @@ jobs:
         python-version: [3.11]
         poetry-version: ['1.2.2']
         os: [ubuntu-20.04]
+        node-version: [20.8.1]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -181,7 +182,7 @@ jobs:
 
       # ====================== post release ======================
       
-      - name: Send http post request
+      - name: Send release notification
         env:
           CHANGELOG: ${{ github.event.inputs.changelog != '' && format('## Frontend changelog👇🏻 \n\n{0}\n\n\n', github.event.inputs.changelog) || '' }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
@@ -189,24 +190,5 @@ jobs:
           NEXT_VERSION: ${{ env.NEXT_VERSION }}
           PYPI_URL: ${{ env.PYPI_URL }}
         run: |
-          REQUEST_BODY=$(cat <<EOF
-          {
-            "msg_type": "interactive",
-            "card": {
-              "elements": [
-                {
-                  "tag": "div",
-                  "text": {
-                    "tag": "lark_md",
-                    "content": "${RELEASE_NOTES}${CHANGELOG}Check it out now \ud83d\udc49\ud83c\udffb  [v${NEXT_VERSION}](${PYPI_URL})"
-                  }
-                }
-              ]
-            }
-          }
-          EOF
-          )
-          echo "$REQUEST_BODY"
-          curl -v POST $WEBHOOK_URL \
-            -H "Content-Type: application/json" \
-            -d "$REQUEST_BODY"
+          node ./scripts/release-notification.js
+          
