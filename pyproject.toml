@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "labelu"
-version = '1.0.9-alpha.3'
+version = '1.0.9-alpha.4'
 description = ""
 license = "Apache-2.0"
 authors = ["shenguanlin <shenguanlin@pjlab.org.cn>"]
