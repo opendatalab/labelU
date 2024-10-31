@@ -13,6 +13,7 @@ class ExportType(str, Enum):
     JSON = "JSON"
     MASK = "MASK"
     COCO = "COCO"
+    YOLO = "YOLO"
     LABEL_ME = "LABEL_ME"
 
 

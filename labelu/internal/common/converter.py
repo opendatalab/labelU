@@ -16,6 +16,7 @@ class Format(str, Enum):
     JSON = "JSON"
     COCO = "COCO"
     MASK = "MASK"
+    YOLO = "YOLO"
     LABEL_ME = "LABEL_ME"
 
 
@@ -54,7 +55,14 @@ class Converter:
                 out_data_file_name_prefix=out_data_file_name_prefix,
                 out_data_dir=out_data_dir,
             )
-
+        elif format == Format.YOLO.value:
+            return self.convert_to_yolo(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+            
     def convert_to_json(
         self,
         input_data: List[dict],
@@ -492,6 +500,67 @@ class Converter:
         logger.info("Export file path: {}", file_full_path_zip)
         return file_full_path_zip
     
+    def convert_to_yolo(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        export_files = []
+        classes = []
+        
+        # make classes
+        for tool in config.get("tools", []):
+            for attr in tool.get("config", {}).get("attributes", []):
+                classes.append(attr.get("value"))
+
+        for attr in config.get("attributes", []):
+            classes.append(attr.get("value"))
+        
+        # make classes.txt
+        classes_file = out_data_dir.joinpath("classes.txt")
+        with classes_file.open("w") as outfile:
+            for c in classes:
+                outfile.write(f"{c}\n")
+        export_files.append(classes_file)
+        
+        for sample in input_data:
+            data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
+            
+            # skip invalid data
+            annotated_result = json.loads(data.get("result"))
+            if sample.get("state") == "SKIPPED" or not annotated_result:
+                continue
+            
+            image_width = annotated_result.get("width", 0)
+            image_height = annotated_result.get("height", 0)
+            
+            for tool in annotated_result.copy().keys():
+                if tool == 'rectTool':
+                    tool_results = annotated_result.pop(tool)
+                    for tool_result in tool_results.get("result", []):
+                        x = tool_result.get("x", 0)
+                        y = tool_result.get("y", 0)
+                        width = tool_result.get("width", 0)
+                        height = tool_result.get("height", 0)
+                        label = tool_result.get("label", "")
+                        x_center = x + width / 2
+                        y_center = y + height / 2
+                        x_center /= image_width
+                        y_center /= image_height
+                        width /= image_width
+                        height /= image_height
+                        file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+                        file_name = out_data_dir.joinpath(f"{file_basename}.txt")
+                        with file_name.open("a") as outfile:
+                            outfile.write(f"{classes.index(label)} {x_center} {y_center} {width} {height}\n")
+                        export_files.append(file_name)
+            
+            
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-yolo.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
 def _polygonArea(X, Y):
 
     # Initialize area
