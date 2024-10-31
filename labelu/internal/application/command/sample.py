@@ -14,6 +14,8 @@ class ExportType(str, Enum):
     MASK = "MASK"
     COCO = "COCO"
     YOLO = "YOLO"
+    CSV = "CSV"
+    XML = "XML"
     LABEL_ME = "LABEL_ME"
 
 
