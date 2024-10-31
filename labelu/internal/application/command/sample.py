@@ -13,6 +13,7 @@ class ExportType(str, Enum):
     JSON = "JSON"
     MASK = "MASK"
     COCO = "COCO"
+    LABEL_ME = "LABEL_ME"
 
 
 class CreateSampleCommand(BaseModel):
