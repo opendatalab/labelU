@@ -17,6 +17,7 @@ class ExportType(str, Enum):
     CSV = "CSV"
     XML = "XML"
     LABEL_ME = "LABEL_ME"
+    TF_RECORD = "TF_RECORD"
 
 
 class CreateSampleCommand(BaseModel):
