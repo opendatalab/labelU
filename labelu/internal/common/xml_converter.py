@@ -1,10 +1,75 @@
 import xml.etree.ElementTree as ET
+from labelu.internal.common.config import settings
 
 class XML_converter:
     def create_root(self, root_name: str):
         root = ET.Element(root_name)
         
         return root
+    
+    def create_pascal_voc_xml(self, config: dict, file: dict, sample_result: dict):
+        annotation = ET.Element("annotation")
+        
+        folder = ET.SubElement(annotation, "folder")
+        folder.text = str(settings.MEDIA_ROOT)
+        
+        filename_elem = ET.SubElement(annotation, "filename")
+        filename_elem.text = file.get("filename", "")
+        
+        path_elem = ET.SubElement(annotation, "path")
+        path_elem.text = file.get("path")
+        
+        image_width = sample_result.get("width", 0)
+        image_height = sample_result.get("height", 0)
+        
+        size_elem = ET.SubElement(annotation, "size")
+        width = ET.SubElement(size_elem, "width")
+        width.text = str(image_width)
+        height = ET.SubElement(size_elem, "height")
+        height.text = str(image_height)
+        depth = ET.SubElement(size_elem, "depth")
+        depth.text = "3"
+        
+        label_text_dict = {}
+        common_attributes = { attr.get("value"): attr.get("key") for attr in config.get("attributes", [])}
+        
+        def get_label(_tool: str, _input_label: str):
+            _label = label_text_dict.get(_tool, {}).get(_input_label, "")
+            
+            if not _label:
+                _label = common_attributes.get(_input_label, "")
+                
+            return _label
+        
+        for tool in sample_result.copy().keys():
+            tool_results = sample_result.pop(tool)
+            
+            if tool == "rectTool":
+                for tool_result in tool_results.get("result", []):
+                    
+                    obj_elem = ET.SubElement(annotation, "object")
+                    name = ET.SubElement(obj_elem, "name")
+                    name.text = get_label(tool, tool_result.get("label", ""))
+                    # get value from attributes
+                    truncated = ET.SubElement(obj_elem, "truncated")
+                    truncated.text = str(tool_result.get("attributes", {}).get("truncated", 0))
+                    difficult = ET.SubElement(obj_elem, "difficult")
+                    difficult.text = str(tool_result.get("attributes", {}).get("difficult", 0))
+
+                    bndbox = ET.SubElement(obj_elem, "bndbox")
+                    xmin = ET.SubElement(bndbox, "xmin")
+                    xmin_value = tool_result.get("x", 0)
+                    xmin.text = str(xmin_value)
+                    ymin = ET.SubElement(bndbox, "ymin")
+                    ymin_value = tool_result.get("y", 0)
+                    ymin.text = str(ymin_value)
+                    xmax = ET.SubElement(bndbox, "xmax")
+                    xmax.text = str(xmin_value + tool_result.get("width", 0))
+                    ymax = ET.SubElement(bndbox, "ymax")
+                    ymax.text = str(ymin_value + tool_result.get("height", 0))
+                    
+        
+        return annotation
 
     def convert_tool_results(self, tool_name, tool_results):
         annotations = []

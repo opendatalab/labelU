@@ -18,6 +18,7 @@ class ExportType(str, Enum):
     XML = "XML"
     LABEL_ME = "LABEL_ME"
     TF_RECORD = "TF_RECORD"
+    PASCAL_VOC = "PASCAL_VOC"
 
 
 class CreateSampleCommand(BaseModel):

@@ -26,6 +26,7 @@ class Format(str, Enum):
     VOC = "VOC"
     TF_RECORD = "TF_RECORD"
     LABEL_ME = "LABEL_ME"
+    PASCAL_VOC = "PASCAL_VOC"
 
 
 class Converter:
@@ -86,6 +87,13 @@ class Converter:
             )
         elif format == Format.TF_RECORD.value:
             return self.convert_to_tf_record(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+        elif format == Format.PASCAL_VOC.value:
+            return self.convert_to_pascal_voc(
                 config=config,
                 input_data=input_data,
                 out_data_file_name_prefix=out_data_file_name_prefix,
@@ -796,6 +804,39 @@ class Converter:
         
         file_relative_path_zip = f"task-{out_data_file_name_prefix}-tfrecord.zip"
         file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
+    
+    def convert_to_pascal_voc(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        export_files = []
+        
+        xml_converter = XML_converter()
+        
+        for sample in input_data:
+            data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
+            
+            # skip invalid data
+            annotated_result = json.loads(data.get("result"))
+            if sample.get("state") == "SKIPPED" or not annotated_result:
+                continue
+            
+            voc_xml = xml_converter.create_pascal_voc_xml(config, file, annotated_result)
+            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_name = out_data_dir.joinpath(f"{file_basename}.xml")
+            
+            tree = ET.ElementTree(voc_xml)
+            tree.write(file_name, encoding="utf-8", xml_declaration=True)
+            
+            export_files.append(file_name)
+    
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-pascal-voc.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        
         with ZipFile(file_full_path_zip, "w") as zipf:
             for f in export_files:
                 zipf.write(str(f), arcname=f.name)
