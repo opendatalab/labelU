@@ -31,6 +31,10 @@ class XML_converter:
         depth.text = "3"
         
         label_text_dict = {}
+        
+        for tool in config.get("tools", []):
+            label_text_dict[tool.get("tool")] = { attr.get("value"): attr.get("key") for attr in tool.get("config", {}).get("attributes", [])}
+        
         common_attributes = { attr.get("value"): attr.get("key") for attr in config.get("attributes", [])}
         
         def get_label(_tool: str, _input_label: str):
