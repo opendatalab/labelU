@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "labelu"
-version = '1.0.9-alpha.5'
+version = '1.0.9'
 description = ""
 license = "Apache-2.0"
 authors = ["shenguanlin <shenguanlin@pjlab.org.cn>"]
@@ -28,6 +28,7 @@ aiofiles = "^22.1.0"
 pillow = "^9.3.0"
 alembic = "^1.9.4"
 httpx = "^0.27.0"
+tfrecord = "^1.14.5"
 
 
 [[tool.poetry.source]]

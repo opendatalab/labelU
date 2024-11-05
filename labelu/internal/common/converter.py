@@ -1,18 +1,32 @@
+import base64
+import csv
 import json
+import os
 from zipfile import ZipFile
 from PIL import Image, ImageDraw
 from enum import Enum
 
+import xml.etree.ElementTree as ET
 from typing import List
 from loguru import logger
+from .xml_converter import XML_converter
+from .tf_record_converter import TF_record_converter
 
 from labelu.internal.common.color import colors
+from labelu.internal.common.config import settings
 
 
 class Format(str, Enum):
     JSON = "JSON"
     COCO = "COCO"
     MASK = "MASK"
+    YOLO = "YOLO"
+    CSV = "CSV"
+    XML = "XML"
+    VOC = "VOC"
+    TF_RECORD = "TF_RECORD"
+    LABEL_ME = "LABEL_ME"
+    PASCAL_VOC = "PASCAL_VOC"
 
 
 class Converter:
@@ -43,7 +57,49 @@ class Converter:
                 out_data_dir=out_data_dir,
                 out_data_file_name_prefix=out_data_file_name_prefix,
             )
-
+        elif format == Format.LABEL_ME.value:
+            return self.convert_to_labelme(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+        elif format == Format.YOLO.value:
+            return self.convert_to_yolo(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+        elif format == Format.CSV.value:
+            return self.convert_to_csv(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+        elif format == Format.XML.value:
+            return self.convert_to_xml(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+        elif format == Format.TF_RECORD.value:
+            return self.convert_to_tf_record(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+        elif format == Format.PASCAL_VOC.value:
+            return self.convert_to_pascal_voc(
+                config=config,
+                input_data=input_data,
+                out_data_file_name_prefix=out_data_file_name_prefix,
+                out_data_dir=out_data_dir,
+            )
+            
     def convert_to_json(
         self,
         input_data: List[dict],
@@ -336,7 +392,457 @@ class Converter:
         logger.info("Export file path: {}", file_full_path_zip)
         return file_full_path_zip
 
+    def convert_to_labelme(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        export_files = []
+        result = []
+        # does not support cuboid / spline
+        shape_dict = {
+            "polygonTool": "polygon",
+            "rectTool": "rectangle",
+            "lineTool": "linestrip",
+            "pointTool": "point",
+        }
+        
+        label_text_dict = {}
+        common_attributes = { attr.get("value"): attr.get("key") for attr in config.get("attributes", [])}
+        
+        for tool in config.get("tools", []):
+            label_text_dict[tool.get("tool")] = { attr.get("value"): attr.get("key") for attr in tool.get("config", {}).get("attributes", [])}
+        
+        def get_label(_tool: str, _input_label: str):
+            _label = label_text_dict.get(_tool, {}).get(_input_label, "")
+            
+            if not _label:
+                _label = common_attributes.get(_input_label, "")
+                
+            return _label
+        
+        def convert_points(points: List[dict]):
+            return [[point.get("x"), point.get("y")] for point in points]
+        
+        def image_to_base64(file_path: str):
+            file_full_path = settings.MEDIA_ROOT.joinpath(file_path.lstrip("/"))
+            with open(file_full_path, "rb") as image_file:
+                return base64.b64encode(image_file.read()).decode('utf-8')
+        
+        for sample in input_data:
+            labelme_item = {
+                "version": "5.5.0",
+                "flags": {},
+                "shapes": [],
+                "imagePath": "",
+                "imageData": "",
+                "imageHeight": 0,
+                "imageWidth": 0,
+            }
+            data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
+            
+            # skip invalid data
+            annotated_result = json.loads(data.get("result"))
+            if sample.get("state") == "SKIPPED":
+                continue
+            
+            labelme_item["imagePath"] = file.get("filename", "")[9:]
+            labelme_item["imageData"] = image_to_base64(file.get("path"))
+            
+            if annotated_result:
+                labelme_item["imageWidth"] = annotated_result.get("width", 0)
+                labelme_item["imageHeight"] = annotated_result.get("height", 0)
+                
+                for tool in annotated_result.copy().keys():
+                    if tool.endswith("Tool") and tool in shape_dict:
+                        # polygon
+                        if tool == "polygonTool":
+                            tool_results = annotated_result.pop(tool)
+                            for tool_result in tool_results.get("result", []):
+                                attributes = tool_result.get("attributes", {})
+                                shape = {
+                                    "label": get_label(tool, tool_result.get("label", "")),
+                                    "points": convert_points(tool_result.get("points", [])),
+                                    "group_id": "",
+                                    # Get description from attributes
+                                    "description": attributes.get("description", ""),
+                                    "shape_type": shape_dict.get(tool, "polygon"),
+                                    "flags": {},
+                                    "mask": "",
+                                }
+                                labelme_item["shapes"].append(shape)
+                                
+                        # rect
+                        if tool == "rectTool":
+                            tool_results = annotated_result.pop(tool)
+                            for tool_result in tool_results.get("result", []):
+                                attributes = tool_result.get("attributes", {})
+                                x = tool_result.get("x", 0)
+                                y = tool_result.get("y", 0)
+                                width = tool_result.get("width", 0)
+                                height = tool_result.get("height", 0)
+                                shape = {
+                                    "label": get_label(tool, tool_result.get("label", "")),
+                                    "points": [[x, y], [x + width, y + height]],
+                                    "group_id": "",
+                                    "description": attributes.get("description", ""),
+                                    "shape_type": shape_dict.get(tool, "rectangle"),
+                                    "flags": {},
+                                    "mask": "",
+                                }
+                                labelme_item["shapes"].append(shape)
+                        
+                        if tool == "lineTool":
+                            tool_results = annotated_result.pop(tool)
+                            for tool_result in tool_results.get("result", []):
+                                attributes = tool_result.get("attributes", {})
+                                shape = {
+                                    "label": get_label(tool, tool_result.get("label", "")),
+                                    "points": convert_points(tool_result.get("points", [])),
+                                    "group_id": "",
+                                    "description": attributes.get("description", ""),
+                                    "shape_type": shape_dict.get(tool, "linestrip"),
+                                    "flags": {},
+                                    "mask": "",
+                                }
+                                labelme_item["shapes"].append(shape)
+                                
+                        if tool == "pointTool":
+                            tool_results = annotated_result.pop(tool)
+                            for tool_result in tool_results.get("result", []):
+                                attributes = tool_result.get("attributes", {})
+                                shape = {
+                                    "label": get_label(tool, tool_result.get("label", "")),
+                                    "points": [[tool_result.get("x", 0), tool_result.get("y", 0)]],
+                                    "group_id": "",
+                                    "description": attributes.get("description", ""),
+                                    "shape_type": shape_dict.get(tool, "point"),
+                                    "flags": {},
+                                    "mask": "",
+                                }
+                                labelme_item["shapes"].append(shape)
+            result.append(labelme_item)
+            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_name = out_data_dir.joinpath(f"{file_basename}.json")
+            with file_name.open("w") as outfile:
+                # 格式化json，两个空格缩进
+                json.dump(labelme_item, outfile, indent=2, ensure_ascii=False)
+                
+            export_files.append(file_name)
+        
+        
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-label-me.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
+    
+    def convert_to_yolo(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        export_files = []
+        classes = []
+        
+        # make classes
+        for tool in config.get("tools", []):
+            for attr in tool.get("config", {}).get("attributes", []):
+                classes.append(attr.get("value"))
 
+        for attr in config.get("attributes", []):
+            classes.append(attr.get("value"))
+        
+        # make classes.txt
+        classes_file = out_data_dir.joinpath("classes.txt")
+        with classes_file.open("w") as outfile:
+            for c in classes:
+                outfile.write(f"{c}\n")
+        export_files.append(classes_file)
+        
+        for sample in input_data:
+            data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
+            
+            # skip invalid data
+            annotated_result = json.loads(data.get("result"))
+            if sample.get("state") == "SKIPPED" or not annotated_result:
+                continue
+            
+            image_width = annotated_result.get("width", 0)
+            image_height = annotated_result.get("height", 0)
+            
+            for tool in annotated_result.copy().keys():
+                if tool == 'rectTool':
+                    tool_results = annotated_result.pop(tool)
+                    for tool_result in tool_results.get("result", []):
+                        x = tool_result.get("x", 0)
+                        y = tool_result.get("y", 0)
+                        width = tool_result.get("width", 0)
+                        height = tool_result.get("height", 0)
+                        label = tool_result.get("label", "")
+                        x_center = x + width / 2
+                        y_center = y + height / 2
+                        x_center /= image_width
+                        y_center /= image_height
+                        width /= image_width
+                        height /= image_height
+                        file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+                        file_name = out_data_dir.joinpath(f"{file_basename}.txt")
+                        with file_name.open("a") as outfile:
+                            outfile.write(f"{classes.index(label)} {x_center} {y_center} {width} {height}\n")
+                        export_files.append(file_name)
+            
+            
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-yolo.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
+
+    def convert_to_csv(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        export_files = []
+        
+        label_text_dict = {}
+        common_attributes = { attr.get("value"): attr.get("key") for attr in config.get("attributes", [])}
+        
+        def get_label(_tool: str, _input_label: str):
+            _label = label_text_dict.get(_tool, {}).get(_input_label, "")
+            
+            if not _label:
+                _label = common_attributes.get(_input_label, "")
+                
+            return _label
+        
+        def get_attributes(attributes: dict):
+            result = []
+            
+            for value in attributes.values():
+                result.append(", ".join(value) if isinstance(value, list) else value)
+                 
+            return ", ".join(result)
+        
+        def get_points(direction: dict):
+            return [
+                (
+                    direction.get("tl").get("x"),
+                    direction.get("tl").get("y"),
+                ),
+                (
+                    direction.get("tr").get("x"),
+                    direction.get("tr").get("y"),
+                ),
+                (
+                    direction.get("br").get("x"),
+                    direction.get("br").get("y"),
+                ),
+                (
+                    direction.get("bl").get("x"),
+                    direction.get("bl").get("y"),
+                ),
+            ]
+                
+        
+        for tool in config.get("tools", []):
+            label_text_dict[tool.get("tool")] = { attr.get("value"): attr.get("key") for attr in tool.get("config", {}).get("attributes", [])}
+            
+        for sample in input_data:
+            data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
+            # tool_name, label, x, y, width, height etc.
+            rows = []
+            
+            # skip invalid data
+            annotated_result = json.loads(data.get("result"))
+            if sample.get("state") == "SKIPPED" or not annotated_result:
+                continue
+            
+            for tool in annotated_result.copy().keys():
+                if tool == 'rectTool':
+                    tool_results = annotated_result.pop(tool)
+                    rows.append(["tool_name", "label", "label_text", "x", "y", "width", "height", "attributes", "order"])
+                    for tool_result in tool_results.get("result", []):
+                        x = tool_result.get("x", 0)
+                        y = tool_result.get("y", 0)
+                        width = tool_result.get("width", 0)
+                        height = tool_result.get("height", 0)
+                        label = tool_result.get("label", "")
+                        order = tool_result.get("order", 0)
+                        label_text = get_label(tool, label)
+                        rows.append([tool, label, label_text, x, y, width, height, get_attributes(tool_result.get('attributes', {})), order])
+                        
+                if tool == 'lineTool':
+                    tool_results = annotated_result.pop(tool)
+                    rows.append(["tool_name", "label", "label_text", "points", "control_points", "attributes", "order"])
+                    for tool_result in tool_results.get("result", []):
+                        points = tool_result.get("points", [])
+                        control_points = tool_result.get("controlPoints", [])
+                        label = tool_result.get("label", "")
+                        order = tool_result.get("order", 0)
+                        label_text = get_label(tool, label)
+                        rows.append([tool, label, label_text, points, control_points, get_attributes(tool_result.get('attributes', {})), order])
+                        
+                if tool == 'pointTool':
+                    tool_results = annotated_result.pop(tool)
+                    rows.append(["tool_name", "label", "label_text", "x", "y", "order"])
+                    for tool_result in tool_results.get("result", []):
+                        x = tool_result.get("x", 0)
+                        y = tool_result.get("y", 0)
+                        label = tool_result.get("label", "")
+                        order = tool_result.get("order", 0)
+                        label_text = get_label(tool, label)
+                        rows.append([tool, label, label_text, x, y, order])
+                        
+                if tool == 'polygonTool':
+                    tool_results = annotated_result.pop(tool)
+                    rows.append(["tool_name", "label", "label_text", "points", "attributes", "order"])
+                    for tool_result in tool_results.get("result", []):
+                        points = tool_result.get("points", [])
+                        control_points = tool_result.get("controlPoints", [])
+                        label = tool_result.get("label", "")
+                        order = tool_result.get("order", 0)
+                        label_text = get_label(tool, label)
+                        rows.append([tool, label, label_text, points, control_points, get_attributes(tool_result.get('attributes', {})), order])
+                
+                if tool == 'cuboidTool':
+                    tool_results = annotated_result.pop(tool)
+                    rows.append(["tool_name", "label", "label_text", "direction", "front", "back", "attributes", "order"])
+                    for tool_result in tool_results.get("result", []):
+                        direction = tool_result.get("direction")
+                        # [[x,y], ...]
+                        front = get_points(tool_result.get("front"))
+                        back = get_points(tool_result.get("back"))
+                        width = tool_result.get("width", 0)
+                        height = tool_result.get("height", 0)
+                        label = tool_result.get("label", "")
+                        order = tool_result.get("order", 0)
+                        label_text = get_label(tool, label)
+                        rows.append([tool, label, label_text, direction, front, back, get_attributes(tool_result.get('attributes', {})), order])
+                        
+            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_name = out_data_dir.joinpath(f"{file_basename}.csv")
+            with file_name.open("w") as outfile:
+                writer = csv.writer(outfile)
+                writer.writerows(rows)
+            export_files.append(file_name)
+            
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-csv.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
+
+
+    def convert_to_xml(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        file_full_path = out_data_dir.joinpath("result.xml")
+        
+        # result struct
+        xml_converter = XML_converter()
+        root = xml_converter.create_root("root")
+        sample_item = ET.Element("sample")
+        
+        for sample in input_data:
+            data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
+            
+            # skip invalid data
+            annotated_result = json.loads(data.get("result"))
+            result = ET.Element("result")
+            if annotated_result and sample.get("state") == "SKIPPED":
+                ET.SubElement(result, "valid").text = "False"
+
+            ET.SubElement(sample_item, "id").text = str(sample.get("id"))
+            ET.SubElement(sample_item, "fileName").text = file.get("filename", "")[9:]
+            ET.SubElement(sample_item, "url").text = file.get("url")
+            
+            ET.SubElement(result, "width").text = str(annotated_result.get("width", 0))
+            ET.SubElement(result, "height").text = str(annotated_result.get("height", 0))
+            ET.SubElement(result, "rotate").text = str(annotated_result.get("rotate", 0))
+            
+            # change result struct
+            if annotated_result:
+                annotations = ET.Element("annotations")
+                for tool in annotated_result.copy().keys():
+                    tool_results = annotated_result.pop(tool)
+                    if tool.endswith("Tool"):
+                        tool_annotations = xml_converter.convert_tool_results(tool, tool_results)
+                
+                        for annotation in tool_annotations:
+                            annotations.append(annotation)
+                    
+                result.append(annotations)
+            
+            sample_item.append(result)
+            
+        root.append(sample_item)    
+        tree = ET.ElementTree(root)
+        tree.write(file_full_path, encoding="utf-8", xml_declaration=True)
+        logger.info("Export file path: {}", file_full_path)
+        return file_full_path
+    
+    def convert_to_tf_record(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        export_files = []
+        
+        # result struct
+        tf_record_examples = TF_record_converter().create_tf_examples(input_data, config)
+        
+        for sample in input_data:
+            file = sample.get("file", {})
+            example = tf_record_examples.pop(0)
+            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            tf_record = f"{file_basename}.tfrecord"
+            file_full_path = out_data_dir.joinpath(tf_record)
+            
+            with file_full_path.open("wb") as outfile:
+                outfile.write(example.SerializeToString())
+                
+            export_files.append(file_full_path)
+        
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-tfrecord.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
+    
+    def convert_to_pascal_voc(self, config: dict, input_data: List[dict], out_data_file_name_prefix: str, out_data_dir: str):
+        out_data_dir.mkdir(parents=True, exist_ok=True)
+        export_files = []
+        
+        xml_converter = XML_converter()
+        
+        for sample in input_data:
+            data = json.loads(sample.get("data"))
+            file = sample.get("file", {})
+            
+            # skip invalid data
+            annotated_result = json.loads(data.get("result"))
+            if sample.get("state") == "SKIPPED" or not annotated_result:
+                continue
+            
+            voc_xml = xml_converter.create_pascal_voc_xml(config, file, annotated_result)
+            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_name = out_data_dir.joinpath(f"{file_basename}.xml")
+            
+            tree = ET.ElementTree(voc_xml)
+            tree.write(file_name, encoding="utf-8", xml_declaration=True)
+            
+            export_files.append(file_name)
+    
+        file_relative_path_zip = f"task-{out_data_file_name_prefix}-pascal-voc.zip"
+        file_full_path_zip = out_data_dir.joinpath(file_relative_path_zip)
+        
+        with ZipFile(file_full_path_zip, "w") as zipf:
+            for f in export_files:
+                zipf.write(str(f), arcname=f.name)
+        logger.info("Export file path: {}", file_full_path_zip)
+        return file_full_path_zip
+    
 def _polygonArea(X, Y):
 
     # Initialize area
@@ -351,6 +857,5 @@ def _polygonArea(X, Y):
 
     # Return absolute value
     return abs(area) / 2.0
-
 
 converter = Converter()
