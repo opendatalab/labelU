@@ -2,7 +2,6 @@ from typing import List, Union
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
-from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
