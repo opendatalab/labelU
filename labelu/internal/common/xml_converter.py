@@ -29,6 +29,8 @@ class XML_converter:
         height.text = str(image_height)
         depth = ET.SubElement(size_elem, "depth")
         depth.text = "3"
+        rotate = ET.SubElement(size_elem, "rotate")
+        rotate.text = str(sample_result.get("rotate", 0))
         
         label_text_dict = {}
         

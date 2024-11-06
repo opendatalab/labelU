@@ -1,4 +1,5 @@
 import json
+from PIL import Image
 from typing import List
 from tfrecord import example_pb2
 from labelu.internal.common.config import settings
@@ -44,13 +45,18 @@ class TF_record_converter:
             
             image_width = annotated_result.get("width", 0)
             image_height = annotated_result.get("height", 0)
+            rotate = annotated_result.get("rotate", 0)
             
             filename = file.get("filename", "")[9:]
             ext = filename.split('.')[-1]
             
             file_full_path = settings.MEDIA_ROOT.joinpath(file.get("path").lstrip("/"))
-            with open(file_full_path, "rb") as image_file:
-                encoded_image_data = image_file.read()
+            
+            with Image.open(file_full_path) as img:
+                if rotate:
+                    img = img.rotate(rotate)
+                    image_width, image_height = img.size
+                    encoded_image_data = img.tobytes()
             
             xmins = []
             xmaxs = []

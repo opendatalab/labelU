@@ -9,11 +9,11 @@ from enum import Enum
 import xml.etree.ElementTree as ET
 from typing import List
 from loguru import logger
+
 from .xml_converter import XML_converter
 from .tf_record_converter import TF_record_converter
-
-from labelu.internal.common.color import colors
-from labelu.internal.common.config import settings
+from .color import colors
+from .config import settings
 
 
 class Format(str, Enum):
@@ -566,29 +566,40 @@ class Converter:
             if sample.get("state") == "SKIPPED" or not annotated_result:
                 continue
             
+            image_path = settings.MEDIA_ROOT.joinpath(file.get("path").lstrip("/"))
+            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_name = out_data_dir.joinpath(f"{file_basename}.txt")
             image_width = annotated_result.get("width", 0)
             image_height = annotated_result.get("height", 0)
+            rotate = annotated_result.get("rotate", 0)
             
-            for tool in annotated_result.copy().keys():
-                if tool == 'rectTool':
-                    tool_results = annotated_result.pop(tool)
-                    for tool_result in tool_results.get("result", []):
-                        x = tool_result.get("x", 0)
-                        y = tool_result.get("y", 0)
-                        width = tool_result.get("width", 0)
-                        height = tool_result.get("height", 0)
-                        label = tool_result.get("label", "")
-                        x_center = x + width / 2
-                        y_center = y + height / 2
-                        x_center /= image_width
-                        y_center /= image_height
-                        width /= image_width
-                        height /= image_height
-                        file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
-                        file_name = out_data_dir.joinpath(f"{file_basename}.txt")
-                        with file_name.open("a") as outfile:
+            with Image.open(image_path) as img:
+                if rotate:
+                    img = img.rotate(rotate, expand=True)
+                image_width, image_height = img.size
+            
+            with file_name.open("a") as outfile:
+                if rotate:
+                    outfile.write(f"# rotate: {rotate}\n")
+                    
+                for tool in annotated_result.copy().keys():
+                    if tool == 'rectTool':
+                        tool_results = annotated_result.pop(tool)
+                        for tool_result in tool_results.get("result", []):
+                            x = tool_result.get("x", 0)
+                            y = tool_result.get("y", 0)
+                            width = tool_result.get("width", 0)
+                            height = tool_result.get("height", 0)
+                            label = tool_result.get("label", "")
+                            x_center = x + width / 2
+                            y_center = y + height / 2
+                            x_center /= image_width
+                            y_center /= image_height
+                            width /= image_width
+                            height /= image_height
+                            
                             outfile.write(f"{classes.index(label)} {x_center} {y_center} {width} {height}\n")
-                        export_files.append(file_name)
+                            export_files.append(file_name)
             
             
         file_relative_path_zip = f"task-{out_data_file_name_prefix}-yolo.zip"
