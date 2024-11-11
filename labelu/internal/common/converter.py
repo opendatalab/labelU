@@ -2,6 +2,7 @@ import base64
 import csv
 import json
 import os
+from xml.dom import minidom
 from zipfile import ZipFile
 from PIL import Image, ImageDraw
 from enum import Enum
@@ -752,8 +753,8 @@ class Converter:
         
         # result struct
         xml_converter = XML_converter()
-        root = xml_converter.create_root("root")
-        sample_item = ET.Element("sample")
+        root = ET.Element("root")
+        sample_item = ET.SubElement(root, "sample")
         
         for sample in input_data:
             data = json.loads(sample.get("data"))
@@ -761,13 +762,15 @@ class Converter:
             
             # skip invalid data
             annotated_result = json.loads(data.get("result"))
-            result = ET.Element("result")
+            result = ET.SubElement(sample_item, "result")
             if annotated_result and sample.get("state") == "SKIPPED":
                 ET.SubElement(result, "valid").text = "False"
 
             ET.SubElement(sample_item, "id").text = str(sample.get("id"))
-            ET.SubElement(sample_item, "fileName").text = file.get("filename", "")[9:]
-            ET.SubElement(sample_item, "url").text = file.get("url")
+            
+            ET.SubElement(sample_item, "folder").text = str(settings.MEDIA_ROOT)
+            ET.SubElement(sample_item, "path").text = file.get("path")
+            ET.SubElement(sample_item, "fileName").text = file.get("filename", "")
             
             ET.SubElement(result, "width").text = str(annotated_result.get("width", 0))
             ET.SubElement(result, "height").text = str(annotated_result.get("height", 0))
@@ -775,7 +778,7 @@ class Converter:
             
             # change result struct
             if annotated_result:
-                annotations = ET.Element("annotations")
+                annotations = ET.SubElement(result, "annotations")
                 for tool in annotated_result.copy().keys():
                     tool_results = annotated_result.pop(tool)
                     if tool.endswith("Tool"):
@@ -783,12 +786,7 @@ class Converter:
                 
                         for annotation in tool_annotations:
                             annotations.append(annotation)
-                    
-                result.append(annotations)
-            
-            sample_item.append(result)
-            
-        root.append(sample_item)    
+               
         tree = ET.ElementTree(root)
         tree.write(file_full_path, encoding="utf-8", xml_declaration=True)
         logger.info("Export file path: {}", file_full_path)
