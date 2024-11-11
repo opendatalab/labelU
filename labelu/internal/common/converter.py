@@ -2,7 +2,6 @@ import base64
 import csv
 import json
 import os
-from xml.dom import minidom
 from zipfile import ZipFile
 from PIL import Image, ImageDraw
 from enum import Enum
