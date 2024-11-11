@@ -1,4 +1,5 @@
 import json
+import os
 from PIL import Image
 from typing import List
 from tfrecord import example_pb2
@@ -47,16 +48,16 @@ class TF_record_converter:
             image_height = annotated_result.get("height", 0)
             rotate = annotated_result.get("rotate", 0)
             
-            filename = file.get("filename", "")[9:]
-            ext = filename.split('.')[-1]
+            _, file_extension = os.path.splitext(file.get("filename", ""))
             
             file_full_path = settings.MEDIA_ROOT.joinpath(file.get("path").lstrip("/"))
             
             with Image.open(file_full_path) as img:
                 if rotate:
                     img = img.rotate(rotate)
-                    image_width, image_height = img.size
-                    encoded_image_data = img.tobytes()
+
+                image_width, image_height = img.size
+                encoded_image_data = img.tobytes()
             
             xmins = []
             xmaxs = []
@@ -79,7 +80,7 @@ class TF_record_converter:
                 "image/filename": self._bytes_feature(file['filename'].encode('utf8')),
                 "image/source_id": self._bytes_feature(file['filename'].encode('utf8')),
                 "image/encoded": self._bytes_feature(encoded_image_data),
-                "image/format": self._bytes_feature(ext.encode('utf8')),
+                "image/format": self._bytes_feature(file_extension.encode('utf8')),
             }
 
             for tool in annotated_result.copy().keys():
