@@ -2,11 +2,6 @@ import xml.etree.ElementTree as ET
 from labelu.internal.common.config import settings
 
 class XML_converter:
-    def create_root(self, root_name: str):
-        root = ET.Element(root_name)
-        
-        return root
-    
     def create_pascal_voc_xml(self, config: dict, file: dict, sample_result: dict):
         annotation = ET.Element("annotation")
         
@@ -58,9 +53,11 @@ class XML_converter:
                     name.text = get_label(tool, tool_result.get("label", ""))
                     # get value from attributes
                     truncated = ET.SubElement(obj_elem, "truncated")
-                    truncated.text = str(tool_result.get("attributes", {}).get("truncated", 0))
+                    truncated_value = tool_result.get("attributes", {}).get("truncated", [0])
+                    truncated.text = str(truncated_value[0])
                     difficult = ET.SubElement(obj_elem, "difficult")
-                    difficult.text = str(tool_result.get("attributes", {}).get("difficult", 0))
+                    difficult_value = tool_result.get("attributes", {}).get("difficult", [0])
+                    difficult.text = str(difficult_value[0])
 
                     bndbox = ET.SubElement(obj_elem, "bndbox")
                     xmin = ET.SubElement(bndbox, "xmin")
@@ -103,15 +100,14 @@ class XML_converter:
         result = ET.Element("attributes")
         
         for key, value in attributes.items():
-            attribute = ET.Element("attribute")
+            attribute = ET.SubElement(result, "attribute")
             ET.SubElement(attribute, "key").text = key
-            ET.SubElement(attribute, "value").text = value
-            result.append(attribute)
+            ET.SubElement(attribute, "value").text = value if isinstance(value, str) else ", ".join(value)
         
         return result
     
     def create_rect(self, anno: dict):
-        annotation = ET.Element("rect")
+        annotation = ET.Element("object")
         
         ET.SubElement(annotation, "toolName").text = "rectTool"
         
@@ -131,7 +127,7 @@ class XML_converter:
         return annotation
     
     def create_polygon(self, anno: dict):
-        annotation = ET.Element("polygon")
+        annotation = ET.Element("object")
         
         ET.SubElement(annotation, "toolName").text = "polygonTool"
         
@@ -170,7 +166,7 @@ class XML_converter:
         return annotation
     
     def create_point(self, anno: dict):
-        annotation = ET.Element("point")
+        annotation = ET.Element("object")
         
         ET.SubElement(annotation, "toolName").text = "pointTool"
         
@@ -187,7 +183,7 @@ class XML_converter:
         return annotation
     
     def create_line(self, anno: dict):
-        annotation = ET.Element("line")
+        annotation = ET.Element("object")
         
         ET.SubElement(annotation, "toolName").text = "lineTool"
         
@@ -226,7 +222,7 @@ class XML_converter:
         return annotation
     
     def create_cuboid(self, anno: dict):
-        annotation = ET.Element("cuboid")
+        annotation = ET.Element("object")
         
         ET.SubElement(annotation, "toolName").text = "cuboidTool"
         
@@ -260,42 +256,35 @@ class XML_converter:
         return annotation
     
     def create_tag(self, anno: dict):
-        annotation = ET.Element("tag")
-        
+        annotation = ET.Element("object")
+        result = ET.SubElement(annotation, "result")
         ET.SubElement(annotation, "toolName").text = "tagTool"
         
-        result = ET.Element("result")
         
         ET.SubElement(result, "order").text = str(anno.get("order", 0))
         
         ET.SubElement(result, "id").text = anno.get("id", "")
         
-        values = ET.Element("values")
+        values = ET.SubElement(result, "values")
+        
         for key, value in anno.get("value", {}).items():
             ET.SubElement(values, key).text = ", ".join(value) if value else ""
-        
-            
-        result.append(values)
-        annotation.append(result)
         
         return annotation
     
     def create_text(self, anno: dict):
-        annotation = ET.Element("text")
+        annotation = ET.Element("object")
         
+        result = ET.SubElement(annotation, "result")
         ET.SubElement(annotation, "toolName").text = "textTool"
-        
-        result = ET.Element("result")
         
         ET.SubElement(result, "order").text = str(anno.get("order", 0))
         ET.SubElement(result, "id").text = anno.get("id", "")
         
-        values = ET.Element("values")
+        values = ET.SubElement(result, "values")
+        
         for key, value in anno.get("value", {}).items():
             ET.SubElement(values, key).text = value
-        
-        result.append(values)
-        annotation.append(result)
         
         return annotation
   
