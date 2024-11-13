@@ -8,7 +8,7 @@ from labelu.internal.domain.models.attachment import TaskAttachment
 def list_by(
     db: Session,
     pageSize: int,
-    ids: List[int] | None = None,
+    ids: List[int] | None = [],
     task_id: Optional[int] = None,
     owner_id: Optional[int] = None,
     after: Optional[int] = None,
@@ -17,7 +17,7 @@ def list_by(
     sorting: Optional[str] = None,
 ) -> Tuple[List[TaskAttachment], int]:
 # query filter
-    query_filter = [TaskAttachment.deleted_at == None]
+    query_filter = [TaskAttachment.deleted_at == None, TaskAttachment.id.in_(ids)]
     if owner_id:
         query_filter.append(TaskAttachment.created_by == owner_id)
         
@@ -27,9 +27,6 @@ def list_by(
         query_filter.append(TaskAttachment.id > after)
     if task_id:
         query_filter.append(TaskAttachment.task_id == task_id)
-        
-    if ids:
-        query_filter.append(TaskAttachment.id.in_(ids))
         
     query = db.query(TaskAttachment).filter(*query_filter)
 
