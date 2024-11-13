@@ -1,10 +1,63 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional, Tuple
 
 from sqlalchemy.orm import Session
 
 from labelu.internal.domain.models.attachment import TaskAttachment
 
+def list_by(
+    db: Session,
+    pageSize: int,
+    ids: List[int] | None = None,
+    task_id: Optional[int] = None,
+    owner_id: Optional[int] = None,
+    after: Optional[int] = None,
+    before: Optional[int] = None,
+    pageNo: Optional[int] = None,
+    sorting: Optional[str] = None,
+) -> Tuple[List[TaskAttachment], int]:
+# query filter
+    query_filter = [TaskAttachment.deleted_at == None]
+    if owner_id:
+        query_filter.append(TaskAttachment.created_by == owner_id)
+        
+    if before:
+        query_filter.append(TaskAttachment.id < before)
+    if after:
+        query_filter.append(TaskAttachment.id > after)
+    if task_id:
+        query_filter.append(TaskAttachment.task_id == task_id)
+        
+    if ids:
+        query_filter.append(TaskAttachment.id.in_(ids))
+        
+    query = db.query(TaskAttachment).filter(*query_filter)
+
+    # default order by id, before need select last items
+    if before:
+        query = query.order_by(TaskAttachment.id.desc())
+    else:
+        query = query.order_by(TaskAttachment.id.asc())
+        
+    count = query.count()
+    
+    results = (
+        query.offset(offset=pageNo * pageSize if pageNo else 0)
+        .limit(limit=pageSize)
+        .all()
+    )
+    
+    if sorting:
+        field, order = sorting.split(":")
+        if order == "desc":
+            results = sorted(results, key=lambda x: getattr(x, field), reverse=True)
+        else:
+            results = sorted(results, key=lambda x: getattr(x, field))
+    
+    if before:
+        results.reverse()
+        
+    return results, count
 
 def create(db: Session, attachment: TaskAttachment) -> TaskAttachment:
     db.add(attachment)

@@ -12,7 +12,6 @@ from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
 from labelu.internal.domain.models.user import User
-from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.attachment import TaskAttachment
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_attachment
