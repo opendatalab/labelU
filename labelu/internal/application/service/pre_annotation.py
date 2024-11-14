@@ -62,23 +62,24 @@ async def create(
         
         pre_annotations = []
         for pre_annotation in cmd:
-            jsonl_file = crud_attachment.get(db, pre_annotation.file_id)
-            exist_pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id_and_sample_name(db=db, task_id=task_id, owner_id=current_user.id, sample_name=jsonl_file.filename)
-            
-            if len(exist_pre_annotations) > 0:
-                raise LabelUException(
-                    code=ErrorCode.CODE_55002_SAMPLE_NAME_EXISTS,
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                )
-            
-            pre_annotation_contents = read_pre_annotation_file(jsonl_file)
+            pre_annotation_file = crud_attachment.get(db, pre_annotation.file_id)
+            pre_annotation_contents = read_pre_annotation_file(pre_annotation_file)
             
             for _item in pre_annotation_contents:
+                sample_name = _item.get("sample_name") if pre_annotation_file.filename.endswith(".jsonl") else _item.get("fileName")
+                exist_pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id_and_sample_name(db=db, task_id=task_id, owner_id=current_user.id, sample_name=sample_name)
+                
+                if len(exist_pre_annotations) > 0:
+                    raise LabelUException(
+                        code=ErrorCode.CODE_55002_SAMPLE_NAME_EXISTS,
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                    )
+                    
                 pre_annotations.append(
                     TaskPreAnnotation(
                         task_id=task_id,
                         file_id=pre_annotation.file_id,
-                        sample_name= _item.get("sample_name") if jsonl_file.filename.endswith(".jsonl") else _item.get("fileName"),
+                        sample_name=sample_name,
                         data=json.dumps(_item, ensure_ascii=False),
                         created_by=current_user.id,
                         updated_by=current_user.id,

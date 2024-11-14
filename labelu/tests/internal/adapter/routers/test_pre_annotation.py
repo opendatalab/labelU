@@ -227,6 +227,7 @@ class TestClassTaskPreAnnotationRouter:
             TaskPreAnnotation(
                 task_id=task.id,
                 file_id=jsonl.json()["data"]["id"],
+                sample_name=img.json()["data"]["filename"],
                 created_by=current_user.id,
                 updated_by=current_user.id,
             )
