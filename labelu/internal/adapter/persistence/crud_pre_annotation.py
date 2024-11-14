@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Union, Tuple
 
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from fastapi.encoders import jsonable_encoder
 
 from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
@@ -34,7 +35,7 @@ def list_by(
         query_filter.append(TaskPreAnnotation.task_id == task_id)
         
     if sample_name:
-        query_filter.append(TaskPreAnnotation.sample_name == sample_name)
+        query_filter.append(or_(TaskPreAnnotation.sample_name == sample_name, TaskPreAnnotation.sample_name == sample_name[9:]))
         
     query = db.query(TaskPreAnnotation).filter(*query_filter)
 
@@ -72,6 +73,14 @@ def list_by_task_id_and_owner_id(db: Session, task_id: int, owner_id: int) -> Di
     ).all()
     
     return pre_annotations
+
+def list_by_task_id_and_file_id(db: Session, task_id: int, file_id: int, owner_id: int) -> List[TaskPreAnnotation]:
+    return db.query(TaskPreAnnotation).filter(
+        TaskPreAnnotation.task_id == task_id,
+        TaskPreAnnotation.created_by == owner_id,
+        TaskPreAnnotation.deleted_at == None,
+        TaskPreAnnotation.file_id == file_id
+    ).all()
 
 def list_by_task_id_and_owner_id_and_sample_name(db: Session, task_id: int, owner_id: int, sample_name: str) -> List[TaskPreAnnotation]:
     """list pre annotations by task_id, owner_id and sample_name without pagination

@@ -149,7 +149,7 @@ class Converter:
                     "id": sample.get("id"),
                     "result": annotated_result_str,
                     "url": file.get("url"),
-                    "fileName": file.get("filename", "")[9:],
+                    "fileName": file.get("filename", ""),
                 }
             )
 
@@ -222,7 +222,7 @@ class Converter:
             # coco image
             image = {
                 "id": sample.get("id"),
-                "fileName": file.get("filename", "")[9:],
+                "fileName": file.get("filename", ""),
                 "width": annotation_result.get("width", 0),
                 "height": annotation_result.get("height", 0),
                 "valid": False
@@ -319,7 +319,7 @@ class Converter:
             logger.info("data is: {}", sample)
             filename = file.get("filename")
             if filename and filename.split("/")[-1]:
-                file_relative_path_base_name = filename.split("/")[-1].split(".")[0][9:]
+                file_relative_path_base_name = filename.split("/")[-1].split(".")[0]
             else:
                 file_relative_path_base_name = "result"
 
@@ -444,7 +444,7 @@ class Converter:
             if sample.get("state") == "SKIPPED":
                 continue
             
-            labelme_item["imagePath"] = file.get("filename", "")[9:]
+            labelme_item["imagePath"] = file.get("filename", "")
             labelme_item["imageData"] = image_to_base64(file.get("path"))
             
             if annotated_result:
@@ -520,7 +520,7 @@ class Converter:
                                 }
                                 labelme_item["shapes"].append(shape)
             result.append(labelme_item)
-            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.json")
             with file_name.open("w") as outfile:
                 # 格式化json，两个空格缩进
@@ -567,7 +567,7 @@ class Converter:
                 continue
             
             image_path = settings.MEDIA_ROOT.joinpath(file.get("path").lstrip("/"))
-            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.txt")
             image_width = annotated_result.get("width", 0)
             image_height = annotated_result.get("height", 0)
@@ -730,7 +730,7 @@ class Converter:
                         label_text = get_label(tool, label)
                         rows.append([tool, label, label_text, direction, front, back, get_attributes(tool_result.get('attributes', {})), order])
                         
-            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.csv")
             with file_name.open("w") as outfile:
                 writer = csv.writer(outfile)
@@ -801,7 +801,7 @@ class Converter:
         for sample in input_data:
             file = sample.get("file", {})
             example = tf_record_examples.pop(0)
-            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_basename = os.path.splitext(file.get("filename", ""))[0]
             tf_record = f"{file_basename}.tfrecord"
             file_full_path = out_data_dir.joinpath(tf_record)
             
@@ -834,7 +834,7 @@ class Converter:
                 continue
             
             voc_xml = xml_converter.create_pascal_voc_xml(config, file, annotated_result)
-            file_basename = os.path.splitext(file.get("filename", "")[9:])[0]
+            file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.xml")
             
             tree = ET.ElementTree(voc_xml)

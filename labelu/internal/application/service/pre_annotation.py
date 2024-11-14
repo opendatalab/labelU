@@ -21,7 +21,7 @@ from labelu.internal.application.response.pre_annotation import CreatePreAnnotat
 from labelu.internal.application.response.pre_annotation import PreAnnotationResponse
 from labelu.internal.application.response.attachment import AttachmentResponse
 
-def read_jsonl_file(attachment: TaskAttachment) -> List[dict]:
+def read_pre_annotation_file(attachment: TaskAttachment) -> List[dict]:
     if attachment is None:
         return []
 
@@ -29,17 +29,23 @@ def read_jsonl_file(attachment: TaskAttachment) -> List[dict]:
     file_full_path = settings.MEDIA_ROOT.joinpath(attachment_path.lstrip("/"))
     
     # check if the file exists
-    if not file_full_path.exists() or not attachment.filename.endswith('.jsonl'):
+    if not file_full_path.exists() or (not attachment.filename.endswith('.jsonl') and not attachment.filename.endswith('.json')):
         return []
 
     try:
-        with open(file_full_path, "r", encoding="utf-8") as f:
-            data = f.readlines()
+        if attachment.filename.endswith('.jsonl'):
+            with open(file_full_path, "r", encoding="utf-8") as f:
+                data = f.readlines()
+                return [json.loads(line) for line in data]
+        else:
+            with open(file_full_path, "r", encoding="utf-8") as f:    
+                # parse result
+                parsed_data = json.load(f)
+                
+                return [{**item, "result": json.loads(item["result"])} for item in parsed_data]
+    
     except FileNotFoundError:
         raise LabelUException(status_code=404, code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND)
-
-    parsed_data = [json.loads(line) for line in data]
-    return parsed_data
 
 async def create(
     db: Session, task_id: int, cmd: List[CreatePreAnnotationCommand], current_user: User
@@ -65,15 +71,15 @@ async def create(
                     status_code=status.HTTP_400_BAD_REQUEST,
                 )
             
-            jsonl_contents = read_jsonl_file(jsonl_file)
+            pre_annotation_contents = read_pre_annotation_file(jsonl_file)
             
-            for jsonl_content in jsonl_contents:
+            for _item in pre_annotation_contents:
                 pre_annotations.append(
                     TaskPreAnnotation(
                         task_id=task_id,
                         file_id=pre_annotation.file_id,
-                        sample_name=jsonl_content.get("sample_name"),
-                        data=json.dumps(jsonl_content, ensure_ascii=False),
+                        sample_name= _item.get("sample_name") if jsonl_file.filename.endswith(".jsonl") else _item.get("fileName"),
+                        data=json.dumps(_item, ensure_ascii=False),
                         created_by=current_user.id,
                         updated_by=current_user.id,
                     )
@@ -138,20 +144,37 @@ async def list_pre_annotation_files(
     sorting: Optional[str],
     current_user: User,
 ) -> Tuple[List[TaskAttachment], int]:
-    pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id(db=db, task_id=task_id, owner_id=current_user.id)
-    file_ids = [pre_annotation.file_id for pre_annotation in pre_annotations]
-    
-    attachments, total = crud_attachment.list_by(db=db, ids=file_ids, after=after, before=before, pageNo=pageNo, pageSize=pageSize, sorting=sorting)
+    try:
+        pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id(db=db, task_id=task_id, owner_id=current_user.id)
+        file_ids = [pre_annotation.file_id for pre_annotation in pre_annotations]
+        
+        attachments, total = crud_attachment.list_by(db=db, ids=file_ids, after=after, before=before, pageNo=pageNo, pageSize=pageSize, sorting=sorting)
+        
+        _attachment_ids = [attachment.id for attachment in attachments]
+        def get_sample_names():
+            _names = []
+            for pre_annotation in pre_annotations:
+                if pre_annotation.file_id in _attachment_ids and pre_annotation.sample_name is not None:
+                    _names.append(pre_annotation.sample_name)
+                    
+            return _names
 
-    return [
-        PreAnnotationFileResponse(
-            id=attachment.id,
-            url=attachment.url,
-            filename=attachment.filename,
-            sample_names=[pre_annotation.sample_name for pre_annotation in pre_annotations if pre_annotation.file_id == attachment.id]
+        return [
+            PreAnnotationFileResponse(
+                id=attachment.id,
+                url=attachment.url,
+                filename=attachment.filename,
+                sample_names=get_sample_names(),
+            )
+            for attachment in attachments
+        ], total
+        
+    except Exception as e:
+        logger.error("list pre annotation files error: {}", e)
+        raise LabelUException(
+            code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
-        for attachment in attachments
-    ], total
 
 
 async def get(
@@ -189,7 +212,7 @@ async def delete_pre_annotation_file(
     db: Session, task_id: int, file_id: int, current_user: User
 ) -> CommonDataResp:
     with db.begin():
-        pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id_and_sample_name(db=db, task_id=task_id, owner_id=current_user.id, sample_name=crud_attachment.get(db, file_id).filename)
+        pre_annotations = crud_pre_annotation.list_by_task_id_and_file_id(db=db, task_id=task_id, owner_id=current_user.id, file_id=file_id)
         pre_annotation_ids = [pre_annotation.id for pre_annotation in pre_annotations]
         crud_pre_annotation.delete(db=db, pre_annotation_ids=pre_annotation_ids)
         crud_attachment.delete(db=db, attachment_ids=[file_id])
