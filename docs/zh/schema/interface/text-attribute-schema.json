@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "标签名称"
+    },
+    "value": {
+      "type": "string",
+      "description": "标签值"
+    },
+    "type": {
+      "type": "string",
+      "const": "string",
+      "description": "标签属性为文本类型",
+      "default": "string"
+    },
+    "max_length": {
+      "type": ["number", "null"],
+      "description": "最大字符长度"
+    },
+    "regexp": {
+      "type": "string",
+      "description": "字符正则验证"
+    },
+    "stringType": {
+      "type": "string",
+      "enum": ["text", "number", "regexp", "english", "order"],
+      "default": "text",
+      "description": "字符类型"
+    },
+    "defaultValue": {
+      "type": "string",
+      "description": "默认值"
+    }
+  },
+  "required": ["key", "value", "type"]
+}

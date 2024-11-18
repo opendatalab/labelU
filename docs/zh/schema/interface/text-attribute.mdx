@@ -1,0 +1,20 @@
+import jsonschema from './text-attribute-schema.json';
+import JsonSchemaTable from 'components/schema-table';
+
+# Text attribute config schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+	"key": "标签-1",
+	"value": "text-label-1",
+	"required": true,
+	"type": "string",
+	"maxLength": 1000,
+	"stringType": "text",
+	"defaultValue": ""
+}
+```

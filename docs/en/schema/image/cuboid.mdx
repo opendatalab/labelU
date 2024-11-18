@@ -1,0 +1,61 @@
+import jsonschema from './cuboid-schema.json';
+import JsonSchemaTable from 'components/schema-table';
+
+# Cuboid tool annotation schema
+
+## Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "toolName": "cuboidTool",
+  "result": [
+    {
+      "id": "026815a5-6149-46b2-acaf-3f72f02bac1c",
+      "direction": "front",
+      "front": {
+        "tl": {
+          "x": 1462.8745754642832,
+          "y": 629.9911885609806
+        },
+        "tr": {
+          "x": 1515.2846582265065,
+          "y": 629.9911885609806
+        },
+        "br": {
+          "x": 1515.2846582265065,
+          "y": 673.1464092563549
+        },
+        "bl": {
+          "x": 1462.8745754642832,
+          "y": 673.1464092563549
+        }
+      },
+      "back": {
+        "tl": {
+          "x": 1474.6371715130847,
+          "y": 630.3624051292308
+        },
+        "tr": {
+          "x": 1524.6376574369958,
+          "y": 630.3624051292308
+        },
+        "br": {
+          "x": 1524.6376574369958,
+          "y": 671.5335289130235
+        },
+        "bl": {
+          "x": 1474.6371715130847,
+          "y": 671.5335289130235
+        }
+      },
+      "order": 2,
+      "attributes": {},
+      "attribute": "car"
+    }
+  ]
+}
+```

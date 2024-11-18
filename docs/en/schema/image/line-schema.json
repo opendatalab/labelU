@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "identifier"
+    },
+    "type": {
+      "type": "string",
+      "description": "line or spline",
+      "default": "line"
+    },
+    "controlPoints": {
+      "type": "array",
+      "description": "control points",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          }
+        },
+        "required": ["x", "y"]
+      }
+    },
+    "points": {
+      "type": "array",
+      "description": "points",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["x", "y", "id"]
+      }
+    },
+    "visible": {
+      "type": "boolean",
+      "description": "visibility"
+    },
+    "attributes": {
+      "type": "object",
+      "description": "category attributes, key-value pairs",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "order": {
+      "type": "number",
+      "description": "order of annotation"
+    },
+    "label": {
+      "type": "string",
+      "description": "annotation category"
+    }
+  },
+  "required": ["type", "points", "id", "", "order", "label"]
+}

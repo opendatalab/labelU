@@ -1,0 +1,13 @@
+
+[
+  {
+    "type": "file",
+    "name": "tag",
+    "label": "Tag"
+  },
+  {
+    "type": "file",
+    "name": "text",
+    "label": "Text"
+  }
+]

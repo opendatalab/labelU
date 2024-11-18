@@ -1,0 +1,32 @@
+[
+  {
+    "type": "dir",
+    "name": "global",
+    "label": "全局工具"
+  },
+  {
+    "type": "dir",
+    "name": "image",
+    "label": "图片"
+  },
+  {
+    "type": "dir",
+    "name": "audio",
+    "label": "音频"
+  },
+  {
+    "type": "dir",
+    "name": "video",
+    "label": "视频"
+  },
+  {
+    "type": "dir",
+    "name": "pre-annotation",
+    "label": "预标注"
+  },
+  {
+    "type": "dir",
+    "name": "interface",
+    "label": "类型接口"
+  }
+]

@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "identifier"
+    },
+    "direction": {
+      "type": "string",
+      "description": "front direction: front, back, left, right",
+      "default": "front"
+    },
+    "front": {
+      "type": "object",
+      "description": "coordinates of the four points on the front",
+      "properties": {
+        "tl": {
+          "type": "object",
+          "description": "top-left corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "tr": {
+          "type": "object",
+          "description": "top-right corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "br": {
+          "type": "object",
+          "description": "bottom-right corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "bl": {
+          "type": "object",
+          "description": "bottom-left corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        }
+      },
+      "required": [
+        "tl",
+        "tr",
+        "br",
+        "bl"
+      ]
+    },
+    "back": {
+      "type": "object",
+      "description": "coordinates of the four points on the back",
+      "properties": {
+        "tl": {
+          "type": "object",
+          "description": "top-left corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "tr": {
+          "type": "object",
+          "description": "top-right corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "br": {
+          "type": "object",
+          "description": "bottom-right corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "bl": {
+          "type": "object",
+          "description": "bottom-left corner coordinates",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        }
+      },
+      "required": [
+        "tl",
+        "tr",
+        "br",
+        "bl"
+      ]
+    },
+    "visible": {
+      "type": "boolean",
+      "description": "visibility",
+      "default": true
+    },
+    "attributes": {
+      "type": "object",
+      "description": "category attributes, key-value pairs",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "order": {
+      "type": "integer",
+      "description": "annotation order",
+      "minimum": 0
+    },
+    "label": {
+      "type": "string",
+      "description": "annotation category"
+    }
+  },
+  "required": ["direction", "front", "back", "x", "y", "width", "height", "id", "order", "label"]
+}

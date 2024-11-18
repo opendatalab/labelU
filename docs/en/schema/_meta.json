@@ -1,0 +1,32 @@
+[
+  {
+    "type": "dir",
+    "name": "global",
+    "label": "Global tools"
+  },
+  {
+    "type": "dir",
+    "name": "image",
+    "label": "Image"
+  },
+  {
+    "type": "dir",
+    "name": "audio",
+    "label": "Audio"
+  },
+  {
+    "type": "dir",
+    "name": "video",
+    "label": "Video"
+  },
+  {
+    "type": "dir",
+    "name": "pre-annotation",
+    "label": "Pre-annotation"
+  },
+  {
+    "type": "dir",
+    "name": "interface",
+    "label": "Interfaces"
+  }
+]

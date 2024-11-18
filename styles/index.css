@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rp-c-brand: #0d53de;
+  --rp-c-brand-dark: #0d53de;
+}
+
+
+.table :where(th,td) {
+  padding: .75rem 1rem;
+  vertical-align: middle;
+}
+
+thead th {
+  color: #121316cc;
+  text-align: left;
+  font-weight: 700;
+}
+
+.dark thead th {
+  color: #fff;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #F8FAFC;
+}
+
+.dark tbody tr:nth-child(odd) {
+  background-color: var(--rp-c-brand-tint);
+}

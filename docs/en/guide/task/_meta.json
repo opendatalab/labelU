@@ -1,0 +1,18 @@
+
+[
+  {
+    "type": "file",
+    "name": "basic",
+    "label": "Basic Config"
+  },
+  {
+    "type": "file",
+    "name": "upload",
+    "label": "Data Upload"
+  },
+  {
+    "type": "file",
+    "name": "config",
+    "label": "Annotation Config"
+  }
+]

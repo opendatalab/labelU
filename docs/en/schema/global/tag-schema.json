@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "identifier"
+    },
+    "type": {
+      "type": "string",
+      "const": "tag",
+      "default": "tag"
+    },
+    "value": {
+      "type": "object",
+      "description": "Tag classification",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          }
+        ]
+      }
+    }
+  },
+  "required": ["id", "type"]
+}

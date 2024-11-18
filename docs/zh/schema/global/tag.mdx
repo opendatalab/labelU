@@ -1,0 +1,28 @@
+import jsonschema from './tag-schema.json';
+import JsonSchemaTable from 'components/schema-table';
+
+
+# Tag tool annotation schema
+
+## Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "toolName": "tagTool",
+  "result": [
+    {
+      "id": "kgou2hwrq4",
+      "type": "tag",
+      "value": {
+        "tag-label-1": [
+          "tag-label-1-1"
+        ]
+      }
+    }
+  ]
+}
+```

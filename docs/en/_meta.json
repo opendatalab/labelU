@@ -1,0 +1,10 @@
+[{
+  "text": "guide",
+  "link": "/guide/introduction",
+  "activeMatch": "/guide"
+},
+{
+  "text": "schema",
+  "link": "/schema/global/tag",
+  "activeMatch": "/schema"
+}]

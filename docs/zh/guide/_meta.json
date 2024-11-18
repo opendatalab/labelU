@@ -1,0 +1,42 @@
+[
+  {
+    "type": "file",
+    "name": "introduction",
+    "label": "产品简介"
+  },
+  {
+    "type": "file",
+    "name": "install",
+    "label": "安装"
+  },
+  {
+    "type": "file",
+    "name": "account",
+    "label": "注册与登录"
+  },
+  {
+    "type": "dir",
+    "name": "task",
+    "label": "创建任务"
+  },
+  {
+    "type": "dir",
+    "name": "annotation",
+    "label": "任务标注"
+  },
+  {
+    "type": "file",
+    "name": "view",
+    "label": "查看任务"
+  },
+  {
+    "type": "file",
+    "name": "export",
+    "label": "结果导出"
+  },
+  {
+    "type": "file",
+    "name": "deploy",
+    "label": "部署"
+  }
+]

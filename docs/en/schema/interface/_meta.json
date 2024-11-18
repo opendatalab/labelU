@@ -1,0 +1,13 @@
+
+[
+  {
+    "type": "file",
+    "name": "text-attribute",
+    "label": "TextAttribute"
+  },
+  {
+    "type": "file",
+    "name": "tag-attribute",
+    "label": "TagAttribute"
+  }
+]

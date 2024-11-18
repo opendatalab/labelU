@@ -1,0 +1,56 @@
+# Installation
+
+1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), choose the appropriate operating system type and download and install it.
+
+:::tip
+
+If your system is MacOS with an Intel chip, please install the [Intel x86_64 version of Miniconda](https://repo.anaconda.com/miniconda/).
+
+:::
+
+2. After installation, run the following command in the terminal (choose the default `y` for prompts during the process):
+
+```bash
+conda create -n labelu python=3.11
+```
+
+:::tip
+
+On Windows, you can run the above command in the Anaconda Prompt program.
+
+:::
+
+3. Activate the environment:
+
+```bash
+conda activate labelu
+```
+
+4. Install LabelU:
+
+```bash
+pip install labelu
+```
+
+:::info
+
+To install the test version: `pip install --extra-index-url https://test.pypi.org/simple/ labelu==<test_version_number>`, You can find the test version number in the [test.pypi.org](https://test.pypi.org/project/labelu/#history).
+
+:::
+
+5. Run LabelU:
+
+```bash
+labelu
+```
+:::tip
+
+If deploying on a cloud server using this method, you need to set the `--host` parameter to `0.0.0.0`:
+
+```bash
+labelu --host 0.0.0.0
+```
+
+:::
+
+6. Open your browser and visit [http://localhost:8000/](http://localhost:8000/) to use LabelU.
