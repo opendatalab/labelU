@@ -74,6 +74,11 @@ jobs:
         with:
           path: ./doc_build
 
+      - name: Send release notification
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: node ./notification.js
+
   # Deployment job
   deploy:
     environment:
@@ -90,10 +95,4 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
         shell: bash
-
-      - name: Send release notification
-        env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-        run: |
-          node ./notification.js
         
