@@ -6,22 +6,8 @@ export default defineConfig({
   root: path.join(__dirname, 'docs'),
   title: 'LabelU',
   lang: 'zh',
-  description: 'Rspack-based Static Site Generator',
-  locales: [
-    {
-      lang: 'en',
-      label: 'English',
-      title: 'Modern.js',
-      description: 'Modern.js 文档框架',
-    },
-    {
-      lang: 'zh',
-      // 导航栏切换语言的标签
-      label: '简体中文',
-      title: 'Modern.js',
-      description: 'Rspress',
-    },
-  ],
+  base: '/labelU/',
+  description: 'LabelU is a comprehensive data annotation platform designed for handling multimodal data. It offers a range of advanced annotation tools and efficient workflows, making it easier for users to tackle annotation tasks involving images, videos, and audio. LabelU is tailored to meet the demands of complex data analysis and model training.',
   icon: '/logo.svg',
   logoText: "LabelU",
   logo: {
@@ -53,7 +39,7 @@ export default defineConfig({
         lang: 'en',
         label: 'English',
         title: 'LabelU',
-        description: 'The Rspack-based build tool for the web',
+        description: 'LabelU is a comprehensive data annotation platform designed for handling multimodal data. It offers a range of advanced annotation tools and efficient workflows, making it easier for users to tackle annotation tasks involving images, videos, and audio. LabelU is tailored to meet the demands of complex data analysis and model training.',
         editLink: {
           docRepoBaseUrl:
             'https://github.com/opendatalab/labelU/tree/website',
@@ -63,11 +49,11 @@ export default defineConfig({
       {
         lang: 'zh',
         label: '简体中文',
-        title: 'Rsbuild',
+        title: 'LabelU',
         outlineTitle: '目录',
         prevPageText: '上一页',
         nextPageText: '下一页',
-        description: '基于 Rspack 的 Web 构建工具',
+        description: 'LabelU是一款综合性的数据标注平台，专为处理多模态数据而设计。该平台旨在通过提供丰富的标注工具和高效的工作流程，帮助用户更轻松地处理图像、视频和音频数据的标注任务，满足各种复杂的数据分析和模型训练需求。',
         editLink: {
           docRepoBaseUrl:
             'https://github.com/opendatalab/labelU/tree/website',
