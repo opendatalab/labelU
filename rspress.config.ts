@@ -42,7 +42,7 @@ export default defineConfig({
         description: 'LabelU is a comprehensive data annotation platform designed for handling multimodal data. It offers a range of advanced annotation tools and efficient workflows, making it easier for users to tackle annotation tasks involving images, videos, and audio. LabelU is tailored to meet the demands of complex data analysis and model training.',
         editLink: {
           docRepoBaseUrl:
-            'https://github.com/opendatalab/labelU/tree/website',
+            'https://github.com/opendatalab/labelU/tree/website/docs',
           text: 'Edit this page on GitHub',
         },
       },
