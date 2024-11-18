@@ -1,0 +1,54 @@
+{
+  "gettingStarted": {
+    "en": "Getting Started",
+    "zh": "开始"
+  },
+  "features": {
+    "en": "Features",
+    "zh": "特性"
+  },
+  "guide": {
+    "en": "Guide",
+    "zh": "指南"
+  },
+  "schema": {
+    "en": "Schema",
+    "zh": "标注格式"
+  },
+  "playground": {
+    "en": "Playground",
+    "zh": "示例"
+  },
+  "installation": {
+    "en": "Installation",
+    "zh": "安装"
+  },
+  "field": {
+    "en": "Field",
+    "zh": "字段"
+  },
+  "type": {
+    "en": "Type",
+    "zh": "类型"
+  },
+  "required": {
+    "en": "Required",
+    "zh": "必填"
+  },
+  "default": {
+    "en": "Default",
+    "zh": "默认值"
+  },
+  "description": {
+    "en": "Description",
+    "zh": "描述"
+  },
+  "yes": {
+    "en": "Yes",
+    "zh": "是"
+  },
+  "no": {
+    "en": "No",
+    "zh": "否"
+  }
+}

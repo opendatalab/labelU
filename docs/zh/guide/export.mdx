@@ -1,0 +1,260 @@
+# 导出标注
+
+LabelU 支持多种标注格式数据导出，方便用户在不同场景下使用标注数据。
+
+:::info
+v1.1.0 版本开始，导出的标注文件中 sample 的文件名将不包含前缀，原本用意是为了避免文件名重复；现改为文件名冲突将上传失败。
+:::
+
+## JSON
+
+  > 支持图片、视频、音频
+
+  json 格式是 LabelU 默认的导出格式，支持图片、视频、音频的标注数据导出。详细格式参考 [标注格式 - JSON 预标注](/schema/pre-annotation/json)。
+
+## XML
+
+  > 支持图片、视频、音频
+
+  示例：
+
+    ```xml title="task-name.xml"
+    <?xml version='1.0' encoding='utf-8'?>
+    <root>
+      <sample>
+        <id>773</id>
+        <folder>/Users/youname/Library/Application Support/labelu/media</folder>
+        <path>upload/277/57c82ae6-2018.jpg</path>
+        <fileName>57c82ae6-2018.jpg</fileName>
+        <result>
+          <width>321</width>
+          <height>481</height>
+          <rotate>90</rotate>
+          <annotations>
+            <object>
+              <toolName>rectTool</toolName>
+              <result>
+                <x>61.82131661442006</x>
+                <y>53.946185997910135</y>
+                <width>210.0919540229885</width>
+                <height>205.56844305120165</height>
+                <label>label-1</label>
+                <order>1</order>
+                <attributes />
+              </result>
+            </object>
+          </annotations>
+        </result>
+      </sample>
+    </root>
+    ```
+
+## CSV
+
+> 仅支持图片标注，且单一标注工具的场景
+
+示例：
+  
+```csv title="task-name.csv"
+tool_name,label,label_text,x,y,width,height,attributes,order
+rectTool,label-1,标签-1,59.37397310283619,49.79279958727368,212.84475544654453,103.16854120486352,"0, 0, 我是描述-1",1
+rectTool,label-1,标签-1,59.56744730525572,163.03303996537298,204.22043257564826,97.59722021834268,"1, 1, 我是描述-2",2
+```
+
+## COCO
+
+> 图片（目标检测、实例分割、关键点检测）
+
+示例：
+```json title="task-name.json"
+{
+  "images": [
+    {
+      "id": 773,
+      "fileName": "57c82ae6-2018.jpg",
+      "width": 321,
+      "height": 481,
+      "valid": true,
+      "rotate": 90
+    }
+  ],
+  "annotations": [
+    {
+      "image_id": 773,
+      "id": 0,
+      "iscrowd": 0,
+      "segmentation": [],
+      "area": 21958.88292252593,
+      "bbox": [
+        59.37397310283619, 49.79279958727368, 212.84475544654453,
+        103.16854120486352
+      ],
+      "category_id": 0,
+      "order": 1
+    },
+    {
+      "image_id": 773,
+      "id": 1,
+      "iscrowd": 0,
+      "segmentation": [],
+      "area": 19931.346531170748,
+      "bbox": [
+        59.56744730525572, 163.03303996537298, 204.22043257564826,
+        97.59722021834268
+      ],
+      "category_id": 0,
+      "order": 2
+    }
+  ],
+  "categories": [
+    { "id": 0, "name": "label-1", "supercategory": "" },
+    { "id": 1, "name": "text-label-1", "supercategory": "" }
+  ]
+}
+```
+
+## Mask
+
+> 图片（实例分割）
+
+mask 导出一个 zip 文件，其中包含：
+
+- colors.json 文件，包含了每个类别的颜色信息
+- \{sample-name\}-segmentation.png 文件，多通道 mask 图片
+- \{sample-name\}-tranids.png 文件，单通道 mask 图片
+
+示例：
+
+![polygon-annotation-mask](/polygon-annotation.png)
+
+```json title="colors.json"
+[
+  {
+    "color": "rgb(128,0,0)",
+    "colorList": [128, 0, 0, 255],
+    "trainIds": 1,
+    "attribute": "camera"
+  },
+  {
+    "color": "rgb(0,128,0)",
+    "colorList": [0, 128, 0, 255],
+    "trainIds": 2,
+    "attribute": "phone"
+  },
+  {
+    "color": "rgb(128,128,0)",
+    "colorList": [128, 128, 0, 255],
+    "trainIds": 3,
+    "attribute": "map"
+  }
+]
+```
+
+多通道 mask 图片：
+
+![多通道 mask 图片](/polygon-mask-segmentation.png)
+
+单通道 mask 图片：
+
+![单通道 mask 图片](/polygon-mask-trainids.png)
+
+:::tip
+灰度图，从 0 开始，每个类别灰度值 + 1，最大支持 255 个类别，类别少的情况下肉眼不好区别。
+:::
+
+## YOLO
+> 图片（目标检测）
+
+yolo 格式导出的 zip 包含一个 classes.txt 文件和一个或多个以样本名称为文件名的 txt 文件。
+
+示例：
+```txt title="classes.txt"
+label-1
+text-label-1
+```
+
+```txt title="57c82ae6-2018.txt" {1}
+# rotate: 90
+0 0.3446909580584375 0.31581641803646554 0.4425046890780551 0.32139732462574305
+0 0.3361281987382117 0.6599116824752159 0.42457470389947666 0.30404118448081835
+```
+
+:::info
+如果样本在标注时有旋转角度，yolo 格式导出的 txt 文件中会包含 `# rotate: 90` 这样的注释，表示该样本的旋转角度。
+:::
+
+
+## TFRecord
+
+> 图片（目标检测、实例分割、关键点检测）
+
+用于 TensorFlow 框架的数据集格式，包含了图片和标注信息，可以直接用于训练模型。
+
+:::info
+在 LabelU 旋转后的图片，TFRecord 格式导出的图片也会旋转再保存。
+:::
+
+## Pascal VOC
+
+> 图片（目标检测）
+
+在导出的 zip 文件中包含多个 xml 文件，每个 xml 文件对应一个样本的标注信息。
+
+示例：
+
+```xml title="57c82ae6-2018.xml"
+<?xml version='1.0' encoding='utf-8'?>
+<annotation>
+  <folder>/Users/gary/Library/Application Support/labelu/media</folder>
+  <filename>57c82ae6-2018.jpg</filename>
+  <path>upload/277/57c82ae6-2018.jpg</path>
+  <size>
+    <width>321</width>
+    <height>481</height>
+    <depth>3</depth>
+    <rotate>90</rotate>
+  </size>
+  <object>
+    <name>标签-1</name>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>59.37397310283619</xmin>
+      <ymin>49.79279958727368</ymin>
+      <xmax>272.2187285493807</xmax>
+      <ymax>152.9613407921372</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>标签-1</name>
+    <truncated>1</truncated>
+    <difficult>1</difficult>
+    <bndbox>
+      <xmin>59.56744730525572</xmin>
+      <ymin>163.03303996537298</ymin>
+      <xmax>263.787879880904</xmax>
+      <ymax>260.6302601837157</ymax>
+    </bndbox>
+  </object>
+</annotation>
+```
+
+:::tip
+其中的 `truncated` 和 `difficult` 字段是 Pascal VOC 标注格式的特有字段；在 LabelU 标注配置中，需要在 标签配置中配置对应的标签属性，即可导出这两个字段。
+
+配置如图：
+![标签配置](/pascal-voc-config.png)
+
+标注效果：
+![标注效果](/pascal-voc-annotation.png)
+:::
+
+## LabelMe
+
+兼容 LabelMe 的标注格式。
+
+:::note
+LabelU中的标注工具不完全兼容 LabelMe 的标注格式，只支持拉框、多边形、标点工具的标注数据导出。
+:::
+
+![LabelMe](/labelme-image.png)

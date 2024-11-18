@@ -1,0 +1,26 @@
+import jsonschema from './segmentation-schema.json';
+import JsonSchemaTable from 'components/schema-table';
+
+# Video segmentation schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "toolName": "videoSegmentTool",
+  "result": [
+    {
+      "id": "dtgvrzgfgcp",
+      "start": 5.713595166163143,
+      "end": 9.89003,
+      "order": 2,
+      "label": "label-1",
+      "attributes": {
+        "car": ["smart"]
+      }
+    }
+  ]
+}
+```

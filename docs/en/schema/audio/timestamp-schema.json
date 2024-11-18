@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "identifier"
+    },
+    "time": {
+      "type": "number",
+      "description": "timestamp"
+    },
+    "order": {
+      "type": "integer",
+      "description": "annotation order",
+      "minimum": 0
+    },
+    "label": {
+      "type": "string",
+      "description": "annotation category"
+    },
+    "attributes": {
+      "type": "object",
+      "description": "category attributes, key-value pairs",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": ["time", "id", "order", "label"]
+}

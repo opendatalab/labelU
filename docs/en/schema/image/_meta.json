@@ -1,0 +1,28 @@
+
+[
+  {
+    "type": "file",
+    "name": "point",
+    "label": "Point"
+  },
+  {
+    "type": "file",
+    "name": "line",
+    "label": "Line"
+  },
+  {
+    "type": "file",
+    "name": "rect",
+    "label": "Rect"
+  },
+  {
+    "type": "file",
+    "name": "polygon",
+    "label": "Polygon"
+  },
+  {
+    "type": "file",
+    "name": "cuboid",
+    "label": "Cuboid"
+  }
+]

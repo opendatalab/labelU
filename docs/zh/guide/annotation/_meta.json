@@ -1,0 +1,18 @@
+
+[
+  {
+    "type": "file",
+    "name": "image",
+    "label": "图片"
+  },
+  {
+    "type": "file",
+    "name": "video",
+    "label": "视频"
+  },
+  {
+    "type": "file",
+    "name": "audio",
+    "label": "音频"
+  }
+]

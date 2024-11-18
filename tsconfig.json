@@ -1,50 +1,20 @@
 {
   "compilerOptions": {
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "target": "ES2020",
+    "lib": ["DOM", "ES2020"],
     "module": "ESNext",
-    "target": "ES2015",
-    "isolatedModules": true,
-    "composite": true,
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
     "jsx": "react-jsx",
-    "declaration": true,
-    "declarationMap": true,
-    "downlevelIteration": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
+    "noEmit": true,
     "strict": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "types": [
-      "node",
-      "jest"
-    ]
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": true,
+    "allowImportingTsExtensions": true
   },
-  "include": [
-    "src",
-    "src/**/*.json"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ],
-  "exclude": [
-    "dist",
-    "openapi.config.ts",
-    "**/*.test.tsx",
-    "**/*.test.ts"
-  ]
+  "include": ["docs", "theme", "rspress.config.ts", "components"],
+  "mdx": {
+    "checkMdx": true
+  }
 }

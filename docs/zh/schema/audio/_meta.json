@@ -1,0 +1,13 @@
+
+[
+  {
+    "type": "file",
+    "name": "segmentation",
+    "label": "片断分割"
+  },
+  {
+    "type": "file",
+    "name": "timestamp",
+    "label": "时间戳"
+  }
+]

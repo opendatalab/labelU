@@ -1,0 +1,262 @@
+# Export Annotations
+
+LabelU supports exporting annotation data in various formats, making it convenient for users to use annotation data in different scenarios.
+
+:::info
+Starting from version v1.1.0, the filenames of samples in the exported annotation files will not include prefixes. The original intention was to avoid filename duplication; now, filename conflicts will cause the upload to fail.
+:::
+
+## JSON
+
+> Supports images, videos, and audio
+
+JSON format is the default export format of LabelU, supporting the export of annotation data for images, videos, and audio. For detailed format, refer to [Annotation Format - JSON Pre-annotation](/schema/pre-annotation/json).
+
+## XML
+
+> Supports images, videos, and audio
+
+Example:
+
+```xml title="task-name.xml"
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <sample>
+    <id>773</id>
+    <folder>/Users/youname/Library/Application Support/labelu/media</folder>
+    <path>upload/277/57c82ae6-2018.jpg</path>
+    <fileName>57c82ae6-2018.jpg</fileName>
+    <result>
+      <width>321</width>
+      <height>481</height>
+      <rotate>90</rotate>
+      <annotations>
+        <object>
+          <toolName>rectTool</toolName>
+          <result>
+            <x>61.82131661442006</x>
+            <y>53.946185997910135</y>
+            <width>210.0919540229885</width>
+            <height>205.56844305120165</height>
+            <label>label-1</label>
+            <order>1</order>
+            <attributes />
+          </result>
+        </object>
+      </annotations>
+    </result>
+  </sample>
+</root>
+```
+
+## CSV
+
+> Only supports image annotations with a single annotation tool
+
+Example:
+
+```csv title="task-name.csv"
+tool_name,label,label_text,x,y,width,height,attributes,order
+rectTool,label-1,label-1,59.37397310283619,49.79279958727368,212.84475544654453,103.16854120486352,"0, 0, I am description-1",1
+rectTool,label-1,label-1,59.56744730525572,163.03303996537298,204.22043257564826,97.59722021834268,"1, 1, I am description-2",2
+```
+
+## COCO
+
+> Images (object detection, instance segmentation, keypoint detection)
+
+Example:
+
+```json title="task-name.json"
+{
+	"images": [
+		{
+			"id": 773,
+			"fileName": "57c82ae6-2018.jpg",
+			"width": 321,
+			"height": 481,
+			"valid": true,
+			"rotate": 90
+		}
+	],
+	"annotations": [
+		{
+			"image_id": 773,
+			"id": 0,
+			"iscrowd": 0,
+			"segmentation": [],
+			"area": 21958.88292252593,
+			"bbox": [
+				59.37397310283619, 49.79279958727368, 212.84475544654453,
+				103.16854120486352
+			],
+			"category_id": 0,
+			"order": 1
+		},
+		{
+			"image_id": 773,
+			"id": 1,
+			"iscrowd": 0,
+			"segmentation": [],
+			"area": 19931.346531170748,
+			"bbox": [
+				59.56744730525572, 163.03303996537298, 204.22043257564826,
+				97.59722021834268
+			],
+			"category_id": 0,
+			"order": 2
+		}
+	],
+	"categories": [
+		{ "id": 0, "name": "label-1", "supercategory": "" },
+		{ "id": 1, "name": "text-label-1", "supercategory": "" }
+	]
+}
+```
+
+## Mask
+
+> Images (instance segmentation)
+
+Mask export generates a zip file that includes:
+
+- `colors.json`, containing color information for each category
+- `{sample-name}-segmentation.png`, multi-channel mask image
+- `{sample-name}-trainids.png`, single-channel mask image
+
+Example:
+
+![polygon-annotation-mask](/polygon-annotation.png)
+
+```json title="colors.json"
+[
+	{
+		"color": "rgb(128,0,0)",
+		"colorList": [128, 0, 0, 255],
+		"trainIds": 1,
+		"attribute": "camera"
+	},
+	{
+		"color": "rgb(0,128,0)",
+		"colorList": [0, 128, 0, 255],
+		"trainIds": 2,
+		"attribute": "phone"
+	},
+	{
+		"color": "rgb(128,128,0)",
+		"colorList": [128, 128, 0, 255],
+		"trainIds": 3,
+		"attribute": "map"
+	}
+]
+```
+
+Multi-channel mask image:
+
+![Multi-channel mask image](/polygon-mask-segmentation.png)
+
+Single-channel mask image:
+
+![Single-channel mask image](/polygon-mask-trainids.png)
+
+:::tip
+Grayscale image, starting from 0, each category's grayscale value + 1, supports up to 255 categories. It is difficult to distinguish with the naked eye when there are few categories.
+:::
+
+## YOLO
+
+> Images (object detection)
+
+YOLO format export generates a zip file containing a `classes.txt` file and one or more txt files named after the sample names.
+
+Example:
+
+```txt title="classes.txt"
+label-1
+text-label-1
+```
+
+```txt title="57c82ae6-2018.txt" {1}
+# rotate: 90
+0 0.3446909580584375 0.31581641803646554 0.4425046890780551 0.32139732462574305
+0 0.3361281987382117 0.6599116824752159 0.42457470389947666 0.30404118448081835
+```
+
+:::info
+If the sample has a rotation angle during annotation, the txt file exported in YOLO format will include a comment like `# rotate: 90`, indicating the rotation angle of the sample.
+:::
+
+## TFRecord
+
+> Images (object detection, instance segmentation, keypoint detection)
+
+A dataset format for the TensorFlow framework, containing images and annotation information, can be directly used for training models.
+
+:::info
+In LabelU, rotated images will also be saved as rotated in the TFRecord format export.
+:::
+
+## Pascal VOC
+
+> Images (object detection)
+
+The exported zip file contains multiple xml files, each corresponding to the annotation information of a sample.
+
+Example:
+
+```xml title="57c82ae6-2018.xml"
+<?xml version='1.0' encoding='utf-8'?>
+<annotation>
+  <folder>/Users/gary/Library/Application Support/labelu/media</folder>
+  <filename>57c82ae6-2018.jpg</filename>
+  <path>upload/277/57c82ae6-2018.jpg</path>
+  <size>
+    <width>321</width>
+    <height>481</height>
+    <depth>3</depth>
+    <rotate>90</rotate>
+  </size>
+  <object>
+    <name>label-1</name>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>59.37397310283619</xmin>
+      <ymin>49.79279958727368</ymin>
+      <xmax>272.2187285493807</xmax>
+      <ymax>152.9613407921372</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>label-1</name>
+    <truncated>1</truncated>
+    <difficult>1</difficult>
+    <bndbox>
+      <xmin>59.56744730525572</xmin>
+      <ymin>163.03303996537298</xmin>
+      <xmax>263.787879880904</xmax>
+      <ymax>260.6302601837157</ymax>
+    </bndbox>
+  </object>
+</annotation>
+```
+
+:::tip
+The `truncated` and `difficult` fields are unique to the Pascal VOC annotation format; in LabelU annotation configuration, you need to configure the corresponding label attributes in the label configuration to export these two fields.
+
+Configuration example:
+![Label Configuration](/pascal-voc-config.png)
+
+Annotation effect:
+![Annotation Effect](/pascal-voc-annotation.png)
+:::
+
+## LabelMe
+
+Compatible with LabelMe annotation format.
+
+:::note
+The annotation tools in LabelU are not fully compatible with the LabelMe annotation format, only supporting the export of annotation data for bounding boxes, polygons, and key points.
+:::
+
+![LabelMe](/labelme-image.png)

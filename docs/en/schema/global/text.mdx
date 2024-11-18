@@ -1,0 +1,26 @@
+import jsonschema from './text-schema.json';
+import JsonSchemaTable from 'components/schema-table';
+
+
+# Text tool annotation schema
+
+## Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "toolName": "textTool",
+  "result": [
+    {
+      "id": "nm5qolxg7tr",
+      "type": "text",
+      "value": {
+        "text-label-1": "This is a description"
+      }
+    }
+  ]
+}
+```

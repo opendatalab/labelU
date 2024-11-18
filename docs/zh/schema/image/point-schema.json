@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
+    "x": {
+      "type": "number",
+      "description": "x坐标"
+    },
+    "y": {
+      "type": "number",
+      "description": "y坐标"
+    },
+    "visible": {
+      "type": "boolean",
+      "description": "是否可见",
+      "default": true
+    },
+    "attributes": {
+      "type": "object",
+      "description": "类别属性，键值对",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "order": {
+      "type": "integer",
+      "description": "标注顺序",
+      "minimum": 0
+    },
+    "label": {
+      "type": "string",
+      "description": "标注类别"
+    }
+  },
+  "required": ["x", "y", "width", "height", "id", "order", "label"]
+}

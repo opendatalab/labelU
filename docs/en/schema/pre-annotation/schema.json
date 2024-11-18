@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": ""
+    },
+    "result": {
+      "type": "string",
+      "description": "json string"
+    },
+    "url": {
+      "type": "string",
+      "description": "http url of the sample file"
+    },
+    "folder": {
+      "type": "string",
+      "description": "directory of the sample file"
+    },
+    "fileName": {
+      "type": "string",
+      "description": ""
+    }
+  },
+  "required": ["id", "result", "url", "folder", "fileName"]
+}

@@ -1,0 +1,13 @@
+
+[
+  {
+    "type": "file",
+    "name": "tag",
+    "label": "标签分类"
+  },
+  {
+    "type": "file",
+    "name": "text",
+    "label": "文本描述"
+  }
+]

@@ -1,0 +1,18 @@
+
+[
+  {
+    "type": "file",
+    "name": "basic",
+    "label": "基础配置"
+  },
+  {
+    "type": "file",
+    "name": "upload",
+    "label": "数据导入"
+  },
+  {
+    "type": "file",
+    "name": "config",
+    "label": "标注配置"
+  }
+]

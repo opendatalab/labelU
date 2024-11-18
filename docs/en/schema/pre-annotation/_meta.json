@@ -1,0 +1,13 @@
+
+[
+  {
+    "type": "dir",
+    "name": "jsonl",
+    "label": "JSONL"
+  },
+  {
+    "type": "file",
+    "name": "json",
+    "label": "JSON"
+  }
+]

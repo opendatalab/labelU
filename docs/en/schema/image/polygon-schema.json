@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
+    "type": {
+      "type": "string",
+      "description": "线条类型: line（直线），spline（曲线）",
+      "default": "line"
+    },
+    "controlPoints": {
+      "type": "array",
+      "description": "贝塞尔曲线控制点列表",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "x坐标"
+          },
+          "y": {
+            "type": "number",
+            "description": "y坐标"
+          }
+        },
+        "required": ["x", "y"]
+      }
+    },
+    "points": {
+      "type": "array",
+      "description": "标注点列表",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "x坐标"
+          },
+          "y": {
+            "type": "number",
+            "description": "y坐标"
+          }
+        },
+        "required": ["x", "y"]
+      }
+    },
+    "visible": {
+      "type": "boolean",
+      "description": "是否可见",
+      "default": true
+    },
+    "attributes": {
+      "type": "object",
+      "description": "类别属性，键值对",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "order": {
+      "type": "integer",
+      "description": "标注顺序",
+      "minimum": 0
+    },
+    "label": {
+      "type": "string",
+      "description": "标注类别"
+    }
+  },
+  "required": ["type", "points", "x", "y", "width", "height", "id", "order", "label"]
+}

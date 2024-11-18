@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "唯一标识"
+    },
+    "result": {
+      "type": "string",
+      "description": "标注结果的 json 字符串"
+    },
+    "url": {
+      "type": "string",
+      "description": "样本文件的 http url"
+    },
+    "folder": {
+      "type": "string",
+      "description": "样本文件所在的文件夹"
+    },
+    "fileName": {
+      "type": "string",
+      "description": "样本文件名"
+    }
+  },
+  "required": ["id", "result", "url", "folder", "fileName"]
+}

@@ -1,0 +1,13 @@
+
+[
+  {
+    "type": "file",
+    "name": "segmentation",
+    "label": "Segmentation"
+  },
+  {
+    "type": "file",
+    "name": "timestamp",
+    "label": "Timestamp"
+  }
+]

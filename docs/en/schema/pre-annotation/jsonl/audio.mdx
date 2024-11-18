@@ -1,0 +1,90 @@
+import jsonschema from './audio-schema.json';
+import JsonSchemaTable from 'components/schema-table';
+
+# Audio pre-anotation schema
+
+## Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+### Example
+
+```json
+{
+  "sample_name": "sample.mp3",
+  "config": {
+    "audioSegmentTool": [
+      {
+        "color": "#ff6600",
+        "key": "标签-1",
+        "value": "label-1"
+      }
+    ],
+    "audioFrameTool": [
+      {
+        "color": "#0040ff",
+        "key": "标签-1",
+        "value": "label-1"
+      }
+    ]
+  },
+  "meta_data": {
+    "duration": 122.0
+  },
+  "annotations": {
+    "audioSegmentTool": {
+      "toolName": "audioSegmentTool",
+      "result": [
+        {
+          "id": "58gz4irdvip",
+          "start": 4.2634441087613295,
+          "end": 8.845921,
+          "order": 1,
+          "label": "label-1",
+          "attributes": {
+            "car": ["smart"]
+          }
+        }
+      ]
+    },
+    "audioFrameTool": {
+      "toolName": "audioFrameTool",
+      "result": [
+        {
+          "id": "cbqbst6gj5f",
+          "time": 5.6555891238670695,
+          "label": "label-1",
+          "order": 3,
+          "attributes": {
+            "contains": "Hello"
+          }
+        }
+      ]
+    },
+    "textTool": {
+      "toolName": "textTool",
+      "result": [
+        {
+          "id": "js6htkz785h",
+          "type": "text",
+          "value": {
+            "text-label-1": "acasdqwe"
+          }
+        }
+      ]
+    },
+    "tagTool": {
+      "toolName": "tagTool",
+      "result": [
+        {
+          "id": "qw8nbms13h",
+          "type": "tag",
+          "value": {
+            "tag-label-1": ["tag-label-1-1"]
+          }
+        }
+      ]
+    }
+  }
+}
+```

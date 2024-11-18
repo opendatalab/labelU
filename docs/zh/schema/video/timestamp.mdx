@@ -1,0 +1,25 @@
+import jsonschema from './timestamp-schema.json';
+import JsonSchemaTable from 'components/schema-table';
+
+# Video timestamp schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "toolName": "videoFrameTool",
+  "result": [
+    {
+      "id": "c8il22ceipi",
+      "time": 7.917824773413897,
+      "label": "label-1",
+      "order": 4,
+      "attributes": {
+        "contains": "Human"
+      }
+    }
+  ]
+}
+```

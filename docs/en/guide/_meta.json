@@ -1,0 +1,42 @@
+[
+  {
+    "type": "file",
+    "name": "introduction",
+    "label": "Introduction"
+  },
+  {
+    "type": "file",
+    "name": "install",
+    "label": "Installations"
+  },
+  {
+    "type": "file",
+    "name": "account",
+    "label": "Account"
+  },
+  {
+    "type": "dir",
+    "name": "task",
+    "label": "Create task"
+  },
+  {
+    "type": "dir",
+    "name": "annotation",
+    "label": "Annotation"
+  },
+  {
+    "type": "file",
+    "name": "view",
+    "label": "Task overview"
+  },
+  {
+    "type": "file",
+    "name": "export",
+    "label": "Export result"
+  },
+  {
+    "type": "file",
+    "name": "deploy",
+    "label": "Deployment"
+  }
+]

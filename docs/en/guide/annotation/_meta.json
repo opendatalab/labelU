@@ -1,0 +1,18 @@
+
+[
+  {
+    "type": "file",
+    "name": "image",
+    "label": "Image"
+  },
+  {
+    "type": "file",
+    "name": "video",
+    "label": "Video"
+  },
+  {
+    "type": "file",
+    "name": "audio",
+    "label": "Audio"
+  }
+]

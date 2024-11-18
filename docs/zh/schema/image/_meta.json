@@ -1,0 +1,28 @@
+
+[
+  {
+    "type": "file",
+    "name": "point",
+    "label": "标点"
+  },
+  {
+    "type": "file",
+    "name": "line",
+    "label": "标线"
+  },
+  {
+    "type": "file",
+    "name": "rect",
+    "label": "拉框"
+  },
+  {
+    "type": "file",
+    "name": "polygon",
+    "label": "多边形"
+  },
+  {
+    "type": "file",
+    "name": "cuboid",
+    "label": "立体框"
+  }
+]

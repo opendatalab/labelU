@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "标签名称"
+    },
+    "value": {
+      "type": "string",
+      "description": "标签值"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["array", "enum"],
+      "description": "标签属性为选择类型",
+      "default": "enum"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "isDefault": {
+            "type": "boolean",
+            "default": false
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": ["key", "value"]
+      }
+    }
+  },
+  "required": ["key", "value", "type", "options"]
+}
