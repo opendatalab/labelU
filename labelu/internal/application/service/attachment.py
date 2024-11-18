@@ -33,56 +33,57 @@ async def create(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    # save file
-    try:
         # file relative path
-        path_filename = cmd.file.filename.split("/")
-        filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1]
-        path = "/".join(path_filename[:-1])
-        attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
-            str(task_id), path
-        )
-        attachment_relative_path = str(attachment_relative_base_dir.joinpath(filename))
+    path_filename = cmd.file.filename.split("/")
+    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1]
+    filename = path_filename[-1]
+    path = "/".join(path_filename[:-1])
+    attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
+        str(task_id), path
+    )
+    attachment_relative_path = str(attachment_relative_base_dir.joinpath(filename))
 
-        # file full path
-        attachment_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(
-            attachment_relative_base_dir
-        )
-        attachment_full_path = Path(settings.MEDIA_ROOT).joinpath(
-            attachment_relative_path
-        )
+    # file full path
+    attachment_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(
+        attachment_relative_base_dir
+    )
+    attachment_full_path = Path(settings.MEDIA_ROOT).joinpath(
+        attachment_relative_path
+    )
 
-        # create dicreatory
-        attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
-
-        # save image
-        logger.info(attachment_full_path)
-        async with aiofiles.open(attachment_full_path, "wb") as out_file:
-            content = await cmd.file.read()  # async read
-            await out_file.write(content)  # async write
-
-        # create thumbnail for image
-        if cmd.file.content_type.startswith("image/"):
-            tumbnail_full_path = Path(
-                f"{attachment_full_path.parent}/{attachment_full_path.stem}-thumbnail{attachment_full_path.suffix}"
-            )
-            logger.info(tumbnail_full_path)
-            image = Image.open(attachment_full_path)
-            image.thumbnail(
-                (
-                    round(image.width / image.height * settings.THUMBNAIL_HEIGH_PIXEL),
-                    settings.THUMBNAIL_HEIGH_PIXEL,
-                ),
-            )
-            if image.mode != "RGB":
-                image = image.convert("RGB")
-            image.save(tumbnail_full_path)
-    except Exception as e:
-        logger.error(e)
+    # create dicreatory
+    attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
+    
+    # check file exist
+    if attachment_full_path.exists():
+        logger.error("file already exists:{}", attachment_full_path)
         raise LabelUException(
-            code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            code=ErrorCode.CODE_51002_TASK_ATTACHMENT_ALREADY_EXISTS,
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
+
+    # save image
+    logger.info(attachment_full_path)
+    async with aiofiles.open(attachment_full_path, "wb") as out_file:
+        content = await cmd.file.read()  # async read
+        await out_file.write(content)  # async write
+
+    # create thumbnail for image
+    if cmd.file.content_type.startswith("image/"):
+        tumbnail_full_path = Path(
+            f"{attachment_full_path.parent}/{attachment_full_path.stem}-thumbnail{attachment_full_path.suffix}"
+        )
+        logger.info(tumbnail_full_path)
+        image = Image.open(attachment_full_path)
+        image.thumbnail(
+            (
+                round(image.width / image.height * settings.THUMBNAIL_HEIGH_PIXEL),
+                settings.THUMBNAIL_HEIGH_PIXEL,
+            ),
+        )
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+        image.save(tumbnail_full_path)
 
     # check file already saved
     if not attachment_full_path.exists() or (

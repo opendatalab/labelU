@@ -72,6 +72,10 @@ class ErrorCode(Enum):
         "Attachment file not found",
     )
 
+    CODE_51002_TASK_ATTACHMENT_ALREADY_EXISTS =(
+        TASK_INIT_CODE + 1002,
+        "Attachment file already exists",
+    )
     # task sample error code
     CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR = (
         TASK_INIT_CODE + 5000,
