@@ -1,6 +1,5 @@
 import aiofiles
 import os
-import uuid
 from PIL import Image
 from pathlib import Path
 
@@ -51,9 +50,6 @@ async def create(
         attachment_relative_path
     )
 
-    # create dicreatory
-    attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
-    
     # check file exist
     if attachment_full_path.exists():
         logger.error("file already exists:{}", attachment_full_path)
@@ -61,6 +57,10 @@ async def create(
             code=ErrorCode.CODE_51002_TASK_ATTACHMENT_ALREADY_EXISTS,
             status_code=status.HTTP_400_BAD_REQUEST,
         )
+        
+    # create dicreatory
+    attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
+    
 
     # save image
     logger.info(attachment_full_path)
