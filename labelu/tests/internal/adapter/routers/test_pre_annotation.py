@@ -12,6 +12,7 @@ from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.attachment import TaskAttachment
 from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
 from labelu.internal.domain.models.sample import TaskSample
+from labelu.tests.utils.utils import empty_task_upload
 
 
 class TestClassTaskPreAnnotationRouter:
@@ -31,6 +32,7 @@ class TestClassTaskPreAnnotationRouter:
         )
         
         # prepare data
+        empty_task_upload(task.id, "test.jsonl")
         with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
             jsonl = client.post(
                 f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
@@ -66,6 +68,8 @@ class TestClassTaskPreAnnotationRouter:
             ),
         )
         
+        empty_task_upload(task.id, "test.jsonl")
+        
         # prepare data
         with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
             res = client.post(
@@ -82,6 +86,8 @@ class TestClassTaskPreAnnotationRouter:
             headers=testuser_token_headers,
             json=data,
         )
+        
+        empty_task_upload(task.id, "test.jsonl")
         
         with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
             res = client.post(
@@ -139,6 +145,8 @@ class TestClassTaskPreAnnotationRouter:
             ),
         )
         
+        empty_task_upload(task.id, "test.jsonl")
+        
         with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
             jsonl = client.post(
                 f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
@@ -194,6 +202,8 @@ class TestClassTaskPreAnnotationRouter:
             ),
         )
         
+        empty_task_upload(task.id, "test.png")
+        empty_task_upload(task.id, "test.jsonl")
         # upload sample file
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
             img = client.post(
@@ -268,7 +278,7 @@ class TestClassTaskPreAnnotationRouter:
                 updated_by=0,
             ),
         )
-        
+        empty_task_upload(task.id, "test.png")
         # upload sample file
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
             img = client.post(
@@ -277,6 +287,7 @@ class TestClassTaskPreAnnotationRouter:
                 files={"file": f},
             )
         # upload jsonl file
+        empty_task_upload(task.id, "test.jsonl")
         with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
             jsonl = client.post(
                 f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
