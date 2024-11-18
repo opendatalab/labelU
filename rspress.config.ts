@@ -56,7 +56,7 @@ export default defineConfig({
         description: 'LabelU是一款综合性的数据标注平台，专为处理多模态数据而设计。该平台旨在通过提供丰富的标注工具和高效的工作流程，帮助用户更轻松地处理图像、视频和音频数据的标注任务，满足各种复杂的数据分析和模型训练需求。',
         editLink: {
           docRepoBaseUrl:
-            'https://github.com/opendatalab/labelU/tree/website',
+            'https://github.com/opendatalab/labelU/tree/website/docs',
           text: '在 GitHub 上编辑此页',
         },
       },
