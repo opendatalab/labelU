@@ -148,6 +148,7 @@ class Converter:
                 {
                     "id": sample.get("id"),
                     "result": annotated_result_str,
+                    "folder": settings.MEDIA_ROOT,
                     "url": file.get("url"),
                     "fileName": file.get("filename", ""),
                 }
