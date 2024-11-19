@@ -97,7 +97,7 @@ def upgrade() -> None:
                     new_task_pre_annotation = TaskPreAnnotation(
                         task_id=task_pre_annotation.task_id,
                         # full file name
-                        sample_name=sample_file.filename,
+                        sample_name=sample_file.filename if sample_file else None,
                         file_id=file_id,
                         created_by=task_pre_annotation.created_by,
                         updated_by=task_pre_annotation.updated_by,
