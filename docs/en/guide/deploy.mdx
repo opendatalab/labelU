@@ -7,7 +7,7 @@ For local deployment, see [Installation](/guide/install).
 ## Dockerfile Example
 
 ```bash
-FROM docker.shlab.tech/public/python:3.11-slim as builder
+FROM python:3.11-slim as builder
 
 # Replace the frontend url with the latest version
 ARG FRONTEND_URL=https://github.com/opendatalab/labelU-Kit/releases/download/v5.4.1/frontend.zip
@@ -38,7 +38,7 @@ RUN pip install poetry -i https://mirrors.aliyun.com/pypi/simple/ && \
 
 ENV BACKEND_VERSION=$BACKEND_VERSION
 
-FROM docker.shlab.tech/public/python:3.11-slim
+FROM python:3.11-slim
 
 ARG BACKEND_VERSION
 ENV BACKEND_VERSION=$BACKEND_VERSION
