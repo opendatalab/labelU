@@ -10,6 +10,21 @@ class CreatePreAnnotationResponse(BaseModel):
     ids: Union[List[int], None] = Field(
         default=None, description="description: attachment ids"
     )
+    
+class PreAnnotationFileResponse(BaseModel):
+    id: int = Field(
+        gt=0,
+        description="description: attachment file id",
+    )
+    filename: str = Field(
+        description="description: attachment file name",
+    )
+    url: str = Field(
+        description="description: attachment file url",
+    )
+    sample_names: List[str] = Field(
+        description="description: sample names",
+    )
 
 
 class PreAnnotationResponse(BaseModel):

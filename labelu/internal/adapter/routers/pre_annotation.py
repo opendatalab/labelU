@@ -2,7 +2,6 @@ from typing import List, Union
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
-from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db
@@ -18,7 +17,7 @@ from labelu.internal.application.response.base import OkResp
 from labelu.internal.application.response.base import MetaData
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.base import OkRespWithMeta
-from labelu.internal.application.response.pre_annotation import PreAnnotationResponse
+from labelu.internal.application.response.pre_annotation import PreAnnotationFileResponse, PreAnnotationResponse
 from labelu.internal.application.response.pre_annotation import CreatePreAnnotationResponse
 
 
@@ -49,6 +48,65 @@ async def create(
     # response
     return OkResp[CreatePreAnnotationResponse](data=data)
 
+@router.get(
+    "/{task_id}/pre_annotations/files",
+    response_model=OkRespWithMeta[List[PreAnnotationFileResponse]],
+    status_code=status.HTTP_200_OK,
+)
+async def list_pre_annotation_files_request(
+    task_id: int,
+    after: Union[int, None] = Query(default=None, gt=0),
+    before: Union[int, None] = Query(default=None, gt=0),
+    pageNo: Union[int, None] = Query(default=None, ge=0),
+    pageSize: Union[int, None] = 100,
+    sort: Union[str, None] = Query(
+        default=None, regex="(created_at):(desc|asc)"
+    ),
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get a list of pre annotation files(json or jsonl).
+    """
+
+    data, total = await service.list_pre_annotation_files(
+        db=db,
+        task_id=task_id,
+        current_user=current_user,
+        after=after,
+        before=before,
+        pageNo=pageNo,
+        pageSize=pageSize,
+        sorting=sort,
+    )
+
+    # response
+    meta_data = MetaData(total=total, page=pageNo, size=len(data))
+    return OkRespWithMeta[List[PreAnnotationFileResponse]](meta_data=meta_data, data=data)
+
+@router.delete(
+    "/{task_id}/pre_annotations/files/{file_id}",
+    response_model=OkResp[CommonDataResp],
+    status_code=status.HTTP_200_OK,
+)
+async def delete_pre_annotation_file_request(
+    task_id: int,
+    file_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Delete a pre annotation file(json or jsonl).
+    """
+
+    data = await service.delete_pre_annotation_file(
+        db=db, task_id=task_id, file_id=file_id, current_user=current_user
+    )
+
+    # response
+    return OkResp[CommonDataResp](data=data)
 
 @router.get(
     "/{task_id}/pre_annotations",
