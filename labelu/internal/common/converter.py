@@ -600,7 +600,7 @@ class Converter:
                             height /= image_height
                             
                             outfile.write(f"{classes.index(label)} {x_center} {y_center} {width} {height}\n")
-                            export_files.append(file_name)
+            export_files.append(file_name)
             
             
         file_relative_path_zip = f"task-{out_data_file_name_prefix}-yolo.zip"
