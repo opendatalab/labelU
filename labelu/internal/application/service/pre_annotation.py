@@ -1,4 +1,6 @@
 import json
+import os
+from pathlib import Path
 from typing import List, Tuple, Optional
 
 from loguru import logger
@@ -213,10 +215,20 @@ async def delete_pre_annotation_file(
     db: Session, task_id: int, file_id: int, current_user: User
 ) -> CommonDataResp:
     with db.begin():
+        attachments = crud_attachment.get_by_ids(
+            db=db, attachment_ids=[file_id]
+        )
+        
+        for attachment in attachments:
+            file_full_path = Path(settings.MEDIA_ROOT).joinpath(attachment.path)
+            os.remove(file_full_path)
+            
         pre_annotations = crud_pre_annotation.list_by_task_id_and_file_id(db=db, task_id=task_id, owner_id=current_user.id, file_id=file_id)
         pre_annotation_ids = [pre_annotation.id for pre_annotation in pre_annotations]
+        
         crud_pre_annotation.delete(db=db, pre_annotation_ids=pre_annotation_ids)
         crud_attachment.delete(db=db, attachment_ids=[file_id])
+            
     # response
     return CommonDataResp(ok=True)
 
