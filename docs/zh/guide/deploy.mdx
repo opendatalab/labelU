@@ -6,54 +6,28 @@ LabelU 支持部署在本地和云端
 
 ## Dockerfile 示例
 
-```bash
-FROM python:3.11-slim as builder
-
-# Replace the frontend url with the latest version
-ARG FRONTEND_URL=https://github.com/opendatalab/labelU-Kit/releases/download/v5.4.1/frontend.zip
-
-# Replace the backend version with the latest version
-ARG BACKEND_VERSION=1.1.0
-
-RUN rm /etc/apt/sources.list.d/debian.sources
-
-RUN echo "deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib" > /etc/apt/sources.list
-
-RUN echo $BACKEND_VERSION
-
-RUN apt-get update && apt-get install -y wget unzip
-
-WORKDIR /labelu
-
-COPY . .
-
-RUN wget $FRONTEND_URL -O frontend.zip && \
-  unzip frontend.zip && \
-  cp -r dist/* labelu/internal/statics/ && \
-  rm frontend.zip
-
-RUN pip install poetry -i https://mirrors.aliyun.com/pypi/simple/ && \
-  poetry source add --priority=default mirrors https://mirrors.aliyun.com/pypi/simple/ && \
-  poetry build
-
-ENV BACKEND_VERSION=$BACKEND_VERSION
-
+```Dockerfile
 FROM python:3.11-slim
 
-ARG BACKEND_VERSION
-ENV BACKEND_VERSION=$BACKEND_VERSION
-
 WORKDIR /labelu
 
-COPY --from=builder /labelu/dist/labelu-${BACKEND_VERSION}-py3-none-any.whl .
+RUN pip3 install labelu==1.1.4
 
-RUN pip3 install labelu-${BACKEND_VERSION}-py3-none-any.whl -i https://mirrors.aliyun.com/pypi/simple/ && \
-    rm labelu-${BACKEND_VERSION}-py3-none-any.whl
-    
-# You can set the media host to your own host
 ENV MEDIA_HOST http://localhost:8000
 
 EXPOSE 8000
 
 CMD ["sh", "-c", "labelu --host=0.0.0.0 --media-host=$MEDIA_HOST"]
+```
+
+### 构建镜像
+
+```bash
+docker build -t labelu:1.1.4 .
+```
+
+### 运行容器
+
+```bash
+docker run -d -p 8000:8000 --name labelu labelu:1.1.4
 ```
