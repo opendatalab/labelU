@@ -11,7 +11,7 @@ FROM python:3.11-slim
 
 WORKDIR /labelu
 
-RUN pip3 install labelu==1.1.4
+RUN pip3 install labelu
 
 ENV MEDIA_HOST http://localhost:8000
 
@@ -23,11 +23,11 @@ CMD ["sh", "-c", "labelu --host=0.0.0.0 --media-host=$MEDIA_HOST"]
 ### Build Image
 
 ```bash
-docker build -t labelu:1.1.4 .
+docker build -t labelu:latest .
 ```
 
 ### Run Container
 
 ```bash
-docker run -d -p 8000:8000 --name labelu labelu:1.1.4
+docker run -d -p 8000:8000 --name labelu labelu:latest
 ```
