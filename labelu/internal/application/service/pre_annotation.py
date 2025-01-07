@@ -152,22 +152,19 @@ async def list_pre_annotation_files(
         file_ids = [pre_annotation.file_id for pre_annotation in pre_annotations]
         
         attachments, total = crud_attachment.list_by(db=db, ids=file_ids, after=after, before=before, pageNo=pageNo, pageSize=pageSize, sorting=sorting)
-        
         _attachment_ids = [attachment.id for attachment in attachments]
-        def get_sample_names():
-            _names = []
-            for pre_annotation in pre_annotations:
-                if pre_annotation.file_id in _attachment_ids and pre_annotation.sample_name is not None:
-                    _names.append(pre_annotation.sample_name)
-                    
-            return _names
+        sample_names_those_has_pre_annotations = []
+        
+        for pre_annotation in pre_annotations:
+            if pre_annotation.file_id in _attachment_ids and pre_annotation.sample_name is not None:
+                sample_names_those_has_pre_annotations.append(pre_annotation.sample_name)
 
         return [
             PreAnnotationFileResponse(
                 id=attachment.id,
                 url=attachment.url,
                 filename=attachment.filename,
-                sample_names=get_sample_names(),
+                sample_names=sample_names_those_has_pre_annotations,
             )
             for attachment in attachments
         ], total
