@@ -103,9 +103,13 @@ class NoCacheStaticFiles(StaticFiles):
 
     def file_response(self, *args: Any, **kwargs: Any) -> Response:
         resp = super().file_response(*args, **kwargs)
-        resp.headers.setdefault("Cache-Control", self.cachecontrol)
-        resp.headers.setdefault("Pragma", self.pragma)
-        resp.headers.setdefault("Expires", self.expires)
+        
+        # No cache for html files
+        if resp.media_type == "text/html":
+            resp.headers.setdefault("Cache-Control", self.cachecontrol)
+            resp.headers.setdefault("Pragma", self.pragma)
+            resp.headers.setdefault("Expires", self.expires)
+            
         return resp
 
 app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))

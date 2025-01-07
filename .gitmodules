@@ -1,5 +1,0 @@
-[submodule "frontend"]
-	path = frontend
-	url = https://github.com/opendatalab/labelU-frontend.git
-	branch = main
-	ignore = dirty
