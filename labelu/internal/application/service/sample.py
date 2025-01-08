@@ -12,8 +12,9 @@ from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
-from labelu.internal.adapter.persistence import crud_task
+from labelu.internal.adapter.persistence import crud_pre_annotation, crud_task
 from labelu.internal.adapter.persistence import crud_sample
+from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
@@ -27,6 +28,20 @@ from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.attachment import AttachmentResponse
+
+def is_sample_pre_annotated(db: Session, task_id: int, current_user: User, sample_name: str | None = None) -> Tuple[List[TaskPreAnnotation], int]:
+    if sample_name is None:
+        return False
+    
+    _, total = crud_pre_annotation.list_by(
+        db=db,
+        task_id=task_id,
+        owner_id=current_user.id,
+        sample_name=sample_name,
+        pageSize=1,
+    )
+    
+    return total > 0
 
 async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
@@ -74,42 +89,49 @@ async def list_by(
     sorting: Union[str, None],
     current_user: User,
 ) -> Tuple[List[SampleResponse], int]:
-
-    samples = crud_sample.list_by(
-        db=db,
-        task_id=task_id,
-        owner_id=current_user.id,
-        after=after,
-        before=before,
-        pageNo=pageNo,
-        pageSize=pageSize,
-        sorting=sorting,
-    )
-
-    total = crud_sample.count(db=db, task_id=task_id, owner_id=current_user.id)
-
-    # response
-    return [
-        SampleResponse(
-            id=sample.id,
-            inner_id=sample.inner_id,
-            state=sample.state,
-            data=json.loads(sample.data),
-            annotated_count=sample.annotated_count,
-            file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
-            created_at=sample.created_at,
-            created_by=UserResp(
-                id=sample.owner.id,
-                username=sample.owner.username,
-            ),
-            updated_at=sample.updated_at,
-            updated_by=UserResp(
-                id=sample.updater.id,
-                username=sample.updater.username,
-            ),
+    try:
+        samples = crud_sample.list_by(
+            db=db,
+            task_id=task_id,
+            owner_id=current_user.id,
+            after=after,
+            before=before,
+            pageNo=pageNo,
+            pageSize=pageSize,
+            sorting=sorting,
         )
-        for sample in samples
-    ], total
+
+        total = crud_sample.count(db=db, task_id=task_id, owner_id=current_user.id)
+
+        # response
+        return [
+            SampleResponse(
+                id=sample.id,
+                inner_id=sample.inner_id,
+                state=sample.state,
+                data=json.loads(sample.data),
+                annotated_count=sample.annotated_count,
+                is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename if sample.file else None),
+                file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
+                created_at=sample.created_at,
+                created_by=UserResp(
+                    id=sample.owner.id,
+                    username=sample.owner.username,
+                ),
+                updated_at=sample.updated_at,
+                updated_by=UserResp(
+                    id=sample.updater.id,
+                    username=sample.updater.username,
+                ),
+            )
+            for sample in samples
+        ], total
+    except Exception as e:
+        logger.error(e)
+        raise LabelUException(
+            code=ErrorCode.CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
 
 
 async def get(
@@ -133,6 +155,7 @@ async def get(
         inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
+        is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename if sample.file else None),
         file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
@@ -210,6 +233,7 @@ async def patch(
         inner_id=updated_sample.inner_id,
         state=updated_sample.state,
         data=json.loads(updated_sample.data),
+        is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename if sample.file else None),
         annotated_count=updated_sample.annotated_count,
         created_at=updated_sample.created_at,
         created_by=UserResp(
