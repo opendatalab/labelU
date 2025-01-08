@@ -29,7 +29,10 @@ from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.attachment import AttachmentResponse
 
-def is_sample_pre_annotated(db: Session, task_id: int, current_user: User, sample_name: str = None) -> Tuple[List[TaskPreAnnotation], int]:
+def is_sample_pre_annotated(db: Session, task_id: int, current_user: User, sample_name: str | None = None) -> Tuple[List[TaskPreAnnotation], int]:
+    if sample_name is None:
+        return False
+    
     _, total = crud_pre_annotation.list_by(
         db=db,
         task_id=task_id,
@@ -108,7 +111,7 @@ async def list_by(
                 state=sample.state,
                 data=json.loads(sample.data),
                 annotated_count=sample.annotated_count,
-                is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename),
+                is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename if sample.file else None),
                 file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
                 created_at=sample.created_at,
                 created_by=UserResp(
@@ -152,7 +155,7 @@ async def get(
         inner_id=sample.inner_id,
         state=sample.state,
         data=json.loads(sample.data),
-        is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename),
+        is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename if sample.file else None),
         file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
@@ -230,7 +233,7 @@ async def patch(
         inner_id=updated_sample.inner_id,
         state=updated_sample.state,
         data=json.loads(updated_sample.data),
-        is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename),
+        is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, current_user=current_user, sample_name=sample.file.filename if sample.file else None),
         annotated_count=updated_sample.annotated_count,
         created_at=updated_sample.created_at,
         created_by=UserResp(
