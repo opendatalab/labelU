@@ -15,14 +15,14 @@ def batch(db: Session, pre_annotations: List[TaskPreAnnotation]) -> List[TaskPre
 
 def list_by(
     db: Session,
-    task_id: Union[int, None],
     owner_id: int,
-    sample_name: str | None,
-    after: Union[int, None],
-    before: Union[int, None],
-    pageNo: Union[int, None],
-    pageSize: int,
-    sorting: Union[str, None],
+    task_id: int | None = None,
+    sample_name: str | None = None,
+    after: int | None = None,
+    before: int | None = None,
+    pageNo: int | None = None,
+    sorting: str | None = None,
+    pageSize: int | None = 10,
 ) -> Tuple[List[TaskPreAnnotation], int]:
 
     # query filter
