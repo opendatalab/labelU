@@ -284,21 +284,13 @@ async def export(
     )
 
     # converter to export_type
-    try:
-        file_full_path = converter.convert(
-            config=json.loads(task.config),
-            input_data=data,
-            out_data_dir=out_data_dir,
-            out_data_file_name_prefix=task_id,
-            format=export_type.value,
-        )
-    except Exception as e:
-        logger.error(data)
-        logger.error(e)
-        raise LabelUException(
-            code=ErrorCode.CODE_55002_SAMPLE_FORMAT_ERROR,
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+    file_full_path = converter.convert(
+        config=json.loads(task.config),
+        input_data=data,
+        out_data_dir=out_data_dir,
+        out_data_file_name_prefix=task_id,
+        format=export_type.value,
+    )
 
     # response
     return file_full_path

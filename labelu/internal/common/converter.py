@@ -8,7 +8,10 @@ from enum import Enum
 
 import xml.etree.ElementTree as ET
 from typing import List
+from fastapi import status
 from loguru import logger
+
+from labelu.internal.common.error_code import ErrorCode, LabelUException
 
 from .xml_converter import XML_converter
 from .tf_record_converter import TF_record_converter
@@ -799,8 +802,16 @@ class Converter:
         # result struct
         tf_record_examples = TF_record_converter().create_tf_examples(input_data, config)
         
+        if len(tf_record_examples) == 0:
+            raise LabelUException(
+                code=ErrorCode.CODE_61000_NO_DATA,
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        
         for sample in input_data:
             file = sample.get("file", {})
+            if len(tf_record_examples) == 0:
+                continue
             example = tf_record_examples.pop(0)
             file_basename = os.path.splitext(file.get("filename", ""))[0]
             tf_record = f"{file_basename}.tfrecord"

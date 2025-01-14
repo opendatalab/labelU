@@ -20,6 +20,9 @@ USER_INIT_CODE = 40000
 # task init error code
 TASK_INIT_CODE = 50000
 
+# export
+EXPORT_INIT_CODE = 60000
+
 
 class ErrorCode(Enum):
     """
@@ -89,6 +92,10 @@ class ErrorCode(Enum):
     CODE_55002_SAMPLE_NAME_EXISTS = (
         TASK_INIT_CODE + 5003,
         "Sample name exists",
+    )
+    CODE_61000_NO_DATA = (
+        EXPORT_INIT_CODE + 1000,
+        "No data",
     )
 
 
