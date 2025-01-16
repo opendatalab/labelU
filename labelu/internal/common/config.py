@@ -6,8 +6,6 @@ from pydantic import BaseSettings
 
 from labelu.internal.common.io import get_data_dir
 
-print(f"dddddd ->>>> {Path(get_data_dir()).joinpath('media')}")
-
 
 class Settings(BaseSettings):
     SCHEME: str = "http"
