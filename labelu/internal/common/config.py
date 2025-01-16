@@ -6,6 +6,8 @@ from pydantic import BaseSettings
 
 from labelu.internal.common.io import get_data_dir
 
+print(f"dddddd ->>>> {Path(get_data_dir()).joinpath('media')}")
+
 
 class Settings(BaseSettings):
     SCHEME: str = "http"
@@ -15,7 +17,7 @@ class Settings(BaseSettings):
     MEDIA_HOST: str = f"{SCHEME}://{HOST}:{PORT}"
 
     BASE_DATA_DIR: str = get_data_dir()
-    MEDIA_ROOT: str = Path(BASE_DATA_DIR).joinpath("media")
+    MEDIA_ROOT: Path = Path(BASE_DATA_DIR).joinpath("media")
     UPLOAD_DIR: str = "upload"
     EXPORT_DIR: str = "export"
     os.makedirs(MEDIA_ROOT, exist_ok=True)
