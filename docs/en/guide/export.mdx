@@ -126,7 +126,7 @@ Mask export generates a zip file that includes:
 
 Example:
 
-![polygon-annotation-mask](/polygon-annotation.png)
+![polygon-annotation-mask](/en/polygon-annotation.png)
 
 ```json title="colors.json"
 [
@@ -153,11 +153,11 @@ Example:
 
 Multi-channel mask image:
 
-![Multi-channel mask image](/polygon-mask-segmentation.png)
+![Multi-channel mask image](/en/polygon-mask-segmentation.png)
 
 Single-channel mask image:
 
-![Single-channel mask image](/polygon-mask-trainIds.png)
+![Single-channel mask image](/en/polygon-mask-trainIds.png)
 
 :::tip
 Grayscale image, starting from 0, each category's grayscale value + 1, supports up to 255 categories. It is difficult to distinguish with the naked eye when there are few categories.
@@ -245,10 +245,10 @@ Example:
 The `truncated` and `difficult` fields are unique to the Pascal VOC annotation format; in LabelU annotation configuration, you need to configure the corresponding label attributes in the label configuration to export these two fields.
 
 Configuration example:
-![Label Configuration](/pascal-voc-config.png)
+![Label Configuration](/en/pascal-voc-config.png)
 
 Annotation effect:
-![Annotation Effect](/pascal-voc-annotation.png)
+![Annotation Effect](/en/pascal-voc-annotation.png)
 :::
 
 ## LabelMe
@@ -259,4 +259,4 @@ Compatible with LabelMe annotation format.
 The annotation tools in LabelU are not fully compatible with the LabelMe annotation format, only supporting the export of annotation data for bounding boxes, polygons, and key points.
 :::
 
-![LabelMe](/labelme-image.png)
+![LabelMe](/en/labelme-image.png)
