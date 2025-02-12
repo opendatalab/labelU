@@ -3,7 +3,6 @@ import uvicorn
 from typer import Typer
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
-from importlib.metadata import version
 
 from labelu.internal.adapter.routers import add_router
 from labelu.internal.middleware import add_middleware
@@ -12,6 +11,8 @@ from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import add_exception_handler
 from labelu.alembic_labelu.run_migrate import run_sqlite_migrations
+
+from .version import version as labelu_version
 
 
 description = """
@@ -69,8 +70,6 @@ tags_metadata = [
         "description": "Task sample management.",
     },
 ]
-
-labelu_version = version('labelu')
 
 app = FastAPI(
     title="labelU",
