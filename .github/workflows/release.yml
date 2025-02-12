@@ -152,6 +152,7 @@ jobs:
       - name: Manage version
         run: |
           sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
+          sed -i "s/^version[ ]*=.*/version='${NEXT_VERSION}'/" labelu/version.py
 
       - name: Publish to TestPyPi
         if: ${{ github.ref_name == 'alpha'}}
