@@ -3,6 +3,7 @@ import uvicorn
 from typer import Typer
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
+from importlib.metadata import version
 
 from labelu.internal.adapter.routers import add_router
 from labelu.internal.middleware import add_middleware
@@ -69,11 +70,12 @@ tags_metadata = [
     },
 ]
 
+labelu_version = version('labelu')
 
 app = FastAPI(
     title="labelU",
     description=description,
-    version="0.1.0",
+    version=labelu_version,
     terms_of_service="",
     contact={
         "name": "labelu",
@@ -118,6 +120,8 @@ app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))
 @app.middleware("http")
 async def add_correct_content_type(request: Request, call_next):
     response = await call_next(request)
+    
+    response.headers["LabelU-Version"] = labelu_version
     
     if request.url.path.endswith(".js"):
         response.headers["content-type"] = "application/javascript"
