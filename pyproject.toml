@@ -30,6 +30,12 @@ alembic = "^1.9.4"
 httpx = "^0.27.0"
 tfrecord = "^1.14.5"
 
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/legacy/"
+default = false
+secondary = false
+
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
