@@ -12,6 +12,8 @@ from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import add_exception_handler
 from labelu.alembic_labelu.run_migrate import run_sqlite_migrations
 
+from .version import version as labelu_version
+
 
 description = """
 labelU backend.
@@ -69,11 +71,10 @@ tags_metadata = [
     },
 ]
 
-
 app = FastAPI(
     title="labelU",
     description=description,
-    version="0.1.0",
+    version=labelu_version,
     terms_of_service="",
     contact={
         "name": "labelu",
@@ -118,6 +119,8 @@ app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))
 @app.middleware("http")
 async def add_correct_content_type(request: Request, call_next):
     response = await call_next(request)
+    
+    response.headers["LabelU-Version"] = labelu_version
     
     if request.url.path.endswith(".js"):
         response.headers["content-type"] = "application/javascript"

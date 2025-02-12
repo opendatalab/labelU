@@ -757,11 +757,11 @@ class Converter:
         # result struct
         xml_converter = XML_converter()
         root = ET.Element("root")
-        sample_item = ET.SubElement(root, "sample")
         
         for sample in input_data:
             data = json.loads(sample.get("data"))
             file = sample.get("file", {})
+            sample_item = ET.SubElement(root, "sample")
             
             # skip invalid data
             annotated_result = json.loads(data.get("result"))
@@ -791,7 +791,8 @@ class Converter:
                             annotations.append(annotation)
                
         tree = ET.ElementTree(root)
-        tree.write(file_full_path, encoding="utf-8", xml_declaration=True)
+        with open(file_full_path, 'wb') as f:
+            tree.write(f, encoding='utf-8', xml_declaration=True)
         logger.info("Export file path: {}", file_full_path)
         return file_full_path
     
