@@ -1,4 +1,5 @@
 import json
+import os
 import uuid
 from datetime import datetime
 from typing import List, Tuple, Union
@@ -12,7 +13,7 @@ from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
-from labelu.internal.adapter.persistence import crud_pre_annotation, crud_task
+from labelu.internal.adapter.persistence import crud_attachment, crud_pre_annotation, crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
 from labelu.internal.domain.models.user import User
@@ -253,6 +254,18 @@ async def delete(
 ) -> CommonDataResp:
 
     with db.begin():
+        # delete media
+        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
+        attachment_ids = [sample.file_id for sample in samples if sample.file_id]
+        attachments = crud_attachment.get_by_ids(db=db, attachment_ids=attachment_ids)
+        
+        attachments = crud_attachment.get_by_ids(
+            db=db, attachment_ids=attachment_ids
+        )
+        for attachment in attachments:
+            file_full_path = Path(settings.MEDIA_ROOT).joinpath(attachment.path)
+            os.remove(file_full_path)
+        
         crud_sample.delete(db=db, sample_ids=sample_ids)
     # response
     return CommonDataResp(ok=True)
