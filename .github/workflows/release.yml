@@ -154,16 +154,9 @@ jobs:
           sed -i "s/^version[ ]*=.*/version = '${NEXT_VERSION}'/" pyproject.toml
           sed -i "s/^version[ ]*=.*/version='${NEXT_VERSION}'/" labelu/version.py
 
-      - name: Publish to TestPyPi
-        if: ${{ github.ref_name == 'alpha'}}
-        env:
-          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
-        run: |
-          poetry config pypi-token.testpypi $TEST_PYPI_TOKEN
-          poetry publish --build --skip-existing -r testpypi
-
       - name: Publish to PyPi
-        if: ${{ github.ref_name == 'main'}}
+        # main or alpha
+        if: ${{ github.ref_name == 'main' || github.ref_name == 'alpha' }}
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |

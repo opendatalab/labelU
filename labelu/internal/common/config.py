@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from loguru import logger
-from pydantic import BaseSettings
+from pydantic import BaseSettings, Field
 
 from labelu.internal.common.io import get_data_dir
 
@@ -23,7 +23,12 @@ class Settings(BaseSettings):
     UPLOAD_FILE_MAX_SIZE: int = 200_000_000  # ~200MB
     THUMBNAIL_HEIGH_PIXEL: int = 120
 
-    DATABASE_URL: str = f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite"
+    DATABASE_URL: str = Field(
+        default="mysql://labelu:labelupass@10.1.52.75/labeludb",
+        # default=f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite",
+        description="Database connection URL. Supports SQLite and MySQL."
+    )
+    # or using DATABASE_URL=mysql://labelu:labelupass@10.1.52.75/labeludb
 
     PASSWORD_SECRET_KEY: str = (
         "e5b7d00a59aaa2a5ea86a7c4d72f856b20bafa1b8d0e66124082ada81f6340bd"
@@ -32,6 +37,14 @@ class Settings(BaseSettings):
     TOKEN_GENERATE_ALGORITHM: str = "HS256"
     TOKEN_ACCESS_EXPIRE_MINUTES: int = 30
     TOKEN_TYPE: str = "Bearer"
+    
+    @property
+    def need_migration_to_mysql(self) -> bool:
+        sqlite_path = Path(self.BASE_DATA_DIR) / "labelu.sqlite"
+        return (
+            self.DATABASE_URL.startswith('mysql') and 
+            sqlite_path.exists()
+        )
 
     class Config:
         env_prefix = ""

@@ -28,10 +28,10 @@ class TaskSample(Base):
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
     updated_by = Column(Integer, ForeignKey("user.id"))
     created_at = Column(
-        DateTime, default=datetime.now, comment="Time a task sample result was created"
+        DateTime(timezone=True), default=datetime.now, comment="Time a task sample result was created"
     )
     updated_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=datetime.now,
         onupdate=datetime.now,
         comment="Last time a task sample result was updated",
@@ -47,7 +47,8 @@ class TaskSample(Base):
         default=SampleState.NEW.value,
         comment="NEW is has not start yet, DONE is completed, SKIPPED is skipped",
     )
-    deleted_at = Column(DateTime, index=True, comment="Task delete time")
+    task_attachment_ids = Column(Text, comment="task sample file ids")
+    deleted_at = Column(DateTime(timezone=True), index=True, comment="Task delete time")
 
     # 由旧的data里的fileNames和urls中的唯一一个，迁移到media中
     file = relationship("TaskAttachment", foreign_keys=[file_id])

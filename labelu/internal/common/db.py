@@ -4,10 +4,23 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from labelu.internal.common.config import settings
 
-# connect_args is needed only for SQLite. It's not needed for other databases
-engine = create_engine(
-    settings.DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
-)
+engine = None
+database_url = settings.DATABASE_URL
+
+if settings.DATABASE_URL.startswith('mysql'):
+    engine = create_engine(
+        database_url,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+    )
+else:
+    # connect_args is needed only for SQLite. It's not needed for other databases
+    engine = create_engine(
+        database_url,
+        connect_args={"check_same_thread": False},
+        echo=True,
+    )
+
 SessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)
 
 Base = declarative_base()
