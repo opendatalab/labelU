@@ -24,11 +24,10 @@ class Settings(BaseSettings):
     THUMBNAIL_HEIGH_PIXEL: int = 120
 
     DATABASE_URL: str = Field(
-        # default="mysql://labelu:labelupass@localhost/labeludb",
         default=f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite",
         description="Database connection URL. Supports SQLite and MySQL."
     )
-    # or using DATABASE_URL=mysql://labelu:labelupass@10.1.52.75/labeludb
+    # or using MySQL DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb
 
     PASSWORD_SECRET_KEY: str = (
         "e5b7d00a59aaa2a5ea86a7c4d72f856b20bafa1b8d0e66124082ada81f6340bd"
