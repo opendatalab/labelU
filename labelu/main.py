@@ -1,4 +1,5 @@
 from typing import Any
+from loguru import logger
 import uvicorn
 from typer import Typer
 from fastapi import FastAPI, Request, Response
@@ -10,7 +11,10 @@ from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import add_exception_handler
-from labelu.alembic_labelu.run_migrate import run_sqlite_migrations
+from labelu.alembic_labelu.run_migrate import run_db_migrations
+from labelu.scripts.migrate_to_mysql import migrate_to_mysql
+
+from .version import version as labelu_version
 
 from .version import version as labelu_version
 
@@ -90,10 +94,17 @@ app = FastAPI(
 
 init_logging()
 init_tables()
-run_sqlite_migrations()
+run_db_migrations()
 add_exception_handler(app=app)
 add_router(app=app)
 add_middleware(app=app)
+
+def startup():
+    if settings.need_migration_to_mysql:
+        logger.info("Migrating database to MySQL")
+        migrate_to_mysql()
+
+app.add_event_handler("startup", startup)
 
 class NoCacheStaticFiles(StaticFiles):
     def __init__(self, *args: Any, **kwargs: Any):
@@ -129,7 +140,11 @@ async def add_correct_content_type(request: Request, call_next):
 
 cli = Typer()
 
-
+@cli.command()
+def to_mysql():
+    """Migrate database to MySQL"""
+    migrate_to_mysql()
+    
 @cli.command()
 def main(
     host: str = "localhost", port: int = 8000, media_host: str = "http://localhost:8000"
