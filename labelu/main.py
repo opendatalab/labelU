@@ -16,9 +16,6 @@ from labelu.scripts.migrate_to_mysql import migrate_to_mysql
 
 from .version import version as labelu_version
 
-from .version import version as labelu_version
-
-
 description = """
 labelU backend.
 
