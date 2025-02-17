@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     TOKEN_GENERATE_ALGORITHM: str = "HS256"
     TOKEN_ACCESS_EXPIRE_MINUTES: int = 30
     TOKEN_TYPE: str = "Bearer"
-    
+
     @property
     def need_migration_to_mysql(self) -> bool:
         sqlite_path = Path(self.BASE_DATA_DIR) / "labelu.sqlite"
