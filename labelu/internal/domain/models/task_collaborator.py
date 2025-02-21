@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlalchemy.schema import Index
 from sqlalchemy import Column, DateTime, ForeignKey, Integer
 from labelu.internal.common.db import Base
 
@@ -22,3 +23,7 @@ class TaskCollaborator(Base):
         default=datetime.now,
         comment="Time a task collaborator was created"
     )
+    
+    Index("ix_task_collaborator_task_id", task_id)
+    Index("ix_task_collaborator_user_id", user_id)
+    Index("ix_task_created_by_deleted_at", task_id, user_id)
