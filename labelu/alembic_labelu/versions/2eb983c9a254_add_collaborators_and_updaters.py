@@ -49,6 +49,13 @@ def upgrade() -> None:
         )
         
         # Performances index
+        is_index_2_exist = op.execute(
+            "SHOW INDEX FROM task_collaborator WHERE Key_name = 'ix_task_collaborator_task_id';"
+        ).fetchone()
+        
+        if is_index_2_exist:
+            return
+        
         op.create_index(
             'ix_task_collaborator_task_id',
             'task_collaborator',
@@ -97,6 +104,14 @@ def upgrade() -> None:
     )
     
     # Performances index
+    # check if the index is already exists
+    is_index_exist = op.execute(
+        "SHOW INDEX FROM task_sample_updater WHERE Key_name = 'ix_task_sample_updater_sample_id';"
+    ).fetchone()
+    
+    if is_index_exist:
+        return
+    
     op.create_index(
         'ix_task_sample_updater_sample_id',
         'task_sample_updater',

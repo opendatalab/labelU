@@ -25,6 +25,3 @@ class TaskSampleUpdater(Base):
         nullable=False,
         comment="created time"
     )
-    
-    Index("ix_task_sample_updater_sample_id", sample_id)
-    Index("ix_task_sample_updater_user_id", user_id)

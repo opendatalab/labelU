@@ -24,6 +24,3 @@ class TaskCollaborator(Base):
         comment="Time a task collaborator was created"
     )
     
-    Index("ix_task_collaborator_task_id", task_id)
-    Index("ix_task_collaborator_user_id", user_id)
-    Index("ix_task_created_by_deleted_at", task_id, user_id)
