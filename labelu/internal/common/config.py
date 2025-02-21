@@ -24,7 +24,8 @@ class Settings(BaseSettings):
     THUMBNAIL_HEIGH_PIXEL: int = 120
 
     DATABASE_URL: str = Field(
-        default=f"sqlite:///{BASE_DATA_DIR}/labelu-test-1.sqlite",
+        # default="mysql://labelu:labelupass@localhost/labeludb",
+        default=f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite",
         description="Database connection URL. Supports SQLite and MySQL."
     )
     # or using MySQL DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb
