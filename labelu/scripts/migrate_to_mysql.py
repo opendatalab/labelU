@@ -141,7 +141,7 @@ class DatabaseMigrator:
                 raise MigrationError(f"Migration failed: {e}")
 
 def migrate_to_mysql():
-    sqlite_url = f"sqlite:///{settings.BASE_DATA_DIR}/labelu.sqlite"
+    sqlite_url = f"sqlite:///{settings.BASE_DATA_DIR}/labelu-test-1.sqlite"
     
     try:
         migrator = DatabaseMigrator(sqlite_url, settings.DATABASE_URL)

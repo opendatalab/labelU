@@ -54,6 +54,6 @@ class TaskSample(Base):
     file = relationship("TaskAttachment", foreign_keys=[file_id])
     task = relationship("Task", foreign_keys=[task_id])
     owner = relationship("User", foreign_keys=[created_by])
-    updater = relationship("User", foreign_keys=[updated_by])
+    updaters = relationship("User", secondary="task_sample_updater")
 
     Index("idx_sample_id_deleted_at", id, deleted_at)

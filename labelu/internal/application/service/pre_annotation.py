@@ -69,7 +69,7 @@ async def create(
             
             for _item in pre_annotation_contents:
                 sample_name = _item.get("sample_name") if pre_annotation_file.filename.endswith(".jsonl") else _item.get("fileName")
-                exist_pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id_and_sample_name(db=db, task_id=task_id, owner_id=current_user.id, sample_name=sample_name)
+                exist_pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id_and_sample_name(db=db, task_id=task_id, sample_name=sample_name)
                 
                 if len(exist_pre_annotations) > 0:
                     raise LabelUException(
@@ -101,8 +101,8 @@ async def list_by(
     sample_name: Optional[str],
     after: Optional[int],
     before: Optional[int],
-    pageNo: Optional[int],
-    pageSize: int,
+    page: Optional[int],
+    size: int,
     sorting: Optional[str],
     current_user: User,
 ) -> Tuple[List[PreAnnotationResponse], int]:
@@ -110,12 +110,11 @@ async def list_by(
     pre_annotations, total = crud_pre_annotation.list_by(
         db=db,
         task_id=task_id,
-        owner_id=current_user.id,
         after=after,
         before=before,
-        pageNo=pageNo,
+        page=page,
         sample_name=sample_name,
-        pageSize=None if sample_name else pageSize,
+        size=None if sample_name else size,
         sorting=sorting,
     )
     
@@ -142,16 +141,15 @@ async def list_pre_annotation_files(
     task_id: Optional[int],
     after: Optional[int],
     before: Optional[int],
-    pageNo: Optional[int],
-    pageSize: int,
+    page: Optional[int],
+    size: int,
     sorting: Optional[str],
-    current_user: User,
 ) -> Tuple[List[TaskAttachment], int]:
     try:
-        pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id(db=db, task_id=task_id, owner_id=current_user.id)
+        pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id(db=db, task_id=task_id)
         file_ids = [pre_annotation.file_id for pre_annotation in pre_annotations]
         
-        attachments, total = crud_attachment.list_by(db=db, ids=file_ids, after=after, before=before, pageNo=pageNo, pageSize=pageSize, sorting=sorting)
+        attachments, total = crud_attachment.list_by(db=db, ids=file_ids, after=after, before=before, page=page, size=size, sorting=sorting)
         _attachment_ids = [attachment.id for attachment in attachments]
         sample_names_those_has_pre_annotations = []
         
@@ -220,7 +218,7 @@ async def delete_pre_annotation_file(
             file_full_path = Path(settings.MEDIA_ROOT).joinpath(attachment.path)
             os.remove(file_full_path)
             
-        pre_annotations = crud_pre_annotation.list_by_task_id_and_file_id(db=db, task_id=task_id, owner_id=current_user.id, file_id=file_id)
+        pre_annotations = crud_pre_annotation.list_by_task_id_and_file_id(db=db, task_id=task_id, file_id=file_id)
         pre_annotation_ids = [pre_annotation.id for pre_annotation in pre_annotations]
         
         crud_pre_annotation.delete(db=db, pre_annotation_ids=pre_annotation_ids)

@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     THUMBNAIL_HEIGH_PIXEL: int = 120
 
     DATABASE_URL: str = Field(
-        default=f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite",
+        default=f"sqlite:///{BASE_DATA_DIR}/labelu-test-1.sqlite",
         description="Database connection URL. Supports SQLite and MySQL."
     )
     # or using MySQL DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
 
     @property
     def need_migration_to_mysql(self) -> bool:
-        sqlite_path = Path(self.BASE_DATA_DIR) / "labelu.sqlite"
+        sqlite_path = Path(self.BASE_DATA_DIR) / "labelu-test-1.sqlite"
         return (
             self.DATABASE_URL.startswith('mysql') and 
             sqlite_path.exists()

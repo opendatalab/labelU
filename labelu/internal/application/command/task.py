@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 from pydantic import BaseModel, Field
 
 from labelu.internal.domain.models.task import MediaType
@@ -16,6 +16,11 @@ class BasicConfigCommand(BaseModel):
         default=None, description="description: task tips", max_length=1000
     )
 
+class CollaboratorUpdateCommand(BaseModel):
+    user_id: int = Field(description="description: user id")
+    
+class CollaboratorBatchCommand(BaseModel):
+    user_ids: List[int] = Field(description="description: user ids")
 
 class UpdateCommand(BaseModel):
     name: Union[str, None] = Field(

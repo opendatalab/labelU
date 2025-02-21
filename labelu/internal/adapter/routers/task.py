@@ -4,12 +4,13 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
 from fastapi.security import HTTPAuthorizationCredentials
 
+from labelu.internal.application.response.user import UserResponse
 from labelu.internal.common import db
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.service import task as service
-from labelu.internal.application.command.task import BasicConfigCommand
+from labelu.internal.application.command.task import BasicConfigCommand, CollaboratorBatchCommand, CollaboratorUpdateCommand
 from labelu.internal.application.command.task import UpdateCommand
 from labelu.internal.application.response.base import OkResp
 from labelu.internal.application.response.base import MetaData
@@ -90,6 +91,116 @@ async def get(
 
     # response
     return OkResp[TaskResponseWithStatics](data=data)
+
+@router.get(
+    "/{task_id}/collaborators",
+    response_model=OkResp[List[UserResponse]],
+    status_code=status.HTTP_200_OK,
+)
+async def get_collaborators(
+    task_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get task detail.
+    """
+
+    # business logic
+    data = await service.get_collaborators(db=db, task_id=task_id, current_user=current_user)
+
+    # response
+    return OkResp[List[UserResponse]](data=data)
+
+@router.post(
+    "/{task_id}/collaborators",
+    response_model=OkResp[UserResponse],
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_collaborator(
+    task_id: int,
+    cmd: CollaboratorUpdateCommand,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Add collaborator to task.
+    """
+
+    # business logic
+    data = await service.add_collaborator(db=db, task_id=task_id, user_id=cmd.user_id, current_user=current_user)
+
+    # response
+    return OkResp[UserResponse](data=data)
+
+@router.post(
+    "/{task_id}/collaborators/batch_add",
+    response_model=OkResp[List[UserResponse]],
+    status_code=status.HTTP_201_CREATED,
+)
+async def batch_add_collaborator_request(
+    task_id: int,
+    cmd: CollaboratorBatchCommand,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Add collaborators to task.
+    """
+
+    # business logic
+    data = await service.batch_add_collaborators(db=db, task_id=task_id, user_ids=cmd.user_ids, current_user=current_user)
+
+    # response
+    return OkResp[List[UserResponse]](data=data)
+
+@router.post(
+    "/{task_id}/collaborators/batch_remove",
+    response_model=OkResp[CommonDataResp],
+    status_code=status.HTTP_201_CREATED,
+)
+async def batch_remove_collaborator_request(
+    task_id: int,
+    cmd: CollaboratorBatchCommand,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Add collaborators to task.
+    """
+
+    # business logic
+    data = await service.batch_remove_collaborators(db=db, task_id=task_id, user_ids=cmd.user_ids, current_user=current_user)
+
+    # response
+    return OkResp[CommonDataResp](data=data)
+
+
+@router.delete(
+    "/{task_id}/collaborators/{user_id}",
+    response_model=OkResp[CommonDataResp],
+    status_code=status.HTTP_200_OK,
+)
+async def remove_collaborator(
+    task_id: int,
+    user_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Remove collaborator from task.
+    """
+
+    # business logic
+    data = await service.remove_collaborator(db=db, task_id=task_id, user_id=user_id, current_user=current_user)
+
+    # response
+    return OkResp[CommonDataResp](data=data)
 
 
 @router.patch(

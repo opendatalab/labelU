@@ -2,10 +2,11 @@ from typing import Any
 from loguru import logger
 import uvicorn
 from typer import Typer
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 
 from labelu.internal.adapter.routers import add_router
+from labelu.internal.adapter.ws import add_ws_router
 from labelu.internal.middleware import add_middleware
 from labelu.internal.common.logger import init_logging
 from labelu.internal.common.db import init_tables
@@ -25,7 +26,7 @@ You will be able to:
 
 * **Signup**
 * **Login**
-* **Logout** (_not implemented_).
+* **Logout**.
 
 ## Tasks
 
@@ -94,6 +95,7 @@ init_tables()
 run_db_migrations()
 add_exception_handler(app=app)
 add_router(app=app)
+add_ws_router(app=app)
 add_middleware(app=app)
 
 def startup():
@@ -105,7 +107,7 @@ app.add_event_handler("startup", startup)
 
 class NoCacheStaticFiles(StaticFiles):
     def __init__(self, *args: Any, **kwargs: Any):
-        self.cachecontrol = "max-age=0, no-cache, no-store, , must-revalidate"
+        self.cachecontrol = "max-age=0, no-cache, no-store, must-revalidate"
         self.pragma = "no-cache"
         self.expires = "0"
         super().__init__(*args, **kwargs)
@@ -122,18 +124,6 @@ class NoCacheStaticFiles(StaticFiles):
         return resp
 
 app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))
-
-
-@app.middleware("http")
-async def add_correct_content_type(request: Request, call_next):
-    response = await call_next(request)
-    
-    response.headers["LabelU-Version"] = labelu_version
-    
-    if request.url.path.endswith(".js"):
-        response.headers["content-type"] = "application/javascript"
-    return response
-
 
 cli = Typer()
 
@@ -152,8 +142,8 @@ def main(
         settings.HOST = host
     if media_host:
         settings.MEDIA_HOST = media_host
-    uvicorn.run(app=app, host=settings.HOST, port=settings.PORT)
-
-
+        
+    uvicorn.run(app=app, host=settings.HOST, port=settings.PORT, ws="websockets")
+        
 if __name__ == "__main__":
     cli()

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
 from labelu.internal.common.db import Base
 
@@ -17,3 +18,4 @@ class User(Base):
     updated_at = Column(
         DateTime(timezone=True), default=datetime.now, comment="Last time a task was updated"
     )
+    tasks = relationship("Task", secondary="task_collaborator", back_populates="collaborators")

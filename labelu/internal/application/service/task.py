@@ -13,7 +13,7 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import SampleState
-from labelu.internal.adapter.persistence import crud_task
+from labelu.internal.adapter.persistence import crud_task, crud_user
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
@@ -65,16 +65,12 @@ async def list_by(
     page: int,
     size: int,
 ) -> Tuple[List[TaskResponseWithStatics], int]:
-
-    # get task total count
-    total_task = crud_task.count(db=db, owner_id=current_user.id)
-
     # get task list
-    tasks = crud_task.list_by(db=db, owner_id=current_user.id, page=page, size=size)
+    tasks, total_task = crud_task.list_by(db=db, owner_id=current_user.id, page=page, size=size)
 
     # get progress
     task_ids = [task.id for task in tasks]
-    statics = crud_sample.statics(db=db, owner_id=current_user.id, task_ids=task_ids)
+    statics = crud_sample.statics(db=db, task_ids=task_ids)
 
     # response
     tasks_with_statics = [
@@ -116,7 +112,6 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     # get progress
     statics = crud_sample.statics(
         db=db,
-        owner_id=current_user.id,
         task_ids=[task.id],
     )
 
@@ -141,6 +136,166 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
         ),
     )
 
+async def get_collaborators(db: Session, task_id: int, current_user: User):
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        logger.error("cannot find task:{}", task_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    return [UserResp(id=user.id, username=user.username) for user in task.collaborators]
+
+async def add_collaborator(db: Session, task_id: int, user_id: int, current_user: User):
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        logger.error("cannot find task:{}", task_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if task.created_by != current_user.id:
+        logger.error(
+            "cannot add collaborator, the task owner is:{}, the add operator is:{}",
+            task.created_by,
+            current_user.id,
+        )
+        raise LabelUException(
+            code=ErrorCode.CODE_30001_NO_PERMISSION,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    user = crud_user.get(db=db, id=user_id)
+    if not user:
+        logger.error("cannot find user:{}", user_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50001_USER_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+        
+    # collaborator exists
+    if user in task.collaborators:
+        logger.error("collaborator already exists:{}", user_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50003_COLLABORATOR_ALREADY_EXISTS,
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    with db.begin():
+        task.collaborators.append(user)
+
+    return UserResp(id=user.id, username=user.username)
+
+async def batch_add_collaborators(db: Session, task_id: int, user_ids: List[int], current_user: User):
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        logger.error("cannot find task:{}", task_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if task.created_by != current_user.id:
+        logger.error(
+            "cannot add collaborator, the task owner is:{}, the add operator is:{}",
+            task.created_by,
+            current_user.id,
+        )
+        raise LabelUException(
+            code=ErrorCode.CODE_30001_NO_PERMISSION,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    user_ids = set(user_ids) - set([user.id for user in task.collaborators]) - set([task.created_by])
+    users = crud_user.list_by_ids(db=db, ids=user_ids)
+    if len(users) != len(user_ids):
+        logger.error("cannot find users:{}", user_ids)
+        raise LabelUException(
+            code=ErrorCode.CODE_40002_USER_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    with db.begin():
+        task.collaborators.extend(users)
+
+    return [UserResp(id=user.id, username=user.username) for user in users]
+
+async def remove_collaborator(db: Session, task_id: int, user_id: int, current_user: User):
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        logger.error("cannot find task:{}", task_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if task.created_by != current_user.id:
+        logger.error(
+            "cannot remove collaborator, the task owner is:{}, the remove operator is:{}",
+            task.created_by,
+            current_user.id,
+        )
+        raise LabelUException(
+            code=ErrorCode.CODE_30001_NO_PERMISSION,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    user = crud_user.get(db=db, id=user_id)
+    if not user:
+        logger.error("cannot find user:{}", user_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_40002_USER_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if user not in task.collaborators:
+        logger.error("cannot find collaborator:{}", user_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50004_COLLABORATOR_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    with db.begin():
+        task.collaborators.remove(user)
+
+    return CommonDataResp(ok=True)
+
+async def batch_remove_collaborators(db: Session, task_id: int, user_ids: List[int], current_user: User):
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        logger.error("cannot find task:{}", task_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if task.created_by != current_user.id:
+        logger.error(
+            "cannot remove collaborator, the task owner is:{}, the remove operator is:{}",
+            task.created_by,
+            current_user.id,
+        )
+        raise LabelUException(
+            code=ErrorCode.CODE_30001_NO_PERMISSION,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    users = crud_user.list_by_ids(db=db, ids=user_ids)
+    if len(users) != len(user_ids):
+        logger.error("cannot find users:{}", user_ids)
+        raise LabelUException(
+            code=ErrorCode.CODE_40002_USER_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    with db.begin():
+        for user in users:
+            if user in task.collaborators:
+                task.collaborators.remove(user)
+
+    return CommonDataResp(ok=True)
 
 async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
 
