@@ -41,6 +41,6 @@ class SampleResponse(BaseModel):
     updated_at: Union[datetime, None] = Field(
         default=None, description="description: task updated at time"
     )
-    updated_by: Union[UserResp, None] = Field(
-        default=None, description="description: task updated by"
+    updaters: List[UserResp] | None = Field(
+        default=[], description="description: sample updaters"
     )

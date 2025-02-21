@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         default=f"sqlite:///{BASE_DATA_DIR}/labelu.sqlite",
         description="Database connection URL. Supports SQLite and MySQL."
     )
-    # or using DATABASE_URL=mysql://labelu:labelupass@10.1.52.75/labeludb
+    # or using MySQL DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb
 
     PASSWORD_SECRET_KEY: str = (
         "e5b7d00a59aaa2a5ea86a7c4d72f856b20bafa1b8d0e66124082ada81f6340bd"
@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     @property
     def need_migration_to_mysql(self) -> bool:
-        sqlite_path = Path(self.BASE_DATA_DIR) / "labelu.sqlite"
+        sqlite_path = Path(self.BASE_DATA_DIR) / "labelu-test-1.sqlite"
         return (
             self.DATABASE_URL.startswith('mysql') and 
             sqlite_path.exists()

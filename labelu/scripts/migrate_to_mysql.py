@@ -9,19 +9,17 @@ from datetime import datetime
 from labelu.internal.common.config import settings
 
 class MigrationError(Exception):
-    """自定义迁移异常"""
     pass
 
 @contextmanager
 def timer(operation: str):
-    """计时器上下文管理器"""
     start = time.time()
     yield
     duration = time.time() - start
     logger.info(f"{operation} took {duration:.2f} seconds")
 
 class DatabaseMigrator:
-    BATCH_SIZE = 1000  # 批量插入的大小
+    BATCH_SIZE = 1000
     
     def __init__(self, sqlite_url: str, mysql_url: str):
         self.sqlite_engine = create_engine(sqlite_url)
@@ -30,7 +28,6 @@ class DatabaseMigrator:
         
     @contextmanager
     def create_sessions(self):
-        """创建数据库会话的上下文管理器"""
         sqlite_session = sessionmaker(bind=self.sqlite_engine)()
         mysql_session = sessionmaker(bind=self.mysql_engine)()
         try:
@@ -40,7 +37,6 @@ class DatabaseMigrator:
             mysql_session.close()
 
     def get_tables_in_order(self) -> List[str]:
-        """获取考虑外键依赖的表排序"""
         inspector = inspect(self.sqlite_engine)
         tables = []
         table_names = inspector.get_table_names()
@@ -67,7 +63,6 @@ class DatabaseMigrator:
         return tables
 
     def _process_row_data(self, row: Dict[str, Any]) -> Dict[str, Any]:
-        """处理行数据，确保数据类型兼容性"""
         processed = {}
         for key, value in row.items():
             if isinstance(value, datetime):
@@ -79,7 +74,6 @@ class DatabaseMigrator:
         return processed
 
     def _batch_insert(self, session, table: Table, rows: List[Dict[str, Any]]) -> None:
-        """批量插入数据"""
         try:
             processed_rows = [self._process_row_data(row._asdict()) for row in rows]
             session.execute(table.insert(), processed_rows)
@@ -87,7 +81,6 @@ class DatabaseMigrator:
         except IntegrityError as e:
             session.rollback()
             logger.error(f"Integrity error during batch insert: {e}")
-            # 回退到逐行插入以处理问题数据
             for row in rows:
                 try:
                     processed_row = self._process_row_data(row._asdict())
@@ -101,7 +94,6 @@ class DatabaseMigrator:
             raise MigrationError(f"Batch insert failed: {e}")
 
     def check_migration_status(self, mysql_session) -> bool:
-        """检查是否已经迁移"""
         try:
             result = mysql_session.execute(text("SELECT COUNT(*) FROM user")).scalar()
             return result > 0
@@ -109,7 +101,6 @@ class DatabaseMigrator:
             return False
 
     def migrate_table(self, table_name: str, sqlite_session, mysql_session) -> None:
-        """迁移单个表"""
         if table_name == "alembic_version":
             return
 
@@ -129,7 +120,6 @@ class DatabaseMigrator:
                 logger.info(f"Migrated {min(batch_start + self.BATCH_SIZE, total_rows)}/{total_rows} rows in {table_name}")
 
     def migrate(self) -> None:
-        """执行完整的数据迁移"""
         with self.create_sessions() as (sqlite_session, mysql_session):
             if self.check_migration_status(mysql_session):
                 logger.info("Database has already been migrated.")
@@ -151,8 +141,7 @@ class DatabaseMigrator:
                 raise MigrationError(f"Migration failed: {e}")
 
 def migrate_to_mysql():
-    """主迁移函数"""
-    sqlite_url = f"sqlite:///{settings.BASE_DATA_DIR}/labelu.sqlite"
+    sqlite_url = f"sqlite:///{settings.BASE_DATA_DIR}/labelu-test-1.sqlite"
     
     try:
         migrator = DatabaseMigrator(sqlite_url, settings.DATABASE_URL)

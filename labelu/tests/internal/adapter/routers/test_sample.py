@@ -131,7 +131,7 @@ class TestClassTaskSampleRouter:
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
-            params={"pageNo": 0, "pageSize": 10},
+            params={"page": 0, "size": 10},
         )
 
         # check
@@ -178,7 +178,7 @@ class TestClassTaskSampleRouter:
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
-            params={"before": 13, "pageSize": 10},
+            params={"before": 13, "size": 10},
         )
 
         # check
@@ -226,7 +226,7 @@ class TestClassTaskSampleRouter:
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
-            params={"after": 5, "pageSize": 10},
+            params={"after": 5, "size": 10},
         )
 
         # check
@@ -275,7 +275,7 @@ class TestClassTaskSampleRouter:
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/samples?sort=annotated_count:desc",
             headers=testuser_token_headers,
-            params={"after": 5, "pageSize": 10},
+            params={"after": 5, "size": 10},
         )
 
         # check
@@ -295,7 +295,7 @@ class TestClassTaskSampleRouter:
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{1}/samples",
             headers=testuser_token_headers,
-            params={"after": 1, "before": 1, "pageNo": 1, "pageSize": 10},
+            params={"after": 1, "before": 1, "page": 1, "size": 10},
         )
 
         # check
@@ -323,7 +323,7 @@ class TestClassTaskSampleRouter:
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/samples?sort",
             headers=testuser_token_headers,
-            params={"pageNo": 0, "pageSize": 10},
+            params={"page": 0, "size": 10},
         )
 
         # check

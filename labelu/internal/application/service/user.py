@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import List, Tuple
 
 from loguru import logger
 from fastapi import status
@@ -15,11 +16,11 @@ from labelu.internal.common.security import get_password_hash
 from labelu.internal.common.security import create_access_token
 from labelu.internal.application.command.user import LoginCommand
 from labelu.internal.application.command.user import SignupCommand
-from labelu.internal.application.response.user import SignupResponse
+from labelu.internal.application.response.user import UserResponse
 from labelu.internal.application.response.user import LoginResponse
 
 
-async def signup(db: Session, cmd: SignupCommand) -> SignupResponse:
+async def signup(db: Session, cmd: SignupCommand) -> UserResponse:
     # check user alredy exists
     user = crud_user.get_user_by_username(db, username=cmd.username)
     if user:
@@ -40,8 +41,17 @@ async def signup(db: Session, cmd: SignupCommand) -> SignupResponse:
         )
 
     # response
-    return SignupResponse(id=user.id, username=user.username)
+    return UserResponse(id=user.id, username=user.username)
 
+async def list_by(db: Session, page: int, size: int, username: str = None) -> Tuple[List[UserResponse], int]:
+    # get all users
+    users, total = crud_user.list_by(db, page, size, username)
+
+    # response
+    return [
+        UserResponse(id=user.id, username=user.username)
+        for user in users
+    ], total
 
 async def login(db: Session, cmd: LoginCommand) -> LoginResponse:
 

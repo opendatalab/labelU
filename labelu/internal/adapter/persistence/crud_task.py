@@ -1,10 +1,12 @@
 from datetime import datetime
-from typing import Any, Dict, List
+from sqlalchemy import or_, exists
+from typing import Any, Dict, List, Tuple
 
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
 from labelu.internal.domain.models.task import Task
+from labelu.internal.domain.models.task_collaborator import TaskCollaborator
 
 
 def create(db: Session, task: Task) -> Task:
@@ -14,15 +16,30 @@ def create(db: Session, task: Task) -> Task:
     return task
 
 
-def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> List[Task]:
-    return (
+def list_by(db: Session, owner_id: int, page: int = 0, size: int = 100) -> Tuple[List[Task], int]:
+    collaborator_exists = exists().where(
+        TaskCollaborator.task_id == Task.id,
+        TaskCollaborator.user_id == owner_id
+    )
+    query = (
         db.query(Task)
-        .filter(Task.created_by == owner_id, Task.deleted_at == None)
+        .filter(
+            Task.deleted_at == None,
+            or_(
+                Task.created_by == owner_id,
+                collaborator_exists
+            )
+        )
+    )
+    total = query.count()
+    
+    return (
+        query
         .order_by(Task.id.desc())
         .offset(offset=page * size)
         .limit(limit=size)
         .all()
-    )
+    ), total
 
 
 def get(db: Session, task_id: int, lock: bool = False) -> Task:

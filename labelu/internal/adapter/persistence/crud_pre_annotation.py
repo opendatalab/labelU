@@ -15,18 +15,17 @@ def batch(db: Session, pre_annotations: List[TaskPreAnnotation]) -> List[TaskPre
 
 def list_by(
     db: Session,
-    owner_id: int,
     task_id: int | None = None,
     sample_name: str | None = None,
     after: int | None = None,
     before: int | None = None,
-    pageNo: int | None = None,
+    page: int | None = None,
     sorting: str | None = None,
-    pageSize: int | None = 10,
+    size: int | None = 10,
 ) -> Tuple[List[TaskPreAnnotation], int]:
 
     # query filter
-    query_filter = [TaskPreAnnotation.created_by == owner_id, TaskPreAnnotation.deleted_at == None]
+    query_filter = [TaskPreAnnotation.deleted_at == None]
     if before:
         query_filter.append(TaskPreAnnotation.id < before)
     if after:
@@ -48,8 +47,8 @@ def list_by(
     count = query.count()
     
     results = (
-        query.offset(offset=pageNo * pageSize if pageNo else 0)
-        .limit(limit=pageSize)
+        query.offset(offset=page * size if page else 0)
+        .limit(limit=size)
         .all()
     )
     
@@ -65,19 +64,17 @@ def list_by(
         
     return results, count
 
-def list_by_task_id_and_owner_id(db: Session, task_id: int, owner_id: int) -> Dict[str, List[TaskPreAnnotation]]:
+def list_by_task_id_and_owner_id(db: Session, task_id: int) -> Dict[str, List[TaskPreAnnotation]]:
     pre_annotations = db.query(TaskPreAnnotation).filter(
         TaskPreAnnotation.task_id == task_id,
         TaskPreAnnotation.deleted_at == None,
-        TaskPreAnnotation.created_by == owner_id
     ).all()
     
     return pre_annotations
 
-def list_by_task_id_and_file_id(db: Session, task_id: int, file_id: int, owner_id: int) -> List[TaskPreAnnotation]:
+def list_by_task_id_and_file_id(db: Session, task_id: int, file_id: int) -> List[TaskPreAnnotation]:
     return db.query(TaskPreAnnotation).filter(
         TaskPreAnnotation.task_id == task_id,
-        TaskPreAnnotation.created_by == owner_id,
         TaskPreAnnotation.deleted_at == None,
         TaskPreAnnotation.file_id == file_id
     ).all()
@@ -97,7 +94,6 @@ def list_by_task_id_and_owner_id_and_sample_name(db: Session, task_id: int, owne
     return db.query(TaskPreAnnotation).filter(
         TaskPreAnnotation.task_id == task_id,
         TaskPreAnnotation.deleted_at == None,
-        TaskPreAnnotation.created_by == owner_id,
         TaskPreAnnotation.sample_name == sample_name
     ).all()
 
@@ -134,8 +130,8 @@ def delete(db: Session, pre_annotation_ids: List[int]) -> None:
     )
 
 
-def count(db: Session, task_id: int, owner_id: int, sample_name: str | None) -> int:
-    query_filter = [TaskPreAnnotation.created_by == owner_id, TaskPreAnnotation.deleted_at == None]
+def count(db: Session, task_id: int, sample_name: str | None) -> int:
+    query_filter = [TaskPreAnnotation.deleted_at == None]
     if task_id:
         query_filter.append(TaskPreAnnotation.task_id == task_id)
         

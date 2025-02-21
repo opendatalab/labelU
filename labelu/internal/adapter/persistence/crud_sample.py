@@ -18,16 +18,15 @@ def batch(db: Session, samples: List[TaskSample]) -> List[TaskSample]:
 def list_by(
     db: Session,
     task_id: Union[int, None],
-    owner_id: int,
     after: Union[int, None],
     before: Union[int, None],
-    pageNo: Union[int, None],
-    pageSize: int,
+    page: Union[int, None],
+    size: int,
     sorting: Union[str, None],
 ) -> List[TaskSample]:
 
     # query filter
-    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
+    query_filter = [TaskSample.deleted_at == None]
     if before:
         query_filter.append(TaskSample.id < before)
     if after:
@@ -58,8 +57,8 @@ def list_by(
     else:
         query = query.order_by(TaskSample.id.asc())
     results = (
-        query.offset(offset=pageNo * pageSize if pageNo else 0)
-        .limit(limit=pageSize)
+        query.offset(offset=page * size if page else 0)
+        .limit(limit=size)
         .all()
     )
     if before:
@@ -100,8 +99,8 @@ def delete(db: Session, sample_ids: List[int]) -> None:
     )
 
 
-def count(db: Session, task_id: int, owner_id: int) -> int:
-    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
+def count(db: Session, task_id: int) -> int:
+    query_filter = [TaskSample.deleted_at == None]
     if task_id:
         query_filter.append(TaskSample.task_id == task_id)
     return db.query(TaskSample).filter(*query_filter).count()
@@ -109,10 +108,9 @@ def count(db: Session, task_id: int, owner_id: int) -> int:
 
 def statics(
     db: Session,
-    owner_id: int,
     task_ids: List[int],
 ) -> dict:
-    query_filter = [TaskSample.created_by == owner_id, TaskSample.deleted_at == None]
+    query_filter = [TaskSample.deleted_at == None]
     if task_ids:
         query_filter.append(TaskSample.task_id.in_(task_ids))
 

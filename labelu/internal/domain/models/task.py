@@ -60,7 +60,8 @@ class Task(Base):
         comment="Last time a task was updated",
     )
     deleted_at = Column(DateTime(timezone=True), index=True, comment="Task delete time")
-
+    
+    collaborators = relationship("User", secondary="task_collaborator", back_populates="tasks")
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])
 
