@@ -10,7 +10,6 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
 
-
 # revision identifiers, used by Alembic.
 revision = '2eb983c9a254'
 down_revision = 'eb9c5b98168b'
@@ -21,10 +20,11 @@ depends_on = None
 def upgrade() -> None:
     # Create task_collaborator table
     # if the table is not exists then create it
-    is_table_exist = op.execute(
-        "SHOW TABLES LIKE 'task_collaborator';"
-    ).fetchone()
-    if not is_table_exist:
+    conn = op.get_bind()
+    inspector = sa.inspect(conn)
+    tables = inspector.get_table_names()
+    
+    if 'task_collaborator' not in tables:
         op.create_table(
             'task_collaborator',
             sa.Column('task_id', sa.Integer(), nullable=False),
@@ -49,79 +49,67 @@ def upgrade() -> None:
         )
         
         # Performances index
-        is_index_2_exist = op.execute(
-            "SHOW INDEX FROM task_collaborator WHERE Key_name = 'ix_task_collaborator_task_id';"
-        ).fetchone()
+        indices = inspector.get_indexes('task_collaborator')
+        existing_index_names = {idx['name'] for idx in indices}
         
-        if is_index_2_exist:
-            return
-        
-        op.create_index(
-            'ix_task_collaborator_task_id',
-            'task_collaborator',
-            ['task_id']
-        )
-        op.create_index(
-            'ix_task_collaborator_user_id',
-            'task_collaborator',
-            ['user_id']
-        )
-        op.create_index(
-            'ix_task_created_by_deleted_at',
-            'task',
-            ['created_by', 'deleted_at']
-        )
+        if 'ix_task_collaborator_task_id' not in existing_index_names:
+            op.create_index(
+                'ix_task_collaborator_task_id',
+                'task_collaborator',
+                ['task_id']
+            )
+            op.create_index(
+                'ix_task_collaborator_user_id',
+                'task_collaborator',
+                ['user_id']
+            )
+            op.create_index(
+                'ix_task_created_by_deleted_at',
+                'task',
+                ['created_by', 'deleted_at']
+            )
     
     # Task sample: updater -> updaters; create a new table task_sample_updater
-    is_task_sample_updater_table_exist = op.execute(
-        "SHOW TABLES LIKE 'task_sample_updater';"
-    ).fetchone()
-    
-    if is_task_sample_updater_table_exist:
-        return
-   
-    op.create_table(
-        'task_sample_updater',
-        sa.Column('sample_id', sa.Integer(), nullable=False),
-        sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column(
-            'created_at',
-            sa.DateTime(timezone=True),
-            server_default=sa.text('CURRENT_TIMESTAMP'),
-            nullable=False
-        ),
-        sa.ForeignKeyConstraint(
-            ['sample_id'],
-            ['task_sample.id'],
-            ondelete='CASCADE'
-        ),
-        sa.ForeignKeyConstraint(
-            ['user_id'],
-            ['user.id'],
-            ondelete='CASCADE'
-        ),
-        sa.PrimaryKeyConstraint('sample_id', 'user_id')
-    )
-    
-    # Performances index
-    # check if the index is already exists
-    is_index_exist = op.execute(
-        "SHOW INDEX FROM task_sample_updater WHERE Key_name = 'ix_task_sample_updater_sample_id';"
-    ).fetchone()
-    
-    if is_index_exist:
-        return
-    
-    op.create_index(
-        'ix_task_sample_updater_sample_id',
-        'task_sample_updater',
-        ['sample_id']
-    )
-    op.create_index(
-        'ix_task_sample_updater_user_id',
-        'task_sample_updater',
-        ['user_id']
-    )
+    if 'task_sample_updater' not in tables:
+        op.create_table(
+            'task_sample_updater',
+            sa.Column('sample_id', sa.Integer(), nullable=False),
+            sa.Column('user_id', sa.Integer(), nullable=False),
+            sa.Column(
+                'created_at',
+                sa.DateTime(timezone=True),
+                server_default=sa.text('CURRENT_TIMESTAMP'),
+                nullable=False
+            ),
+            sa.ForeignKeyConstraint(
+                ['sample_id'],
+                ['task_sample.id'],
+                ondelete='CASCADE'
+            ),
+            sa.ForeignKeyConstraint(
+                ['user_id'],
+                ['user.id'],
+                ondelete='CASCADE'
+            ),
+            sa.PrimaryKeyConstraint('sample_id', 'user_id')
+        )
+        
+        # Performances index
+        # check if the index is already exists
+        indices = inspector.get_indexes('task_sample_updater')
+        existing_index_names = {idx['name'] for idx in indices}
+        
+        if 'ix_task_sample_updater_sample_id' not in existing_index_names:
+            op.create_index(
+                'ix_task_sample_updater_sample_id',
+                'task_sample_updater',
+                ['sample_id']
+            )
+            op.create_index(
+                'ix_task_sample_updater_user_id',
+                'task_sample_updater',
+                ['user_id']
+            )
     
      # Migrate data from task_sample.updated_by to task_sample_updater
     task_sample = table(

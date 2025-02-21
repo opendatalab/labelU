@@ -5,7 +5,6 @@ Revises: 1b174ca5159a
 Create Date: 2024-02-07 15:58:30.618151
 
 """
-import imp
 import json
 import os
 
@@ -14,6 +13,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 from labelu.internal.common.config import settings
+from labelu.alembic_labelu.alembic_labelu_tools import table_exist, column_exist_in_table
 
 Base = automap_base()
 
@@ -23,17 +23,6 @@ revision = 'bc8fcb35b66b'
 down_revision = '1b174ca5159a'
 branch_labels = None
 depends_on = None
-
-# import alembic_labelu_tools from the absolute path
-alembic_labelu_tools = imp.load_source(
-    "alembic_labelu_tools",
-    (
-        os.path.join(
-            os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
-            "alembic_labelu_tools.py",
-        )
-    ),
-)
 
 def upgrade() -> None:
     bind = op.get_bind()
@@ -47,7 +36,7 @@ def upgrade() -> None:
     
         with context.begin_transaction():
             # Create a new table task_pre_annotation
-            if not alembic_labelu_tools.table_exist("task_pre_annotation"):
+            if not table_exist("task_pre_annotation"):
                 op.create_table(
                     "task_pre_annotation",
                     sa.Column("id", sa.Integer, primary_key=True, autoincrement=True, index=True),
@@ -78,7 +67,7 @@ def upgrade() -> None:
                     ),
                 )
             # Update the task_sample table
-            if not alembic_labelu_tools.column_exist_in_table(
+            if not column_exist_in_table(
                 "task_sample", "file_id"
             ):
                 with op.batch_alter_table('task_sample', recreate="always") as batch_op:
@@ -93,7 +82,7 @@ def upgrade() -> None:
                     )
             
             # Update the task_attachment table
-            if not alembic_labelu_tools.column_exist_in_table("task_attachment", "filename"):
+            if not column_exist_in_table("task_attachment", "filename"):
                 with op.batch_alter_table("task_attachment", recreate="always") as batch_op_task_attachment:
                     batch_op_task_attachment.add_column(
                         sa.Column(
