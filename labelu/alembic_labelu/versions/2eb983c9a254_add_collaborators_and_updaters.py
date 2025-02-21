@@ -72,7 +72,7 @@ def upgrade() -> None:
     
     if is_task_sample_updater_table_exist:
         return
-    
+   
     op.create_table(
         'task_sample_updater',
         sa.Column('sample_id', sa.Integer(), nullable=False),
