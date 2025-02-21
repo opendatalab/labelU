@@ -79,7 +79,7 @@ def list_by_task_id_and_file_id(db: Session, task_id: int, file_id: int) -> List
         TaskPreAnnotation.file_id == file_id
     ).all()
 
-def list_by_task_id_and_owner_id_and_sample_name(db: Session, task_id: int, owner_id: int, sample_name: str) -> List[TaskPreAnnotation]:
+def list_by_task_id_and_owner_id_and_sample_name(db: Session, task_id: int, sample_name: str) -> List[TaskPreAnnotation]:
     """list pre annotations by task_id, owner_id and sample_name without pagination
 
     Args:
