@@ -10,10 +10,6 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
 
-from labelu.alembic_labelu.alembic_labelu_tools import (
-    table_exist,
-)
-
 
 # revision identifiers, used by Alembic.
 revision = '2eb983c9a254'
@@ -25,7 +21,10 @@ depends_on = None
 def upgrade() -> None:
     # Create task_collaborator table
     # if the table is not exists then create it
-    if not table_exist('task_collaborator'):
+    is_table_exist = op.execute(
+        "SHOW TABLES LIKE 'task_collaborator';"
+    ).fetchone()
+    if not is_table_exist:
         op.create_table(
             'task_collaborator',
             sa.Column('task_id', sa.Integer(), nullable=False),
@@ -67,7 +66,11 @@ def upgrade() -> None:
         )
     
     # Task sample: updater -> updaters; create a new table task_sample_updater
-    if table_exist('task_sample_updater'):
+    is_task_sample_updater_table_exist = op.execute(
+        "SHOW TABLES LIKE 'task_sample_updater';"
+    ).fetchone()
+    
+    if is_task_sample_updater_table_exist:
         return
     
     op.create_table(
