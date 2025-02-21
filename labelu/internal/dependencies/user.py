@@ -43,7 +43,7 @@ def get_current_user(
         )
     user = crud_user.get(db, id=token_data.id)
     if not user:
-        raise LabelUException(code=ErrorCode.CODE_40002_USER_NOT_FOUND, status_code=404)
+        raise LabelUException(code=ErrorCode.CODE_40002_USER_NOT_FOUND, status_code=401)
     return user
 
 

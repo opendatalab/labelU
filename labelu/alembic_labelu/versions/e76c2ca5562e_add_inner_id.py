@@ -5,24 +5,12 @@ Revises: 54fee6a7ecd8
 Create Date: 2023-02-28 22:29:31.595257
 
 """
-import imp
-import os
-
 from alembic import op
 from alembic import context
 import sqlalchemy as sa
 from sqlalchemy.sql import text
+from labelu.alembic_labelu.alembic_labelu_tools import column_exist_in_table
 
-# import alembic_labelu_tools from the absolute path
-alembic_labelu_tools = imp.load_source(
-    "alembic_labelu_tools",
-    (
-        os.path.join(
-            os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
-            "alembic_labelu_tools.py",
-        )
-    ),
-)
 
 # revision identifiers, used by Alembic.
 revision = "e76c2ca5562e"
@@ -36,7 +24,7 @@ def upgrade() -> None:
     add inner_id and last_sample_inner_id columns in the task and sample tables
     """
     with context.begin_transaction():
-        if not alembic_labelu_tools.column_exist_in_table(
+        if not column_exist_in_table(
             "task", "last_sample_inner_id"
         ):
             with op.batch_alter_table("task", recreate="always") as batch_op_task:
@@ -50,7 +38,7 @@ def upgrade() -> None:
                     ),
                     insert_before="config",
                 )
-        if not alembic_labelu_tools.column_exist_in_table("task_sample", "inner_id"):
+        if not column_exist_in_table("task_sample", "inner_id"):
             with op.batch_alter_table(
                 "task_sample", recreate="always"
             ) as batch_op_task_sample:
