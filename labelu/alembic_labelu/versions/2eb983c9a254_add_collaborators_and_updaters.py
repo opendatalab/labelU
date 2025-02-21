@@ -55,7 +55,7 @@ def upgrade() -> None:
         
         if is_index_2_exist:
             return
-        
+
         op.create_index(
             'ix_task_collaborator_task_id',
             'task_collaborator',

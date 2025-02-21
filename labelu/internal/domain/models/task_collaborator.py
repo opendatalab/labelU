@@ -23,4 +23,3 @@ class TaskCollaborator(Base):
         default=datetime.now,
         comment="Time a task collaborator was created"
     )
-    
