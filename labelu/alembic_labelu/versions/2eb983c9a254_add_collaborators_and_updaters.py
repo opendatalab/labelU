@@ -10,6 +10,10 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
 
+from labelu.alembic_labelu.alembic_labelu_tools import (
+    table_exist,
+)
+
 
 # revision identifiers, used by Alembic.
 revision = '2eb983c9a254'
@@ -20,47 +24,52 @@ depends_on = None
 
 def upgrade() -> None:
     # Create task_collaborator table
-    op.create_table(
-        'task_collaborator',
-        sa.Column('task_id', sa.Integer(), nullable=False),
-        sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column(
-            'created_at',
-            sa.DateTime(timezone=True),
-            server_default=sa.text('CURRENT_TIMESTAMP'),
-            nullable=False
-        ),
-        sa.ForeignKeyConstraint(
-            ['task_id'],
-            ['task.id'],
-            ondelete='CASCADE'
-        ),
-        sa.ForeignKeyConstraint(
-            ['user_id'],
-            ['user.id'],
-            ondelete='CASCADE'
-        ),
-        sa.PrimaryKeyConstraint('task_id', 'user_id')
-    )
-    
-    # Performances index
-    op.create_index(
-        'ix_task_collaborator_task_id',
-        'task_collaborator',
-        ['task_id']
-    )
-    op.create_index(
-        'ix_task_collaborator_user_id',
-        'task_collaborator',
-        ['user_id']
-    )
-    op.create_index(
-        'ix_task_created_by_deleted_at',
-        'task',
-        ['created_by', 'deleted_at']
-    )
+    # if the table is not exists then create it
+    if not table_exist('task_collaborator'):
+        op.create_table(
+            'task_collaborator',
+            sa.Column('task_id', sa.Integer(), nullable=False),
+            sa.Column('user_id', sa.Integer(), nullable=False),
+            sa.Column(
+                'created_at',
+                sa.DateTime(timezone=True),
+                server_default=sa.text('CURRENT_TIMESTAMP'),
+                nullable=False
+            ),
+            sa.ForeignKeyConstraint(
+                ['task_id'],
+                ['task.id'],
+                ondelete='CASCADE'
+            ),
+            sa.ForeignKeyConstraint(
+                ['user_id'],
+                ['user.id'],
+                ondelete='CASCADE'
+            ),
+            sa.PrimaryKeyConstraint('task_id', 'user_id')
+        )
+        
+        # Performances index
+        op.create_index(
+            'ix_task_collaborator_task_id',
+            'task_collaborator',
+            ['task_id']
+        )
+        op.create_index(
+            'ix_task_collaborator_user_id',
+            'task_collaborator',
+            ['user_id']
+        )
+        op.create_index(
+            'ix_task_created_by_deleted_at',
+            'task',
+            ['created_by', 'deleted_at']
+        )
     
     # Task sample: updater -> updaters; create a new table task_sample_updater
+    if table_exist('task_sample_updater'):
+        return
+    
     op.create_table(
         'task_sample_updater',
         sa.Column('sample_id', sa.Integer(), nullable=False),
