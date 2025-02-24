@@ -103,6 +103,13 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
     # get task detail
     task = crud_task.get(db=db, task_id=task_id)
     
+    if not task:
+        logger.error("cannot find task:{}", task_id)
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+        
     # not the collaborators
     if task.created_by != current_user.id and current_user not in task.collaborators:
         logger.error(
@@ -113,12 +120,6 @@ async def get(db: Session, task_id: int, current_user: User) -> TaskResponseWith
         raise LabelUException(
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,
-        )
-    if not task:
-        logger.error("cannot find task:{}", task_id)
-        raise LabelUException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
-            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     # get progress
