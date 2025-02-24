@@ -23,11 +23,17 @@ TASK_INIT_CODE = 50000
 # export
 EXPORT_INIT_CODE = 60000
 
+UNEXPECTED_ERROR_CODE = 99999
+
 
 class ErrorCode(Enum):
     """
     business error code
     """
+    UNEXPECTED_ERROR = (
+        UNEXPECTED_ERROR_CODE,
+        "Internal Error",
+    )
 
     # common init error code
     CODE_30000_SQL_ERROR = (
@@ -184,7 +190,7 @@ async def unexpected_exception_handler(request: Request, exc: Exception):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "msg": str(exc),
-            "err_code": ErrorCode.CODE_30000_SQL_ERROR.value[0],
+            "err_code": ErrorCode.UNEXPECTED_ERROR.value[0],
         },
     )
 
