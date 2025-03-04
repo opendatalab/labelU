@@ -145,7 +145,7 @@ def main(
         
     uvicorn.run(app=app, host=settings.HOST, port=settings.PORT, ws="websockets")
         
-cli.default_command = "main"
+cli.callback()(main)
 
 if __name__ == "__main__":
     cli()
