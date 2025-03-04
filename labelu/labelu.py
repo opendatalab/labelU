@@ -127,7 +127,7 @@ app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))
 
 cli = Typer()
 
-@cli.command()
+@cli.command('migrate_to_mysql')
 def to_mysql():
     """Migrate database to MySQL"""
     migrate_to_mysql()
