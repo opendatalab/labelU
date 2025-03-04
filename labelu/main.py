@@ -133,7 +133,7 @@ def to_mysql():
     migrate_to_mysql()
 
 @cli.command()
-def labbelu(
+def main(
     host: str = "localhost", port: int = 8000, media_host: str = "http://localhost:8000"
 ):
     if port:
