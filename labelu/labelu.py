@@ -131,9 +131,9 @@ cli = Typer()
 def to_mysql():
     """Migrate database to MySQL"""
     migrate_to_mysql()
-    
-@cli.command()
-def main(
+
+@app.command()
+def labbelu(
     host: str = "localhost", port: int = 8000, media_host: str = "http://localhost:8000"
 ):
     if port:
@@ -145,7 +145,6 @@ def main(
         
     uvicorn.run(app=app, host=settings.HOST, port=settings.PORT, ws="websockets")
         
-cli.callback()(main)
 
 if __name__ == "__main__":
     cli()
