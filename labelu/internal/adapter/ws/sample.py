@@ -27,7 +27,7 @@ class TaskSampleWsPayload(BaseModel):
 def get_task_connection_payloads(conns: ConnectionData):    
     if not conns:
         return {
-            "type": "connected",
+            "type": "peers",
             "data": {
                 "collaborators": [],
                 "connections": []
@@ -55,7 +55,7 @@ def get_task_connection_payloads(conns: ConnectionData):
                 })
         
     return {
-        "type": "connected",
+        "type": "peers",
         "data": {
             "collaborators": collaborators,
             "connections": connections
@@ -67,7 +67,7 @@ def get_task_sample_connection_payloads(conns: ConnectionData):
     
     if not conns:
         return {
-            "type": "connected",
+            "type": "peers",
             "data": []
         }
     
@@ -80,7 +80,7 @@ def get_task_sample_connection_payloads(conns: ConnectionData):
         })
         
     return {
-        "type": "connected",
+        "type": "peers",
         "data": result
     }
 
@@ -133,6 +133,17 @@ async def task_sample_ws_endpoint(websocket: WebSocket, task_id: int, sample_id:
         
         await sampleConnections.send_message(sample_payload, client_id)
     
+    async def tell_others_someone_leaved():
+        await sampleConnections.send_message({
+            "type": "leave",
+            "data": {
+                "task_id": task_id,
+                "user_id": user.id,
+                "username": user.username,
+                "sample_id": sample_id
+            },
+        }, client_id)
+    
     async def tell_other_task_connections():
         connections = taskConnections.active_connections
         current_connection = connections.get(f"{task_id}", [])
@@ -160,9 +171,12 @@ async def task_sample_ws_endpoint(websocket: WebSocket, task_id: int, sample_id:
     except WebSocketDisconnect:
         await sampleConnections.disconnect(websocket, client_id)
         await tell_others()
+        await tell_others_someone_leaved()
         await tell_other_task_connections()
+        
     except Exception as e:
         logger.error(f"WebSocket error for user {client_id}: {e}")
         await sampleConnections.disconnect(websocket, client_id)
         await tell_others()
+        await tell_others_someone_leaved()
         await tell_other_task_connections()
