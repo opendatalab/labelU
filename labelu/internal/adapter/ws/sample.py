@@ -1,22 +1,10 @@
-from typing import List
 from fastapi import Depends, WebSocket, WebSocketDisconnect
 from loguru import logger
 from pydantic import BaseModel
 
-from labelu.internal.clients.ws import sampleConnections, taskConnections
-from labelu.internal.common.websocket import ConnectionData
+from labelu.internal.clients.ws import sampleConnectionManager
+from labelu.internal.common.websocket import ConnectionData, Message, MessageType
 from labelu.internal.dependencies.user import verify_ws_token
-
-class CollaboratorWsPayload(BaseModel):
-    user_id: int
-    username: str
-    sample_id: int
-    
-class TaskWsPayload(BaseModel):
-    task_id: int
-    user_id: int
-    username: str
-    collaborators: List[CollaboratorWsPayload] = []
     
 class TaskSampleWsPayload(BaseModel):
     task_id: int
@@ -24,159 +12,92 @@ class TaskSampleWsPayload(BaseModel):
     username: str
     sample_id: int
     
-def get_task_connection_payloads(conns: ConnectionData):    
-    if not conns:
-        return {
-            "type": "peers",
-            "data": {
-                "collaborators": [],
-                "connections": []
-            }
-        }
-    
-    connections = []
-    collaborators = []
-    
-    for conn in conns:
-        connections.append({
-            "task_id": conn.data.task_id,
-            "user_id": conn.data.user_id,
-            "username": conn.data.username
-        })
-    
-    for _, sample_conns in sampleConnections.active_connections.items():
-        if sample_conns[0].data.task_id == conns[0].data.task_id:
-            for sample_conn in sample_conns:
-                # The first connector in the sample connection is the annotator, and the others can not annotate
-                collaborators.append({
-                    "user_id": sample_conn.data.user_id,
-                    "username": sample_conn.data.username,
-                    "sample_id": sample_conn.data.sample_id
-                })
-        
-    return {
-        "type": "peers",
-        "data": {
-            "collaborators": collaborators,
-            "connections": connections
-        }
-    }
-    
 def get_task_sample_connection_payloads(conns: ConnectionData):
-    result = []
-    
     if not conns:
-        return {
-            "type": "peers",
-            "data": []
-        }
-    
-    for conn in conns:
-        result.append({
-            "task_id": conn.data.task_id,
-            "user_id": conn.data.user_id,
-            "username": conn.data.username,
-            "sample_id": conn.data.sample_id,
-        })
+        return Message(
+            type=MessageType.PEERS,
+            data=[]
+        )
         
-    return {
-        "type": "peers",
-        "data": result
-    }
+    return Message(
+        type=MessageType.PEERS,
+        data=[
+            TaskSampleWsPayload(
+                task_id=conn.data.task_id,
+                user_id=conn.data.user_id,
+                username=conn.data.username,
+                sample_id=conn.data.sample_id
+            ) for conn in conns
+        ]
+    )
 
-async def task_ws_endpoint(websocket: WebSocket, task_id: int, user=Depends(verify_ws_token)):
+    
+async def task_ws_endpoint(websocket: WebSocket, task_id: int, sample_id: int, user=Depends(verify_ws_token)):
     if not user:
+        await websocket.close(code=1008, reason="Unauthorized")
         return
     
-    client_id = f"{task_id}"
+    client_id = f"task_{task_id}"
     
-    async def tell_others():
-        connections = taskConnections.active_connections
-        current_connection = connections.get(client_id, [])
-        task_payload = get_task_connection_payloads(current_connection)
+    async def sync_peers():
+        connections = sampleConnectionManager.active_connections
+        current_connections = connections.get(client_id, {})
+        sample_payload = get_task_sample_connection_payloads(current_connections.values())
         
-        await taskConnections.send_message(task_payload, client_id)
+        await sampleConnectionManager.send_message(client_id=client_id, message=sample_payload)
+        
     
-    try:
-        await taskConnections.connect(
-            websocket,
-            client_id,
-            data=TaskWsPayload(
-                task_id=task_id,
-                user_id=user.id,
-                username=user.username
+    connection = None
+    
+    async def cleanup():
+        await sampleConnectionManager.disconnect(client_id, websocket)
+        await sync_peers()
+        # Tell clients that someone has left the sample page and refresh the page data
+        await sampleConnectionManager.send_message(
+            client_id=client_id,
+            message=Message(
+                type=MessageType.LEAVE,
+                data=TaskSampleWsPayload(
+                    task_id=task_id,
+                    user_id=user.id,
+                    username=user.username,
+                    sample_id=sample_id,
+                )
             )
         )
-        await tell_others()
         
-        while True:
-            await websocket.receive_text()
-            
-    except WebSocketDisconnect:
-        await taskConnections.disconnect(websocket, client_id)
-        await tell_others()
-    except Exception as e:
-        logger.error(f"WebSocket error for user {client_id}: {e}")
-        await taskConnections.disconnect(websocket, client_id)
-        await tell_others()
-    
-async def task_sample_ws_endpoint(websocket: WebSocket, task_id: int, sample_id: int, user=Depends(verify_ws_token)):
-    if not user:
-        return
-    
-    client_id = f"{task_id}_{sample_id}"
-    
-    async def tell_others():
-        connections = sampleConnections.active_connections
-        current_connection = connections.get(client_id, [])
-        sample_payload = get_task_sample_connection_payloads(current_connection)
-        
-        await sampleConnections.send_message(sample_payload, client_id)
-    
-    async def tell_others_someone_leaved():
-        await sampleConnections.send_message({
-            "type": "leave",
-            "data": {
-                "task_id": task_id,
-                "user_id": user.id,
-                "username": user.username,
-                "sample_id": sample_id
-            },
-        }, client_id)
-    
-    async def tell_other_task_connections():
-        connections = taskConnections.active_connections
-        current_connection = connections.get(f"{task_id}", [])
-        task_payload = get_task_connection_payloads(current_connection)
-        
-        await taskConnections.send_message(task_payload, f"{task_id}")
+        if connection:
+            connection.heartbeat_task.cancel()
     
     try:
-        await sampleConnections.connect(
-            websocket,
+        connection = await sampleConnectionManager.connect(
             client_id,
+            websocket,
             data=TaskSampleWsPayload(
                 task_id=task_id,
-                sample_id=sample_id,
                 user_id=user.id,
-                username=user.username
+                username=user.username,
+                sample_id=sample_id,
             )
         )
-        await tell_others()
-        await tell_other_task_connections()
+        
+        await sync_peers()
         
         while True:
-            await websocket.receive_text()
+            try:
+                data = await websocket.receive_text()
+                message = Message.parse_raw(data)
+                
+                if message.type == MessageType.PONG:
+                    connection.update_heartbeat()
+                
+            except WebSocketDisconnect as e:
+                logger.info(f"WebSocket disconnected for client {client_id}: Code={e.code}")
+                break
             
-    except WebSocketDisconnect:
-        await sampleConnections.disconnect(websocket, client_id)
-        await tell_others()
-        await tell_others_someone_leaved()
-        await tell_other_task_connections()
-        
+    except WebSocketDisconnect as e:
+        logger.info(f"WebSocket disconnected during connection setup for client {client_id}: Code={e.code}")
     except Exception as e:
-        logger.error(f"WebSocket error for user {client_id}: {e}")
-        await sampleConnections.disconnect(websocket, client_id)
-        await tell_others()
-        await tell_others_someone_leaved()
-        await tell_other_task_connections()
+        logger.error(f"WebSocket error for client {client_id}: {e}")
+    finally:
+        await cleanup()
