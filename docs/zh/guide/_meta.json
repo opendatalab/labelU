@@ -26,6 +26,11 @@
   },
   {
     "type": "file",
+    "name": "collaboration",
+    "label": "协同标注"
+  },
+  {
+    "type": "file",
     "name": "view",
     "label": "查看任务"
   },
