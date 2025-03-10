@@ -10,6 +10,8 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
 
+from labelu.alembic_labelu.alembic_labelu_tools import column_exist_in_table
+
 # revision identifiers, used by Alembic.
 revision = '2eb983c9a254'
 down_revision = 'eb9c5b98168b'
@@ -137,14 +139,47 @@ def upgrade() -> None:
                 )
             )
 
+    # Fix missing task_attachment_ids column in task_sample table
+    if not column_exist_in_table("task_sample", "task_attachment_ids"):
+        with op.batch_alter_table('task_sample', recreate="always") as batch_op:
+            batch_op.add_column(
+                sa.Column(
+                    "task_attachment_ids",
+                    sa.Text(),
+                    comment="task attachment ids",
+                ),
+            )
 
 def downgrade() -> None:
-    op.drop_index('ix_task_collaborator_user_id')
-    op.drop_index('ix_task_collaborator_task_id')
+    conn = op.get_bind()
+    inspector = sa.inspect(conn)
+    tables = inspector.get_table_names()
     
-    op.drop_table('task_collaborator')
+    if 'task_collaborator' in tables:
+        indices = inspector.get_indexes('task_collaborator')
+        existing_index_names = {idx['name'] for idx in indices}
+        
+        if 'ix_task_collaborator_user_id' in existing_index_names:
+            op.drop_index('ix_task_collaborator_user_id', table_name='task_collaborator')
+        if 'ix_task_collaborator_task_id' in existing_index_names:
+            op.drop_index('ix_task_collaborator_task_id', table_name='task_collaborator')
+            
+        op.drop_table('task_collaborator')
     
-    op.drop_index('ix_task_sample_updater_user_id')
-    op.drop_index('ix_task_sample_updater_task_sample_id')
+    if 'task' in tables:
+        indices = inspector.get_indexes('task')
+        existing_index_names = {idx['name'] for idx in indices}
+        
+        if 'ix_task_created_by_deleted_at' in existing_index_names:
+            op.drop_index('ix_task_created_by_deleted_at', table_name='task')
     
-    op.drop_table('task_sample_updater')
+    if 'task_sample_updater' in tables:
+        indices = inspector.get_indexes('task_sample_updater')
+        existing_index_names = {idx['name'] for idx in indices}
+        
+        if 'ix_task_sample_updater_user_id' in existing_index_names:
+            op.drop_index('ix_task_sample_updater_user_id', table_name='task_sample_updater')
+        if 'ix_task_sample_updater_sample_id' in existing_index_names:
+            op.drop_index('ix_task_sample_updater_sample_id', table_name='task_sample_updater')
+            
+        op.drop_table('task_sample_updater')
