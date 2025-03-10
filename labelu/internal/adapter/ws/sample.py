@@ -52,22 +52,16 @@ async def task_ws_endpoint(websocket: WebSocket, task_id: int, sample_id: int, u
     async def cleanup():
         await sampleConnectionManager.disconnect(client_id, websocket)
         await sync_peers()
-        # Tell clients that someone has left the sample page and refresh the page data
-        await sampleConnectionManager.send_message(
-            client_id=client_id,
-            message=Message(
-                type=MessageType.LEAVE,
-                data=TaskSampleWsPayload(
-                    task_id=task_id,
-                    user_id=user.id,
-                    username=user.username,
-                    sample_id=sample_id,
-                )
-            )
-        )
         
         if connection:
-            connection.heartbeat_task.cancel()
+            # Tell clients that someone has left the sample page and refresh the page data
+            await sampleConnectionManager.send_message(
+                client_id=client_id,
+                message=Message(
+                    type=MessageType.LEAVE,
+                    data=connection.data
+                )
+            )
     
     try:
         connection = await sampleConnectionManager.connect(
