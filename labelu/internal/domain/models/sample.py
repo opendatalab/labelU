@@ -47,7 +47,6 @@ class TaskSample(Base):
         default=SampleState.NEW.value,
         comment="NEW is has not start yet, DONE is completed, SKIPPED is skipped",
     )
-    task_attachment_ids = Column(Text, comment="task sample file ids")
     deleted_at = Column(DateTime(timezone=True), index=True, comment="Task delete time")
 
     # 由旧的data里的fileNames和urls中的唯一一个，迁移到media中

@@ -120,32 +120,33 @@ def upgrade() -> None:
                         f"UPDATE task_attachment SET filename='{filename}', url='{url}' WHERE id={attachment_id}"
                     )
             
-            for task_item in task_items:
-                task_id = task_item[0]
-                task_samples = session.execute(
-                    f"SELECT id, task_attachment_ids FROM task_sample WHERE task_id={task_id}"
-                )
-
-                for task_sample in task_samples:
-                    task_sample_id = task_sample[0]
-                    attachment_ids = json.loads(task_sample[1])
-                    # attachment_ids 存储的是字符串[id1, id2, id3]，需要转换成数组
-                    file_id = attachment_ids[0]
-                    
-                    if not file_id:
-                        continue
-                    
-                    attachment = session.execute(
-                        f"SELECT id, path FROM task_attachment WHERE id={file_id}"
+            if column_exist_in_table("task_sample", "task_attachment_ids"):
+                for task_item in task_items:
+                    task_id = task_item[0]
+                    task_samples = session.execute(
+                        f"SELECT id, task_attachment_ids FROM task_sample WHERE task_id={task_id}"
                     )
-                    attachment_path = list(attachment)[0][1]
-                    
-                    if attachment_path:
-                        # Update the task_sample table
-                        session.execute(
-                            f"UPDATE task_sample SET file_id={file_id} WHERE id={task_sample_id}"
+
+                    for task_sample in task_samples:
+                        task_sample_id = task_sample[0]
+                        attachment_ids = json.loads(task_sample[1])
+                        # attachment_ids 存储的是字符串[id1, id2, id3]，需要转换成数组
+                        file_id = attachment_ids[0]
+                        
+                        if not file_id:
+                            continue
+                        
+                        attachment = session.execute(
+                            f"SELECT id, path FROM task_attachment WHERE id={file_id}"
                         )
-            
+                        attachment_path = list(attachment)[0][1]
+                        
+                        if attachment_path:
+                            # Update the task_sample table
+                            session.execute(
+                                f"UPDATE task_sample SET file_id={file_id} WHERE id={task_sample_id}"
+                            )
+                
             session.commit()
     
     except Exception as e:
