@@ -1,0 +1,80 @@
+import { Tab, Tabs } from 'rspress/theme';
+
+# 使用 MySQL 数据库
+
+从 `v1.2.0` 开始，labelu支持 MySQL 数据库。
+
+## 开始
+
+首先，你需要在你本机或云服务器上安装 MySQL 数据库。你可以参考 [MySQL 官方文档](https://dev.mysql.com/downloads/installer/)来安装，或者使用 Docker。
+
+下面提供一个 `docker-compose.yaml` 文件来准备 MySQL 数据库作为示例：
+
+```yaml title="docker-compose.yml"
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: labelu-mysql
+    restart: unless-stopped
+    environment:
+      # 只作为示例，不要在公网环境使用这些默认值，也不要在docker-compose.yml文件中明文写入密码
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-labeludb}
+      MYSQL_USER: ${MYSQL_USER:-labelu}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-labelupass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./conf.d:/etc/mysql/conf.d
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mysql_data:
+```
+
+`conf.d`目录下的自定义配置示例：
+
+```ini title="conf.d/labelu.cnf"
+[mysqld]
+innodb_buffer_pool_size=1G
+innodb_log_file_size=256M
+max_connections=1000
+
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+
+slow_query_log=1
+slow_query_log_file=/var/log/mysql/slow.log
+long_query_time=2
+
+[mysql]
+default-character-set=utf8mb4
+
+[client]
+default-character-set=utf8mb4
+```
+
+然后，使用以下命令启动 MySQL 服务：
+
+```bash
+docker-compose up -d
+```
+
+最后，通过设置数据库环境变量启动 labelu：
+
+```bash
+DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu
+```
+
+## 从 SQLite 迁移到 MySQL
+
+`v1.2.0` 之前的版本使用的是 SQLite 数据库。升级到最新版本后，你可以使用以下步骤将数据迁移到 MySQL 数据库：
+
+```bash
+DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu migrate_to_mysql
+```

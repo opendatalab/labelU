@@ -1,0 +1,35 @@
+# Collaboration
+
+:::info
+
+Collaborative annotation requires version 1.2.0 or higher. If multiple users are required, it is recommended to migrate the database to MySQL. For details, please refer to [Migrate Database](/en/guide/migrate-to-mysql).
+
+:::
+
+## How to configure?
+
+On the sample list page of the task, click "Collaborators" to display the following UI:
+
+![collaborators](/en/collaboration-1.png)
+
+Check the users who need to join the annotation to take effect (copy the task link and send it to the users who participate in the annotation, replace `localhost` with the local IP address in the local area network, and refresh the **users** after the user registers). Users participating in the annotation can see the task in the task list, as shown in the following figure:
+
+![collaborators](/en/collaboration-2.png)
+
+:::tip
+
+Non-task creators cannot modify task configurations or delete tasks.
+
+:::
+
+When a sample is annotated by other users, you will not be able to annotate it after entering the sample annotation page, as shown in the following figure:
+
+![collaborators](/en/collaboration-3.png)
+
+After the user leaves the sample annotation page, other users can continue to annotate, and the annotation data of the sample will be refreshed at the same time, as shown in the following figure:
+
+![collaborators](/en/collaboration-4.png)
+
+Finally, the task annotators will be displayed on the sample list page:
+
+![collaborators](/en/collaboration-5.png)

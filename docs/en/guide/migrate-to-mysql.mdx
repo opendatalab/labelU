@@ -1,0 +1,80 @@
+import { Tab, Tabs } from 'rspress/theme';
+
+# Migrate to MySQL
+
+Starting from `v1.2.0`, labelu supports MySQL database.
+
+## Getting Started
+
+First, you need to install MySQL database on your local machine or cloud server. You can refer to the [MySQL official documentation](https://dev.mysql.com/downloads/installer/) for installation, or use Docker.
+
+Here is a `docker-compose.yaml` file to prepare MySQL database as an example:
+
+```yaml title="docker-compose.yml"
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: labelu-mysql
+    restart: unless-stopped
+    environment:
+      # Just an example, do not use these default values in a public environment, and do not write passwords in plain text in the docker-compose.yml file
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-labeludb}
+      MYSQL_USER: ${MYSQL_USER:-labelu}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-labelupass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./conf.d:/etc/mysql/conf.d
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mysql_data:
+```
+
+Custom configuration example under the `conf.d` directory:
+
+```ini title="conf.d/labelu.cnf"
+[mysqld]
+innodb_buffer_pool_size=1G
+innodb_log_file_size=256M
+max_connections=1000
+
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+
+slow_query_log=1
+slow_query_log_file=/var/log/mysql/slow.log
+long_query_time=2
+
+[mysql]
+default-character-set=utf8mb4
+
+[client]
+default-character-set=utf8mb4
+```
+
+Then, start the MySQL database:
+
+```bash
+docker-compose up -d
+```
+
+Finally, set the `DATABASE_URL` environment variable to use MySQL database:
+
+```bash
+DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu
+```
+
+## Migrate from SQLite to MySQL
+
+Before `v1.2.0`, labelu used SQLite database. After upgrading to the latest version, you can use the following steps to migrate data to MySQL database:
+
+```bash
+DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu migrate_to_mysql
+```
