@@ -29,6 +29,9 @@ from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.attachment import AttachmentResponse
+from labelu.internal.clients.ws import sampleConnectionManager
+from labelu.internal.common.websocket import Message, MessageType
+from labelu.internal.adapter.ws.sample import TaskSampleWsPayload
 
 def is_sample_pre_annotated(db: Session, task_id: int, sample_name: str | None = None) -> Tuple[List[TaskPreAnnotation], int]:
     if sample_name is None:
@@ -220,6 +223,20 @@ async def patch(
             sample.updaters.append(current_user)
         # update task sample result
         updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=sample_obj_in)
+    
+    # tell other clients in the same sample page to refresh data
+    await sampleConnectionManager.send_message(
+        client_id=f"task_{task_id}",
+        message=Message(
+            type=MessageType.UPDATE,
+            data=TaskSampleWsPayload(
+                task_id=task_id,
+                user_id=current_user.id,
+                username=current_user.username,
+                sample_id=sample_id,
+            )
+        )
+    )
 
     # response
     return SampleResponse(

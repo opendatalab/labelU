@@ -16,7 +16,7 @@ class MessageType(str, Enum):
     PEERS = "peers"
     PING = "ping"
     PONG = "pong"
-    LEAVE = "leave"
+    UPDATE = "update"
 
 class Message(BaseModel):
     type: MessageType
