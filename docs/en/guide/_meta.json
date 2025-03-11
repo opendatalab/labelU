@@ -26,6 +26,11 @@
   },
   {
     "type": "file",
+    "name": "collaboration",
+    "label": "Collaboration"
+  },
+  {
+    "type": "file",
     "name": "view",
     "label": "Task overview"
   },
@@ -38,5 +43,10 @@
     "type": "file",
     "name": "deploy",
     "label": "Deployment"
+  },
+  {
+    "type": "file",
+    "name": "migrate-to-mysql",
+    "label": "Migrate to MySQL"
   }
 ]

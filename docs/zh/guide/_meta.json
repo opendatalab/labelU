@@ -43,5 +43,10 @@
     "type": "file",
     "name": "deploy",
     "label": "部署"
+  },
+  {
+    "type": "file",
+    "name": "migrate-to-mysql",
+    "label": "使用MySQL"
   }
 ]
