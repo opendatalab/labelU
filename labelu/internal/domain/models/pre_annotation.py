@@ -19,16 +19,16 @@ class TaskPreAnnotation(Base):
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
     updated_by = Column(Integer, ForeignKey("user.id"))
     created_at = Column(
-        DateTime, default=datetime.now, comment="Time a task sample result was created"
+        DateTime(timezone=True), default=datetime.now, comment="Time a task sample result was created"
     )
     updated_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=datetime.now,
         onupdate=datetime.now,
         comment="Last time a task pre annotation result was updated",
     )
     data = Column(Text, comment="task sample pre annotation result")
-    deleted_at = Column(DateTime, index=True, comment="Task pre-annotation delete time")
+    deleted_at = Column(DateTime(timezone=True), index=True, comment="Task pre-annotation delete time")
 
     file = relationship("TaskAttachment", foreign_keys=[file_id])
     task = relationship("Task", foreign_keys=[task_id])

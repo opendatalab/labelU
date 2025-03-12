@@ -51,16 +51,17 @@ class Task(Base):
         Integer, ForeignKey(column="user.id"), comment="Last time a task was updated by"
     )
     created_at = Column(
-        DateTime, default=datetime.now, comment="Time a task was created"
+        DateTime(timezone=True), default=datetime.now, comment="Time a task was created"
     )
     updated_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=datetime.now,
         onupdate=datetime.now,
         comment="Last time a task was updated",
     )
-    deleted_at = Column(DateTime, index=True, comment="Task delete time")
-
+    deleted_at = Column(DateTime(timezone=True), index=True, comment="Task delete time")
+    
+    collaborators = relationship("User", secondary="task_collaborator", back_populates="tasks")
     owner = relationship("User", foreign_keys=[created_by])
     updater = relationship("User", foreign_keys=[updated_by])
 

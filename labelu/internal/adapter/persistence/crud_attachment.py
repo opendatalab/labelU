@@ -7,13 +7,13 @@ from labelu.internal.domain.models.attachment import TaskAttachment
 
 def list_by(
     db: Session,
-    pageSize: int,
+    size: int,
     ids: List[int] | None = [],
     task_id: Optional[int] = None,
     owner_id: Optional[int] = None,
     after: Optional[int] = None,
     before: Optional[int] = None,
-    pageNo: Optional[int] = None,
+    page: Optional[int] = None,
     sorting: Optional[str] = None,
 ) -> Tuple[List[TaskAttachment], int]:
 # query filter
@@ -39,8 +39,8 @@ def list_by(
     count = query.count()
     
     results = (
-        query.offset(offset=pageNo * pageSize if pageNo else 0)
-        .limit(limit=pageSize)
+        query.offset(offset=page * size if page else 0)
+        .limit(limit=size)
         .all()
     )
     

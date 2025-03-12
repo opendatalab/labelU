@@ -1,9 +1,10 @@
 from typing import Optional
 
 from jose import jwt
+from loguru import logger
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
-from fastapi import status, Depends, Request
+from fastapi import HTTPException, WebSocket, status, Depends, Request
 
 from labelu.internal.domain.models.user import User
 from labelu.internal.common import db
@@ -42,5 +43,35 @@ def get_current_user(
         )
     user = crud_user.get(db, id=token_data.id)
     if not user:
-        raise LabelUException(code=ErrorCode.CODE_40002_USER_NOT_FOUND, status_code=404)
+        raise LabelUException(code=ErrorCode.CODE_40002_USER_NOT_FOUND, status_code=401)
     return user
+
+
+async def verify_ws_token(websocket: WebSocket, db: Session = Depends(db.get_db)):
+    try:
+        token = websocket.query_params.get('token')
+        
+        if not token:
+            await websocket.close(code=4001, reason="Missing authentication token")
+            raise HTTPException(status_code=401, detail="Missing authentication token")
+            
+        payload = jwt.decode(
+            token,
+            settings.PASSWORD_SECRET_KEY,
+            algorithms=[settings.TOKEN_GENERATE_ALGORITHM],
+            options={"verify_exp": False},
+        )
+        
+        token_data = AccessToken(**payload)
+        user = crud_user.get(db, id=token_data.id)
+        
+        if not user:
+            await websocket.close(code=4002, reason="User not found")
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return user
+        
+    except jwt.JWTError as e:
+        logger.error(f"WebSocket authentication error: {str(e)}")
+        await websocket.close(code=4003, reason="Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token")

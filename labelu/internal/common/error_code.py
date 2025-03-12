@@ -23,11 +23,17 @@ TASK_INIT_CODE = 50000
 # export
 EXPORT_INIT_CODE = 60000
 
+UNEXPECTED_ERROR_CODE = 99999
+
 
 class ErrorCode(Enum):
     """
     business error code
     """
+    UNEXPECTED_ERROR = (
+        UNEXPECTED_ERROR_CODE,
+        "Internal Error",
+    )
 
     # common init error code
     CODE_30000_SQL_ERROR = (
@@ -54,7 +60,7 @@ class ErrorCode(Enum):
     )
     CODE_40001_USERNAME_ALREADY_EXISTS = (
         USER_INIT_CODE + 1,
-        "Username Aready exists in the system",
+        "Username Already exists in the system",
     )
     CODE_40002_USER_NOT_FOUND = (USER_INIT_CODE + 2, "User not found")
     CODE_40003_CREDENTIAL_ERROR = (USER_INIT_CODE + 3, "Could not validate credentials")
@@ -64,7 +70,14 @@ class ErrorCode(Enum):
     CODE_50000_TASK_ERROR = (TASK_INIT_CODE, "Internal Error")
     CODE_50001_TASK_FINISHED_ERROR = (TASK_INIT_CODE + 1, "Task is finished")
     CODE_50002_TASK_NOT_FOUND = (TASK_INIT_CODE + 2, "Task not found")
+    CODE_50003_COLLABORATOR_ALREADY_EXISTS = (
+        TASK_INIT_CODE + 3,
+        "Collaborator already exists")
 
+    CODE_50004_COLLABORATOR_NOT_FOUND = (
+        TASK_INIT_CODE + 4,
+        "Collaborator not found",
+    )
     # task attachment error code
     CODE_51000_CREATE_ATTACHMENT_ERROR = (
         TASK_INIT_CODE + 1000,
@@ -82,7 +95,7 @@ class ErrorCode(Enum):
     # task sample error code
     CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR = (
         TASK_INIT_CODE + 5000,
-        "Paramenters error: 'after', 'before', 'pageNo' only one must be Ture, pageNo can be 0",
+        "Paramenters error: 'after', 'before', 'page' only one must be Ture, page can be 0",
     )
     CODE_55001_SAMPLE_NOT_FOUND = (TASK_INIT_CODE + 5001, "Sample not found")
     CODE_55002_SAMPLE_FORMAT_ERROR = (
@@ -171,9 +184,19 @@ async def validation_exception_handler(request, exc):
         },
     )
 
+async def unexpected_exception_handler(request: Request, exc: Exception):
+    logger.error(exc)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "msg": str(exc),
+            "err_code": ErrorCode.UNEXPECTED_ERROR.value[0],
+        },
+    )
 
 def add_exception_handler(app: FastAPI):
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(LabelUException, labelu_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
+    app.add_exception_handler(Exception, unexpected_exception_handler)

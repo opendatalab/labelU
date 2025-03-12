@@ -127,5 +127,5 @@ class TestClassUserRouter:
         r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
 
         # check
-        assert r.status_code == 404
+        assert r.status_code == 401
         assert r.json()["err_code"] == 40002
