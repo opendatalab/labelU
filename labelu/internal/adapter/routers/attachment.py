@@ -7,7 +7,6 @@ import mimetypes
 import os
 
 from labelu.internal.common import db
-from labelu.internal.common.config import settings
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user

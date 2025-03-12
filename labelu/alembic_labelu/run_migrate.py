@@ -7,7 +7,7 @@ from alembic.script import ScriptDirectory
 from labelu.internal.common.config import settings
 
 
-def run_sqlite_migrations():
+def run_db_migrations():
     migrations_dir = os.path.dirname(os.path.realpath(__file__))
     # assumes the alembic.ini is also contained in the current directory of this file
     config_file = os.path.join(migrations_dir, "alembic.ini")

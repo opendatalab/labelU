@@ -1,9 +1,6 @@
-from typing import List, Union
+from typing import List
 from pydantic import BaseModel, Field
 from fastapi import UploadFile, File
-
-from labelu.internal.domain.models.task import MediaType
-
 
 class AttachmentCommand(BaseModel):
     file: UploadFile = File()

@@ -1,8 +1,7 @@
 import json
 
 from alembic import op
-from sqlalchemy import engine_from_config
-from sqlalchemy.engine import reflection
+import sqlalchemy as sa
 
 def table_exist(table_name):
     """check table is not exist
@@ -13,20 +12,11 @@ def table_exist(table_name):
     Returns:
         bool: true or false, whether the table_name exists
     """
-    config = op.get_context().config
-    engine = engine_from_config(
-        config.get_section(config.config_ini_section), prefix="sqlalchemy."
-    )
-    insp = reflection.Inspector.from_engine(engine)
-    table_exist = False
+    conn = op.get_bind()
+    inspector = sa.inspect(conn)
+    tables = inspector.get_table_names()
     
-    for table in insp.get_table_names():
-        if table_name not in table:
-            continue
-        table_exist = True
-        break
-    
-    return table_exist
+    return table_name in tables
 
 def column_exist_in_table(table_name, column_name):
     """check column is not exist in table
@@ -38,17 +28,11 @@ def column_exist_in_table(table_name, column_name):
     Returns:
         bool: true or false, whether the column_name exists in the table_name
     """
-    config = op.get_context().config
-    engine = engine_from_config(
-        config.get_section(config.config_ini_section), prefix="sqlalchemy."
-    )
-    insp = reflection.Inspector.from_engine(engine)
-    column_exist = False
-    for col in insp.get_columns(table_name):
-        if column_name not in col["name"]:
-            continue
-        column_exist = True
-    return column_exist
+    conn = op.get_bind()
+    inspector = sa.inspect(conn)
+    columns = inspector.get_columns(table_name)
+    
+    return column_name in [column["name"] for column in columns]
 
 
 def get_tool_label_dict(task_config: dict) -> dict:

@@ -1,5 +1,3 @@
-import os
-import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -8,11 +6,6 @@ from sqlalchemy import pool
 from alembic import context
 
 from labelu.internal.common.db import Base
-from labelu.internal.domain.models.task import Task
-from labelu.internal.domain.models.user import User
-from labelu.internal.domain.models.sample import TaskSample
-from labelu.internal.domain.models.attachment import TaskAttachment
-from labelu.internal.common.config import settings
 
 
 # this is the Alembic Config object, which provides
@@ -74,7 +67,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(connection=connection, target_metadata=target_metadata, render_as_batch=not str(connection.engine.url).startswith('mysql'))
 
         with context.begin_transaction():
             context.run_migrations()

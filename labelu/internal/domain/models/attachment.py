@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.schema import Index
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, SmallInteger, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from labelu.internal.common.db import Base
 
@@ -17,10 +17,10 @@ class TaskAttachment(Base):
     created_by = Column(Integer, ForeignKey("user.id"), index=True)
     updated_by = Column(Integer, ForeignKey("user.id"), index=True)
     created_at = Column(
-        DateTime, default=datetime.now, comment="Time a task was created"
+        DateTime(timezone=True), default=datetime.now, comment="Time a task was created"
     )
     updated_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=datetime.now,
         onupdate=datetime.now,
         comment="Last time a task was updated",

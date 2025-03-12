@@ -57,8 +57,8 @@ async def list_pre_annotation_files_request(
     task_id: int,
     after: Union[int, None] = Query(default=None, gt=0),
     before: Union[int, None] = Query(default=None, gt=0),
-    pageNo: Union[int, None] = Query(default=None, ge=0),
-    pageSize: Union[int, None] = 100,
+    page: Union[int, None] = Query(default=None, ge=0),
+    size: Union[int, None] = 100,
     sort: Union[str, None] = Query(
         default=None, regex="(created_at):(desc|asc)"
     ),
@@ -73,16 +73,15 @@ async def list_pre_annotation_files_request(
     data, total = await service.list_pre_annotation_files(
         db=db,
         task_id=task_id,
-        current_user=current_user,
         after=after,
         before=before,
-        pageNo=pageNo,
-        pageSize=pageSize,
+        page=page,
+        size=size,
         sorting=sort,
     )
 
     # response
-    meta_data = MetaData(total=total, page=pageNo, size=len(data))
+    meta_data = MetaData(total=total, page=page, size=len(data))
     return OkRespWithMeta[List[PreAnnotationFileResponse]](meta_data=meta_data, data=data)
 
 @router.delete(
@@ -118,8 +117,8 @@ async def list_by(
     sample_name: str = Query(default=None, min_length=1, max_length=255),
     after: Union[int, None] = Query(default=None, gt=0),
     before: Union[int, None] = Query(default=None, gt=0),
-    pageNo: Union[int, None] = Query(default=None, ge=0),
-    pageSize: Union[int, None] = 100,
+    page: Union[int, None] = Query(default=None, ge=0),
+    size: Union[int, None] = 100,
     sort: Union[str, None] = Query(
         default=None, regex="(annotated_count|state):(desc|asc)"
     ),
@@ -131,7 +130,7 @@ async def list_by(
     Get a annotation result.
     """
 
-    if len([i for i in (after, before, pageNo) if i != None]) != 1:
+    if len([i for i in (after, before, page) if i != None]) != 1:
         raise LabelUException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             code=ErrorCode.CODE_55000_SAMPLE_LIST_PARAMETERS_ERROR,
@@ -144,14 +143,14 @@ async def list_by(
         sample_name=sample_name,
         after=after,
         before=before,
-        pageNo=pageNo,
-        pageSize=pageSize,
+        page=page,
+        size=size,
         sorting=sort,
         current_user=current_user,
     )
 
     # response
-    meta_data = MetaData(total=total, page=pageNo, size=len(data))
+    meta_data = MetaData(total=total, page=page, size=len(data))
     return OkRespWithMeta[List[PreAnnotationResponse]](meta_data=meta_data, data=data)
 
 
