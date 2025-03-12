@@ -7,6 +7,14 @@
   }
 }
 
+@media (min-width: 1280px) {
+  .rspress-doc {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-height: calc(100vh - 120px);
+  }
+}
+
 .labelu-image-annotator {
   border: 1px solid #e2e2e2;
   border-radius: 6px;

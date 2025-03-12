@@ -8,11 +8,16 @@
     "preview": "rspress preview"
   },
   "dependencies": {
+    "@labelu/image": "^1.4.0",
+    "@labelu/image-annotator-react": "^2.4.1",
     "@react-icons/all-files": "^4.1.0",
     "clsx": "^2.1.1",
-    "rspress": "^1.35.3"
+    "rspress": "^1.43.4"
   },
   "devDependencies": {
+    "@rspress/plugin-api-docgen": "^1.43.4",
+    "@rspress/plugin-playground": "^1.43.4",
+    "@rspress/plugin-preview": "^1.43.4",
     "@types/node": "^16",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",

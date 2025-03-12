@@ -1,8 +1,0 @@
-
-@media (min-width: 1440px) {
-  .rspress-doc {
-    max-width: 100% !important;
-    width: 100% !important;
-    min-height: calc(100vh - 120px);
-  }
-}

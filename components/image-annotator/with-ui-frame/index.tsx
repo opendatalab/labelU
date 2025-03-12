@@ -56,7 +56,7 @@ export default function Basic() {
 
   return (
       <Annotator
-        offsetTop={220}
+        offsetTop={320}
         config={config}
         editingSample={editingSample}
         renderSidebar={null}
