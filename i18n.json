@@ -15,6 +15,10 @@
     "en": "Schema",
     "zh": "标注格式"
   },
+  "components": {
+    "en": "Components",
+    "zh": "组件"
+  },
   "playground": {
     "en": "Playground",
     "zh": "示例"

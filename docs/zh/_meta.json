@@ -7,4 +7,9 @@
   "text": "schema",
   "link": "/schema/global/tag",
   "activeMatch": "/schema"
+},
+{
+  "text": "components",
+  "link": "/components/image/basic",
+  "activeMatch": "/components"
 }]
