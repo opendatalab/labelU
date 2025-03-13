@@ -93,13 +93,13 @@ pip install labelu[mysql]
 labelu
 ```
 
-> If you need to use MySQL database after upgrading from version `1.2.0` or below, run the following command to migrate data from the built-in SQLite database to the MySQL database:
+> If you need to use MySQL database after upgrading from version 1.x, run the following command to migrate data from the built-in SQLite database to the MySQL database:
 
 ```bash
 DATABASE_URL=mysql://<username>:<password>@<host>/<your dbname> labelu migrate_to_mysql
 ```
 
-6. Visit [http://localhost:8000/](http://localhost:8000/) and ready to go.
+1. Visit [http://localhost:8000/](http://localhost:8000/) and ready to go.
 
 ### Local development
 
