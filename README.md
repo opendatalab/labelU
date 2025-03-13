@@ -83,7 +83,7 @@ Install labelu with MySQL support：
 ```bash
 pip install labelu[mysql]
 
-# or install labelu and mysqlclient separately
+# Or install labelu and mysqlclient separately
 # pip install labelu mysqlclient
 ```
 
