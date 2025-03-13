@@ -1,0 +1,20 @@
+
+@media (min-width: 1440px) {
+  .rspress-doc {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-height: calc(100vh - 120px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .rspress-doc {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-height: calc(100vh - 120px);
+  }
+}
+
+.labelu-image-annotator {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}

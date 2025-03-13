@@ -1,0 +1,17 @@
+[
+  {
+    "type": "dir",
+    "name": "image",
+    "label": "图片"
+  },
+  {
+    "type": "dir",
+    "name": "video",
+    "label": "视频"
+  },
+  {
+    "type": "dir",
+    "name": "audio",
+    "label": "音频"
+  }
+]

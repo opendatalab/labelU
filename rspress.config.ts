@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { defineConfig } from 'rspress/config';
 import { pluginGoogleAnalytics } from 'rsbuild-plugin-google-analytics';
+import { pluginPreview } from '@rspress/plugin-preview';
 
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
@@ -14,6 +15,9 @@ export default defineConfig({
     light: '/logo.svg',
     dark: '/logo.svg',
   },
+  plugins: [
+    pluginPreview(),
+  ],
   builderConfig: {
     plugins: [
       pluginGoogleAnalytics({ id: 'G-VZ82VW0WEH' }),
