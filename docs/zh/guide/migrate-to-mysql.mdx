@@ -73,7 +73,7 @@ DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu
 
 ## 从 SQLite 迁移到 MySQL
 
-`v1.2.0` 之前的版本使用的是 SQLite 数据库。升级到最新版本后，你可以使用以下步骤将数据迁移到 MySQL 数据库：
+`v1.2.0` 之前的版本使用的是 SQLite 数据库。升级到最新版本后，你可以使用以下步骤，在启动前将数据迁移到 MySQL 数据库：
 
 ```bash
 DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu migrate_to_mysql

@@ -48,7 +48,7 @@ const toolNameMapping = {
 
 const presetSamples = [
   {
-    url: '/assets/object-detect-1.jpg',
+    url: '/labelU/assets/object-detect-1.jpg',
     name: 'rect',
     id: 'rect',
     meta: {
@@ -156,7 +156,7 @@ const presetSamples = [
     },
   },
   {
-    url: '/assets/object-detect-3.jpg',
+    url: '/labelU/assets/object-detect-3.jpg',
     name: 'cuboid',
     id: 'cuboid',
     meta: {
@@ -458,7 +458,7 @@ const presetSamples = [
     },
   },
   {
-    url: '/assets/segmentation.jpg',
+    url: '/labelU/assets/segmentation.jpg',
     name: 'segmentation',
     id: 'segmentation',
     meta: {
@@ -608,7 +608,7 @@ const presetSamples = [
       tag: [],
     },
   }, {
-    url: '/assets/keypoints.jpg',
+    url: '/labelU/assets/keypoints.jpg',
     name: 'keypoints',
     id: 'keypoints',
     meta: {
