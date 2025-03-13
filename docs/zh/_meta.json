@@ -9,7 +9,22 @@
   "activeMatch": "/schema"
 },
 {
-  "text": "components",
-  "link": "/components/image/basic",
-  "activeMatch": "/components"
+  "text": "playground",
+  "items": [
+    {
+      "text": "图像",
+      "link": "/playground/image",
+      "activeMatch": "/playground/image"
+    },
+    {
+      "text": "视频",
+      "link": "/playground/video",
+      "activeMatch": "/playground/video"
+    },
+    {
+      "text": "音频",
+      "link": "/playground/audio",
+      "activeMatch": "/playground/audio"
+    }
+  ]
 }]

@@ -1,0 +1,85 @@
+
+.ant-tree-treenode {
+  padding-left: 0.6rem;
+  position: relative;
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
+}
+.ant-tree-node-content-wrapper {
+  &:hover {
+    background-color: transparent;
+  }
+
+  cursor: default;
+}
+
+.category {
+  display: flex;
+  align-items: baseline;
+}
+
+.option {
+  display: flex;
+  align-items: baseline;
+}
+
+.sn {
+  position: absolute;
+  top: 0.3rem;
+  left: -2rem;
+}
+
+.icon {
+  font-size: 2rem !important;
+}
+
+.category .ant-form-item,
+.option .ant-form-item {
+  margin-bottom: 0;
+  flex-grow: 1;
+  margin-right: 0.5rem;
+}
+
+.add-option {
+  padding-left: 0;
+  margin-bottom: 0.5rem;
+}
+
+.remove {
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--color-text-tertiary);
+
+  &:hover {
+    color: var(--color-error);
+  }
+}
+
+.multiple-switcher {
+  cursor: pointer;
+}
+
+.text-form-wrapper {
+  .ant-form-item {
+    margin-bottom: 0.5rem;
+  }
+  .ant-form-item-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ant-form-item-control {
+    min-height: auto;
+    width: 100%;
+  }
+}
+
+.should-align-center {
+  display: flex;
+  align-items: center;
+}
+
+.buttons {
+  background-color: #fff;
+}

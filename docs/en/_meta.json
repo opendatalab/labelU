@@ -7,4 +7,24 @@
   "text": "schema",
   "link": "/schema/global/tag",
   "activeMatch": "/schema"
+},
+{
+  "text": "playground",
+  "items": [
+    {
+      "text": "Image",
+      "link": "/playground/image",
+      "activeMatch": "/playground/image"
+    },
+    {
+      "text": "Video",
+      "link": "/playground/video",
+      "activeMatch": "/playground/video"
+    },
+    {
+      "text": "Audio",
+      "link": "/playground/audio",
+      "activeMatch": "/playground/audio"
+    }
+  ]
 }]

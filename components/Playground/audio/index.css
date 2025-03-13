@@ -1,0 +1,10 @@
+.audio-wrapper {
+  .labelu-audio-card {
+    flex-grow: unset;
+    padding: 0;
+  }
+}
+
+.labelu-audio-editor {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
