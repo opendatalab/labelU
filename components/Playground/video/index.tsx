@@ -23,14 +23,14 @@ const defaultConfig = {
   segment: [
     {
       color: '#a600ff',
-      key: '游艇行驶',
+      key: 'Ship Appears',
       value: 'ship',
     },
   ],
   frame: [
     {
       color: '#ff6600',
-      key: '汽车出现',
+      key: 'Car Appears',
       value: 'car',
     },
   ],
@@ -148,7 +148,7 @@ export default function VideoPage() {
                     attributes: [
                       {
                         color: '#a600ff',
-                        key: '游艇行驶',
+                        key: 'Ship Appears',
                         value: 'ship',
                       },
                     ],
@@ -159,7 +159,7 @@ export default function VideoPage() {
                     attributes: [
                       {
                         color: '#ff6600',
-                        key: '汽车出现',
+                        key: 'Car Appears',
                         value: 'car',
                       },
                     ],
