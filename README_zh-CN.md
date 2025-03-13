@@ -73,12 +73,27 @@ conda activate labelu
 pip install labelu
 ```
 
-> 安装测试版本：`pip install labelu==<测试版本号> --pre`
+> 安装测试版本：`pip install labelu==<测试版本号>`
+
+或安装带 `mysqlclient` 的版本：
+
+```bash
+pip install labelu[mysql]
+
+# 或手动安装mysqlclient
+# pip install labelu mysqlclient
+```
 
 5. 运行：
 
 ```bash
 labelu
+```
+
+> 如果从 `1.2.0` 以下版本升级，同时需要使用 MySQL 数据库，请运行以下命令从 内置的 SQLite 数据库迁移数据到 MySQL 数据库：
+
+```bash
+DATABASE_URL=mysql://<username>:<password>@<host>/<your dbname> labelu migrate_to_mysql
 ```
 
 6. 打开浏览器，访问 [http://localhost:8000/](http://localhost:8000/) 。
