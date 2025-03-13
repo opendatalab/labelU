@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     @property
     def need_migration_to_mysql(self) -> bool:
-        sqlite_path = Path(self.BASE_DATA_DIR) / "labelu-test-1.sqlite"
+        sqlite_path = Path(self.BASE_DATA_DIR) / "labelu.sqlite"
         return (
             self.DATABASE_URL.startswith('mysql') and 
             sqlite_path.exists()
