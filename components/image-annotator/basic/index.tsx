@@ -72,7 +72,7 @@ export default function Basic() {
       return;
     }
 
-    engine.loadImage('/assets/rect.jpg').then(() => {
+    engine.loadImage('/labelU/assets/rect.jpg').then(() => {
       engine.loadData('rect', [
         {
           x: 925,

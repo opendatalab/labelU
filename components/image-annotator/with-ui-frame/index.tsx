@@ -6,7 +6,7 @@ export default function Basic() {
   const editingSample = useMemo(() => ({
     id: '1',
     name: 'rect',
-    url: '/assets/rect.jpg',
+    url: '/labelU/assets/rect.jpg',
     data: {
       line: [],
       point: [],

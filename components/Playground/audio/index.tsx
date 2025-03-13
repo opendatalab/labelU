@@ -38,7 +38,7 @@ const defaultConfig = {
 const defaultSamples = [
   {
     id: 'audio-segment',
-    url: '/assets/audio-segment.mp3',
+    url: '/labelU/assets/audio-segment.mp3',
     name: 'audio-segment',
     data: {
       segment: [
@@ -64,7 +64,7 @@ const defaultSamples = [
   },
   {
     id: 'audio-frame',
-    url: '/assets/audio-frame.m4a',
+    url: '/labelU/assets/audio-frame.m4a',
     name: 'audio-frame',
     data: {
       frame: [{ id: 'wo2tiebj64e', type: 'frame', time: 5.2, label: 'mon_is_getting_upset', order: 3 }],
