@@ -10,8 +10,6 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
 
-from labelu.alembic_labelu.alembic_labelu_tools import column_exist_in_table
-
 # revision identifiers, used by Alembic.
 revision = '2eb983c9a254'
 down_revision = 'eb9c5b98168b'
