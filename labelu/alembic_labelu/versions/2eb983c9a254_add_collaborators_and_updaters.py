@@ -139,17 +139,6 @@ def upgrade() -> None:
                 )
             )
 
-    # Fix missing task_attachment_ids column in task_sample table
-    if not column_exist_in_table("task_sample", "task_attachment_ids"):
-        with op.batch_alter_table('task_sample', recreate="always") as batch_op:
-            batch_op.add_column(
-                sa.Column(
-                    "task_attachment_ids",
-                    sa.Text(),
-                    comment="task attachment ids",
-                ),
-            )
-
 def downgrade() -> None:
     conn = op.get_bind()
     inspector = sa.inspect(conn)
