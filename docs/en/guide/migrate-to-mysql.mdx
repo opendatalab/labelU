@@ -6,7 +6,19 @@ Starting from `v1.2.0`, labelu supports MySQL database.
 
 ## Getting Started
 
-First, you need to install MySQL database on your local machine or cloud server. You can refer to the [MySQL official documentation](https://dev.mysql.com/downloads/installer/) for installation, or use Docker.
+Install `labelu` with `mysqlclient`
+
+```bash
+pip install labelu[mysql]
+```
+
+Or manually install `mysqlclient`
+
+```bash
+pip install labelu mysqlclient
+```
+
+Then, you need to install MySQL database on your local machine or cloud server. You can refer to the [MySQL official documentation](https://dev.mysql.com/downloads/installer/) for installation, or use Docker.
 
 Here is a `docker-compose.yaml` file to prepare MySQL database as an example:
 

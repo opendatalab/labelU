@@ -6,7 +6,19 @@ import { Tab, Tabs } from 'rspress/theme';
 
 ## 开始
 
-首先，你需要在你本机或云服务器上安装 MySQL 数据库。你可以参考 [MySQL 官方文档](https://dev.mysql.com/downloads/installer/)来安装，或者使用 Docker。
+安装带 `mysqlclient` 的 `labelu`：
+
+```bash
+pip install labelu[mysql]
+```
+
+或者手动安装 `mysqlclient`：
+
+```bash
+pip install labelu mysqlclient
+```
+
+然后，你需要在你本机或云服务器上安装 MySQL 数据库。你可以参考 [MySQL 官方文档](https://dev.mysql.com/downloads/installer/)来安装，或者使用 Docker。
 
 下面提供一个 `docker-compose.yaml` 文件来准备 MySQL 数据库作为示例：
 
