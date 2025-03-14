@@ -85,8 +85,18 @@ DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu
 
 ## 从 SQLite 迁移到 MySQL
 
-LabelU 默认使用内置的 SQLite 数据库。如果你从 1.x 升级，同时想迁移到 MySQL 数据库，你可以使用 `migrate_to_mysql` 命令：
+LabelU 默认使用内置的 SQLite 数据库。如果你从 `v1.x` 升级，安装最新版本后，先确认使用内置 SQLite 是否能正常启动：
+
+```bash
+labelu
+```
+
+然后使用 `migrate_to_mysql` 命令将数据从 SQLite 迁移到 MySQL：
 
 ```bash
 DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu migrate_to_mysql
 ```
+
+最终你能看到下面的结果，表示迁移成功：
+
+![Migrate to MySQL](/assets/migrate-to-mysql.png)

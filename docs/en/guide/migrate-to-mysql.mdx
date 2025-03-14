@@ -85,9 +85,18 @@ DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu
 
 ## Migrate from SQLite to MySQL
 
-LabelU uses the built-in SQLite database by default. If you are upgrading from `v1.x` and want to migrate to a MySQL database, you can use the `migrate_to_mysql` command:
+LabelU uses the built-in SQLite database by default. If you are upgrading from `v1.x`, first make sure that you can start using the built-in SQLite:
 
+```bash
+labelu
+```
+
+Then you can use the `migrate_to_mysql` command to migrate data from SQLite to MySQL:
 
 ```bash
 DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb labelu migrate_to_mysql
 ```
+
+Finally, you will see the following result, indicating that the migration was successful:
+
+![Migrate to MySQL](/assets/migrate-to-mysql.png)
