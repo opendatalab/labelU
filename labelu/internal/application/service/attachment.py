@@ -1,3 +1,4 @@
+import re
 import aiofiles
 import os
 from PIL import Image
@@ -34,13 +35,15 @@ async def create(
 
         # file relative path
     path_filename = cmd.file.filename.split("/")
-    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1]
+    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1] NOTE: If you want keep filename safe, you can use uuid as filename 
     filename = path_filename[-1]
+    sanitized = re.sub(r'%', '_pct_', filename)
+    sanitized = re.sub(r'[\\/*?:"<>|]', '_', sanitized)
     path = "/".join(path_filename[:-1])
     attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
         str(task_id), path
     )
-    attachment_relative_path = str(attachment_relative_base_dir.joinpath(filename))
+    attachment_relative_path = str(attachment_relative_base_dir.joinpath(sanitized))
 
     # file full path
     attachment_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(
@@ -109,7 +112,7 @@ async def create(
             attachment=TaskAttachment(
                 path=attachment_url_path,
                 url=attachment_api_url,
-                filename=filename,
+                filename=sanitized,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 task_id=task_id,
@@ -120,7 +123,7 @@ async def create(
     return AttachmentResponse(
         id=attachment.id,
         url=attachment_api_url,
-        filename=filename,
+        filename=sanitized,
     )
 
 
