@@ -1,7 +1,6 @@
 from pathlib import Path
 import re
 import aiofiles
-from app.internal.common.error_code import ErrorCode, LabelToolException
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
 from fastapi import File, Header, UploadFile
@@ -10,6 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 import mimetypes
 
 from labelu.internal.common import db
+from labelu.internal.common.error_code import ErrorCode, LabelToolException
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
