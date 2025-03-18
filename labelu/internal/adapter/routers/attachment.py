@@ -9,7 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 import mimetypes
 
 from labelu.internal.common import db
-from labelu.internal.common.error_code import ErrorCode, LabelToolException
+from labelu.internal.common.error_code import ErrorCode, LabelUException
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
@@ -77,13 +77,13 @@ async def get_content(file_path: str, range: str = Header(None)):
         full_path = await service.download_attachment(file_path=file_path)
         full_path = Path(full_path) 
     except Exception:
-        raise LabelToolException(
+        raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
     
     if not full_path.exists():
-        raise LabelToolException(
+        raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
