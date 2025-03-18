@@ -64,12 +64,29 @@ async def create(
     # create dicreatory
     attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
     
-
-    # save image
+    CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
     logger.info(attachment_full_path)
-    async with aiofiles.open(attachment_full_path, "wb") as out_file:
-        content = await cmd.file.read()  # async read
-        await out_file.write(content)  # async write
+    try:
+        async with aiofiles.open(attachment_full_path, "wb") as out_file:
+            total_size = 0
+            while True:
+                chunk = await cmd.file.read(CHUNK_SIZE)
+                if not chunk:
+                    break
+                await out_file.write(chunk)
+                total_size += len(chunk)
+                logger.debug(f"{total_size} bytes written")
+
+        logger.info(f"File saved: {attachment_full_path}, size: {total_size} bytes")
+    except Exception as e:
+        if attachment_full_path.exists():
+            os.remove(attachment_full_path)
+        logger.error(f"Upload failed: {str(e)}")
+        raise LabelUException(
+            code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Upload failed: {str(e)}"
+        )
 
     # create thumbnail for image
     if cmd.file.content_type.startswith("image/"):
