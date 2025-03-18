@@ -10,8 +10,6 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
 
-from labelu.alembic_labelu.alembic_labelu_tools import column_exist_in_table
-
 # revision identifiers, used by Alembic.
 revision = '2eb983c9a254'
 down_revision = 'eb9c5b98168b'
@@ -137,17 +135,6 @@ def upgrade() -> None:
                     user_id=row.updated_by,
                     created_at=row.updated_at or datetime.now()
                 )
-            )
-
-    # Fix missing task_attachment_ids column in task_sample table
-    if not column_exist_in_table("task_sample", "task_attachment_ids"):
-        with op.batch_alter_table('task_sample', recreate="always") as batch_op:
-            batch_op.add_column(
-                sa.Column(
-                    "task_attachment_ids",
-                    sa.Text(),
-                    comment="task attachment ids",
-                ),
             )
 
 def downgrade() -> None:

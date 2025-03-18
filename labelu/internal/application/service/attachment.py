@@ -1,3 +1,4 @@
+import re
 import aiofiles
 import os
 from PIL import Image
@@ -34,13 +35,15 @@ async def create(
 
         # file relative path
     path_filename = cmd.file.filename.split("/")
-    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1]
+    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1] NOTE: If you want keep filename safe, you can use uuid as filename 
     filename = path_filename[-1]
+    sanitized = re.sub(r'%', '_pct_', filename)
+    sanitized = re.sub(r'[\\/*?:"<>|]', '_', sanitized)
     path = "/".join(path_filename[:-1])
     attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
         str(task_id), path
     )
-    attachment_relative_path = str(attachment_relative_base_dir.joinpath(filename))
+    attachment_relative_path = str(attachment_relative_base_dir.joinpath(sanitized))
 
     # file full path
     attachment_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(
@@ -61,12 +64,29 @@ async def create(
     # create dicreatory
     attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
     
-
-    # save image
+    CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
     logger.info(attachment_full_path)
-    async with aiofiles.open(attachment_full_path, "wb") as out_file:
-        content = await cmd.file.read()  # async read
-        await out_file.write(content)  # async write
+    try:
+        async with aiofiles.open(attachment_full_path, "wb") as out_file:
+            total_size = 0
+            while True:
+                chunk = await cmd.file.read(CHUNK_SIZE)
+                if not chunk:
+                    break
+                await out_file.write(chunk)
+                total_size += len(chunk)
+                logger.debug(f"{total_size} bytes written")
+
+        logger.info(f"File saved: {attachment_full_path}, size: {total_size} bytes")
+    except Exception as e:
+        if attachment_full_path.exists():
+            os.remove(attachment_full_path)
+        logger.error(f"Upload failed: {str(e)}")
+        raise LabelUException(
+            code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Upload failed: {str(e)}"
+        )
 
     # create thumbnail for image
     if cmd.file.content_type.startswith("image/"):
@@ -109,7 +129,7 @@ async def create(
             attachment=TaskAttachment(
                 path=attachment_url_path,
                 url=attachment_api_url,
-                filename=filename,
+                filename=sanitized,
                 created_by=current_user.id,
                 updated_by=current_user.id,
                 task_id=task_id,
@@ -120,7 +140,7 @@ async def create(
     return AttachmentResponse(
         id=attachment.id,
         url=attachment_api_url,
-        filename=filename,
+        filename=sanitized,
     )
 
 
