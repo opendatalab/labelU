@@ -38,7 +38,7 @@ async def create(
     #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1] NOTE: If you want keep filename safe, you can use uuid as filename 
     filename = path_filename[-1]
     sanitized = re.sub(r'%', '_pct_', filename)
-    sanitized = re.sub(r'[\\/*?:"<>|]', '_', sanitized)
+    sanitized = re.sub(r'[\\/*?:"<>|#]', '_', sanitized)
     path = "/".join(path_filename[:-1])
     attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
         str(task_id), path
