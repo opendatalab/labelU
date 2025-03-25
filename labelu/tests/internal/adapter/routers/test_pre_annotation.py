@@ -487,3 +487,211 @@ class TestClassTaskPreAnnotationRouter:
 
         # check
         assert r.status_code == 200
+
+    def test_pre_annotation_files_list(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="list files task",
+                description="description",
+                tips="tips",
+                created_by=current_user.id,
+                updated_by=current_user.id,
+            ),
+        )
+        
+        # 上传预注释文件
+        empty_task_upload(task.id, "test.jsonl")
+        with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
+            jsonl1 = client.post(
+                f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": f},
+            )
+        
+        # 为文件创建预注释
+        client.post(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
+            headers=testuser_token_headers,
+            json=[{"file_id": jsonl1.json()["data"]["id"]}],
+        )
+
+        # 测试 page 列表
+        r1 = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files",
+            headers=testuser_token_headers,
+            params={"page": 0, "size": 10},
+        )
+
+        # 检查
+        json1 = r1.json()
+        assert r1.status_code == 200
+        assert len(json1["data"]) == 1
+        assert json1["meta_data"]["total"] == 1
+        
+        # 测试 before 列表
+        r2 = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files",
+            headers=testuser_token_headers,
+            params={"before": json1["data"][0]["id"], "size": 10},
+        )
+        
+        # 检查
+        json2 = r2.json()
+        assert r2.status_code == 200
+        assert len(json2["data"]) == 0
+        assert json2["meta_data"]["total"] == 0
+        
+        # 测试 after 列表
+        r3 = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files",
+            headers=testuser_token_headers,
+            params={"after": json1["data"][0]["id"], "size": 10},
+        )
+        
+        # 检查
+        json3 = r3.json()
+        assert r3.status_code == 200
+        assert len(json3["data"]) == 0  # 没有更多的文件了
+        
+        # 测试排序
+        r4 = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files",
+            headers=testuser_token_headers,
+            params={"page": 0, "size": 10, "sort": "created_at:desc"},
+        )
+        
+        # 检查
+        json4 = r4.json()
+        assert r4.status_code == 200
+        assert len(json4["data"]) == 1
+        # 检查降序排序（最新的文件应该在前面）
+        # assert json4["data"][0]["id"] > json4["data"][1]["id"]
+        
+    def test_pre_annotation_files_list_with_errors(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # 测试不存在的任务
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/9999/pre_annotations/files",
+            headers=testuser_token_headers,
+            params={"page": 0, "size": 10},
+        )
+        
+        # 检查
+        assert r.status_code == 200
+        
+        # 测试无效的排序规则
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="invalid sort task",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+        
+        r2 = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files",
+            headers=testuser_token_headers,
+            params={"page": 0, "size": 10, "sort": "invalid:desc"},
+        )
+        
+        # 检查 - 应该返回验证错误
+        assert r2.status_code == 422
+
+    def test_delete_pre_annotation_file(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="delete file task",
+                description="description",
+                tips="tips",
+                created_by=current_user.id,
+                updated_by=current_user.id,
+            ),
+        )
+        
+        # 上传预注释文件
+        empty_task_upload(task.id, "test.jsonl")
+        with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
+            jsonl = client.post(
+                f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": f},
+            )
+        
+        file_id = jsonl.json()["data"]["id"]
+        
+        # 为文件创建预注释
+        pre_resp = client.post(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
+            headers=testuser_token_headers,
+            json=[{"file_id": file_id}],
+        )
+        
+        # 删除预注释文件
+        r = client.delete(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files/{file_id}",
+            headers=testuser_token_headers,
+        )
+        
+        # 检查
+        json = r.json()
+        assert r.status_code == 200
+        assert json["data"]["ok"] == True
+        
+        # 确认文件已被删除
+        files_resp = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files",
+            headers=testuser_token_headers,
+            params={"page": 0, "size": 10},
+        )
+        
+        assert len(files_resp.json()["data"]) == 0
+        
+    def test_delete_pre_annotation_file_errors(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # 测试不存在的任务
+        r1 = client.delete(
+            f"{settings.API_V1_STR}/tasks/9999/pre_annotations/files/1",
+            headers=testuser_token_headers,
+        )
+        
+        # 检查
+        assert r1.status_code == 404
+        
+        # 测试不存在的文件
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="not found file task",
+                description="description",
+                tips="tips",
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+        
+        r2 = client.delete(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files/9999",
+            headers=testuser_token_headers,
+        )
+        
+        # 检查
+        assert r2.status_code == 404

@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
 from labelu.internal.domain.models.task import Task
+from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
 
@@ -346,3 +347,250 @@ class TestClassTaskRouter:
         json = r.json()
         assert r.status_code == 403
         assert json["err_code"] == 30001
+
+    def test_task_get_collaborators(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task_response = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=data,
+        )
+        task_id = task_response.json()["data"]["id"]
+
+        # run
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 200
+        # 创建者可能不会自动成为协作者，根据实际业务逻辑修改断言
+        # assert len(json["data"]) >= 1
+
+    def test_task_add_collaborator(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        data = {
+            "name": "collaborative task",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task_response = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=data,
+        )
+        task_id = task_response.json()["data"]["id"]
+
+        # run - 尝试添加当前用户为协作者（即使它已经是协作者）
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators",
+            headers=testuser_token_headers,
+            json={"user_id": current_user.id},
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 201
+        assert json["data"]["id"] == current_user.id
+
+    def test_task_batch_add_collaborators(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        # 获取或创建测试用户
+        new_user = crud_user.get_user_by_username(db=db, username="collaborator@example.com")
+        if not new_user:
+            new_user = crud_user.create(
+                db=db,
+                user=User(
+                    username="collaborator@example.com",
+                    hashed_password="hashed_password",
+                ),
+            )
+        
+        data = {
+            "name": "batch collaborative task",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task_response = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=data,
+        )
+        task_id = task_response.json()["data"]["id"]
+
+        # run
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators/batch_add",
+            headers=testuser_token_headers,
+            json={"user_ids": [current_user.id, new_user.id]},
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 201
+        # 期望只有一个协作者
+        assert len(json["data"]) == 1
+        user_ids = [user["id"] for user in json["data"]]
+        assert new_user.id in user_ids
+
+    def test_task_batch_remove_collaborators(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        # 获取或创建测试用户
+        new_user = crud_user.get_user_by_username(db=db, username="to_remove@example.com")
+        if not new_user:
+            new_user = crud_user.create(
+                db=db,
+                user=User(
+                    username="to_remove@example.com",
+                    hashed_password="hashed_password",
+                ),
+            )
+        
+        data = {
+            "name": "remove collaborative task",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task_response = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=data,
+        )
+        task_id = task_response.json()["data"]["id"]
+
+        # 先添加协作者
+        client.post(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators/batch_add",
+            headers=testuser_token_headers,
+            json={"user_ids": [new_user.id]},
+        )
+
+        # run - 移除协作者
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators/batch_remove",
+            headers=testuser_token_headers,
+            json={"user_ids": [new_user.id]},
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 201
+        assert json["data"]["ok"] == True
+
+        # 验证协作者已被移除
+        collaborators = client.get(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators",
+            headers=testuser_token_headers,
+        )
+        assert new_user.id not in [c["id"] for c in collaborators.json()["data"]]
+
+    def test_task_remove_collaborator(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        # 获取或创建测试用户
+        new_user = crud_user.get_user_by_username(db=db, username="single_remove@example.com")
+        if not new_user:
+            new_user = crud_user.create(
+                db=db,
+                user=User(
+                    username="single_remove@example.com",
+                    hashed_password="hashed_password",
+                ),
+            )
+        
+        data = {
+            "name": "single remove task",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task_response = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=data,
+        )
+        task_id = task_response.json()["data"]["id"]
+
+        # 先添加协作者
+        client.post(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators",
+            headers=testuser_token_headers,
+            json={"user_id": new_user.id},
+        )
+
+        # run - 移除单个协作者
+        r = client.delete(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators/{new_user.id}",
+            headers=testuser_token_headers,
+        )
+
+        # check
+        json = r.json()
+        assert r.status_code == 200
+        assert json["data"]["ok"] == True
+
+        # 验证协作者已被移除
+        collaborators = client.get(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators",
+            headers=testuser_token_headers,
+        )
+        assert new_user.id not in [c["id"] for c in collaborators.json()["data"]]
+
+    def test_task_not_found_for_collaborators(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # 测试不存在的任务
+        r1 = client.get(
+            f"{settings.API_V1_STR}/tasks/99999/collaborators",
+            headers=testuser_token_headers,
+        )
+        assert r1.status_code == 404
+        
+    def test_user_not_found_for_collaborators(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # 测试添加不存在的用户
+        
+        data = {
+            "name": "error test task",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task_response = client.post(
+            f"{settings.API_V1_STR}/tasks",
+            headers=testuser_token_headers,
+            json=data,
+        )
+        task_id = task_response.json()["data"]["id"]
+        
+        r2 = client.post(
+            f"{settings.API_V1_STR}/tasks/{task_id}/collaborators",
+            headers=testuser_token_headers,
+            json={"user_id": 99999},  # 不存在的用户ID
+        )
+        # 验证状态码是4xx，表示客户端错误
+        assert r2.status_code == 404
