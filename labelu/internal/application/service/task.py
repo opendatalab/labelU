@@ -184,7 +184,7 @@ async def add_collaborator(db: Session, task_id: int, user_id: int, current_user
     if not user:
         logger.error("cannot find user:{}", user_id)
         raise LabelUException(
-            code=ErrorCode.CODE_50001_USER_NOT_FOUND,
+            code=ErrorCode.CODE_40002_USER_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
         

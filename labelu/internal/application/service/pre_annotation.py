@@ -210,9 +210,23 @@ async def delete_pre_annotation_file(
     db: Session, task_id: int, file_id: int, current_user: User
 ) -> CommonDataResp:
     with db.begin():
+        task = crud_task.get(db=db, task_id=task_id, lock=True)
+        if not task:
+            logger.error("cannot find task:{}", task_id)
+            raise LabelUException(
+                code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        
         attachments = crud_attachment.get_by_ids(
             db=db, attachment_ids=[file_id]
         )
+
+        if len(attachments) == 0:
+            raise LabelUException(
+                code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
         
         for attachment in attachments:
             file_full_path = Path(settings.MEDIA_ROOT).joinpath(attachment.path)
