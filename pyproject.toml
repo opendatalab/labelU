@@ -24,6 +24,7 @@ email-validator = "^1.3.0"
 python-multipart = "^0.0.5"
 python-dotenv = "^0.21.0"
 appdirs = "^1.4.4"
+mysqlclient = { version = "^2.1.1", optional = true }
 aiofiles = "^22.1.0"
 pillow = "^9.3.0"
 alembic = "^1.9.4"
