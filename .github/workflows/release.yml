@@ -28,12 +28,8 @@ jobs:
 
       - name: Semantic Release dry-run
         id: dry-run
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          dry_run: true
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-            @semantic-release/exec
+        run: |
+          npx semantic-release -p @semantic-release/exec -p @semantic-release/commit-analyzer --dry-run --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -157,14 +153,8 @@ jobs:
           poetry publish --build --skip-existing
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-            @semantic-release/release-notes-generator
-            @semantic-release/exec
-            @semantic-release/github
-        env:
+        run: |
+          npx semantic-release -p @semantic-release/commit-analyzer -p @semantic-release/release-notes-generator -p @semantic-release/exec -p @semantic-release/github --yes
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ====================== post release ======================
