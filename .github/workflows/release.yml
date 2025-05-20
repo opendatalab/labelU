@@ -157,6 +157,7 @@ jobs:
         run: |
           npm i -g semantic-release @semantic-release/git @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/exec @semantic-release/github
           semantic-release --yes
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ====================== post release ======================
