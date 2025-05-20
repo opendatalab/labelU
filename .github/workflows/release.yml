@@ -29,7 +29,7 @@ jobs:
       - name: Semantic Release dry-run
         id: dry-run
         run: |
-          npm i -g @semantic-release/exec @semantic-release/commit-analyzer
+          npm i -g @semantic-release/exec @semantic-release/commit-analyzer @semantic-release/git
           npx semantic-release --dry-run --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -155,7 +155,7 @@ jobs:
 
       - name: Semantic Release
         run: |
-          npm i -g @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/exec @semantic-release/github
+          npm i -g @semantic-release/git @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/exec @semantic-release/github
           npx semantic-release --yes
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
