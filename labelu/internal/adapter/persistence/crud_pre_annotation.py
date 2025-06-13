@@ -65,10 +65,13 @@ def list_by(
     return results, count
 
 def list_by_task_id_and_owner_id(db: Session, task_id: int) -> Dict[str, List[TaskPreAnnotation]]:
-    pre_annotations = db.query(TaskPreAnnotation).filter(
-        TaskPreAnnotation.task_id == task_id,
-        TaskPreAnnotation.deleted_at == None,
-    ).all()
+    pre_annotations = db.query(
+            TaskPreAnnotation.sample_name,
+            TaskPreAnnotation.file_id
+        ).filter(
+            TaskPreAnnotation.task_id == task_id,
+            TaskPreAnnotation.deleted_at == None,
+        ).all()
     
     return pre_annotations
 
