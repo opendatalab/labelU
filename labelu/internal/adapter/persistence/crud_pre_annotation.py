@@ -63,7 +63,17 @@ def list_by(
         results.reverse()
         
     return results, count
-
+def list_by_task_id_and_owner_id_lightweight(db: Session, task_id: int, owner_id: int) -> List[Dict[str, Any]]:
+    pre_annotations = db.query(
+        TaskPreAnnotation.file_id,
+        TaskPreAnnotation.sample_name
+    ).filter(
+        TaskPreAnnotation.task_id == task_id,
+        TaskPreAnnotation.deleted_at == None,
+        TaskPreAnnotation.created_by == owner_id
+    ).values('file_id', 'sample_name')
+    
+    return list(pre_annotations)
 def list_by_task_id_and_owner_id(db: Session, task_id: int) -> Dict[str, List[TaskPreAnnotation]]:
     pre_annotations = db.query(
             TaskPreAnnotation.sample_name,
