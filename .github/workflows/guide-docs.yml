@@ -74,10 +74,10 @@ jobs:
         with:
           path: ./doc_build
 
-      - name: Send release notification
-        env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-        run: node ./notification.js
+      # - name: Send release notification
+      #   env:
+      #     WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+      #   run: node ./notification.js
 
   # Deployment job
   deploy:
