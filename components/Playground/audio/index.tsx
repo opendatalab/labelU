@@ -142,6 +142,10 @@ export default function AudioPage() {
       </div>
     );
   }, [t, showDrawer, showResult]);
+  
+  const requestEdit = useCallback(() => {
+    return true;
+  }, []);
 
   return (
     <LocaleWrapper>
@@ -151,8 +155,10 @@ export default function AudioPage() {
           primaryColor={'#1890ff'}
           samples={defaultSamples}
           offsetTop={180}
+          editingSample={currentSample}
           ref={annotatorRef}
           type={editingType}
+          requestEdit={requestEdit}
           config={config}
         />
         <Drawer width={480} title={t('annotationConfig')} onClose={onClose} open={configOpen}>

@@ -113,6 +113,10 @@ export default function VideoPage() {
     copy(currentSample.data, t('copied'));
   };
 
+  const requestEdit = useCallback(() => {
+    return true;
+  }, []);
+
   const toolbarRight = useMemo(() => {
     return (
       <div className="flex items-center gap-2">
@@ -135,6 +139,8 @@ export default function VideoPage() {
           ref={annotatorRef}
           type={editingType}
           config={config}
+          editingSample={currentSample}
+          requestEdit={requestEdit}
         />
         <Drawer width={480} title={t('annotationConfig')} onClose={onClose} open={configOpen}>
           <Form
