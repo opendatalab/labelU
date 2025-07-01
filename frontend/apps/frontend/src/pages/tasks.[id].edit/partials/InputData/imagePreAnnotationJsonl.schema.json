@@ -1,0 +1,700 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "sample_name": {
+      "type": "string",
+      "description": "The name of the sample file."
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "pointTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelItem"
+          }
+        },
+        "rectTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelItem"
+          }
+        },
+        "polygonTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelItem"
+          }
+        },
+        "lineTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelItem"
+          }
+        },
+        "cuboidTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelItem"
+          }
+        },
+        "textTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextAttribute"
+          }
+        },
+        "tagTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnumAttribute"
+          }
+        }
+      }
+    },
+    "meta_data": {
+      "type": "object",
+      "description": "The meta data of the sample file.",
+      "properties": {
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "rotate": {
+          "type": "number"
+        }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "properties": {
+        "pointTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "pointTool",
+              "default": "pointTool"
+            },
+            "result": {
+              "description": "标注结果",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PointTool"
+              }
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "rectTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "rectTool",
+              "default": "rectTool"
+            },
+            "result": {
+              "description": "标注结果",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RectTool"
+              }
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "polygonTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "polygonTool",
+              "default": "polygonTool"
+            },
+            "result": {
+              "description": "标注结果",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PolygonTool"
+              }
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "lineTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "lineTool",
+              "default": "lineTool"
+            },
+            "result": {
+              "description": "标注结果",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LineTool"
+              }
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "cuboidTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "cuboidTool",
+              "default": "cuboidTool"
+            },
+            "result": {
+              "description": "标注结果",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CuboidTool"
+              }
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "textTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "textTool"
+            },
+            "result": {
+              "$ref": "#/definitions/TextTool"
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "tagTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "tagTool"
+            },
+            "result": {
+              "$ref": "#/definitions/TagTool"
+            }
+          },
+          "required": ["toolName", "result"]
+        }
+      }
+    }
+  },
+  "required": ["sample_name", "annotations", "config"],
+  "definitions": {
+    "LabelItem": {
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "标签颜色"
+        },
+        "key": {
+          "type": "string",
+          "description": "标签名称"
+        },
+        "value": {
+          "type": "string",
+          "description": "标签值"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TextAttribute"
+              },
+              {
+                "$ref": "#/definitions/EnumAttribute"
+              }
+            ]
+          }
+        }
+      },
+      "required": ["key", "value"]
+    },
+    "TextAttribute": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "string",
+          "description": "标签属性为文本类型",
+          "default": "string"
+        },
+        "max_length": {
+          "type": ["number", "null"],
+          "description": "最大字符长度"
+        },
+        "regexp": {
+          "type": "string",
+          "description": "字符正则验证"
+        },
+        "stringType": {
+          "type": "string",
+          "enum": ["text", "number", "regexp", "english", "order"],
+          "default": "text",
+          "description": "字符类型"
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "默认值"
+        }
+      },
+      "required": ["type"]
+    },
+    "EnumAttribute": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["array", "enum"],
+          "description": "标签属性为选择类型",
+          "default": "enum"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "isDefault": {
+                "type": "boolean",
+                "default": false
+              },
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": ["key", "value"]
+          }
+        }
+      }
+    },
+    "PointTool": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识"
+        },
+        "x": {
+          "type": "number",
+          "description": "x坐标"
+        },
+        "y": {
+          "type": "number",
+          "description": "y坐标"
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "是否可见",
+          "default": true
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attribute"
+        },
+        "order": {
+          "type": "integer",
+          "description": "标注顺序",
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "description": "标注类别",
+          "default": "none"
+        }
+      },
+      "required": ["x", "y", "id", "order", "label"]
+    },
+    "LineTool": {
+      "title": "Generated schema for Root",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识"
+        },
+        "type": {
+          "type": "string",
+          "description": "线条类型: line（直线），spline（曲线）",
+          "default": "line",
+          "enum": ["line", "spline"]
+        },
+        "controlPoints": {
+          "type": "array",
+          "description": "控制点列表",
+          "items": {
+            "$ref": "#/definitions/Point"
+          }
+        },
+        "points": {
+          "type": "array",
+          "description": "线条点列表",
+          "items": {
+            "$ref": "#/definitions/Point"
+          }
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "是否可见"
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attribute"
+        },
+        "order": {
+          "type": "number",
+          "description": "标注顺序"
+        },
+        "label": {
+          "type": "string",
+          "description": "标注类别"
+        }
+      },
+      "required": ["type", "points", "id", "order", "label"]
+    },
+    "PolygonTool": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识"
+        },
+        "type": {
+          "type": "string",
+          "description": "线条类型: line（直线），spline（曲线）",
+          "default": "line",
+          "enum": ["line", "spline"]
+        },
+        "controlPoints": {
+          "type": "array",
+          "description": "控制点列表",
+          "items": {
+            "$ref": "#/definitions/Point"
+          }
+        },
+        "points": {
+          "type": "array",
+          "description": "线条点列表",
+          "items": {
+            "$ref": "#/definitions/Point"
+          }
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "是否可见",
+          "default": true
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attribute"
+        },
+        "order": {
+          "type": "integer",
+          "description": "标注顺序",
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "description": "标注类别",
+          "default": "none"
+        }
+      },
+      "required": ["type", "points", "id", "order", "label"]
+    },
+    "RectTool": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识"
+        },
+        "x": {
+          "type": "number",
+          "description": "拉框左上角x坐标"
+        },
+        "y": {
+          "type": "number",
+          "description": "拉框左上角y坐标"
+        },
+        "width": {
+          "type": "number",
+          "description": "拉框宽度"
+        },
+        "height": {
+          "type": "number",
+          "description": "拉框高度"
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "是否可见",
+          "default": true
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attribute"
+        },
+        "order": {
+          "type": "integer",
+          "description": "标注顺序",
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "description": "标注类别",
+          "default": "none"
+        }
+      },
+      "required": ["x", "y", "width", "height", "id", "order", "label"]
+    },
+    "CuboidTool": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识"
+        },
+        "direction": {
+          "type": "string",
+          "description": "正面方向: front（前面），back（后面），left（左侧面），right（右侧面）",
+          "default": "front"
+        },
+        "front": {
+          "type": "object",
+          "description": "正面四个点坐标",
+          "properties": {
+            "tl": {
+              "type": "object",
+              "description": "左上角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            },
+            "tr": {
+              "type": "object",
+              "description": "右上角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            },
+            "br": {
+              "type": "object",
+              "description": "右下角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            },
+            "bl": {
+              "type": "object",
+              "description": "左下角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            }
+          },
+          "required": ["tl", "tr", "br", "bl"]
+        },
+        "back": {
+          "type": "object",
+          "description": "背面四个点坐标",
+          "properties": {
+            "tl": {
+              "type": "object",
+              "description": "左上角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            },
+            "tr": {
+              "type": "object",
+              "description": "右上角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            },
+            "br": {
+              "type": "object",
+              "description": "右下角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            },
+            "bl": {
+              "type": "object",
+              "description": "左下角坐标",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"]
+            }
+          },
+          "required": ["tl", "tr", "br", "bl"]
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "是否可见",
+          "default": true
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attribute"
+        },
+        "order": {
+          "type": "integer",
+          "description": "标注顺序",
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "description": "标注类别",
+          "default": "none"
+        }
+      },
+      "required": ["direction", "front", "back", "x", "y", "width", "height", "id", "order", "label"]
+    },
+    "TextTool": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "唯一标识"
+          },
+          "type": {
+            "type": "string",
+            "const": "text",
+            "description": "文本类型: text（文本）"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "文本内容"
+          }
+        }
+      }
+    },
+    "TagTool": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "唯一标识"
+          },
+          "type": {
+            "type": "string",
+            "const": "tag"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "Attribute": {
+      "type": "object",
+      "description": "类别属性，键值对",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "Point": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "x坐标"
+        },
+        "y": {
+          "type": "number",
+          "description": "y坐标"
+        }
+      },
+      "required": ["x", "y"]
+    }
+  }
+}

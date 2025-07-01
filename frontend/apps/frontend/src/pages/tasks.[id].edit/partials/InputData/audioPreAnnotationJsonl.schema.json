@@ -1,0 +1,351 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "sample_name": {
+      "type": "string",
+      "description": "The name of the sample file."
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "audioSegmentTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelItem"
+          }
+        },
+        "audioFrameTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelItem"
+          }
+        },
+        "textTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextAttribute"
+          }
+        },
+        "tagTool": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnumAttribute"
+          }
+        }
+      }
+    },
+    "meta_data": {
+      "type": "object",
+      "description": "The meta data of the sample file.",
+      "properties": {
+        "duration": {
+          "type": "number"
+        }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "properties": {
+        "audioSegmentTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "audioSegmentTool"
+            },
+            "result": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SegmentTool"
+              }
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "audioFrameTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "audioFrameTool"
+            },
+            "result": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FrameTool"
+              }
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "textTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "textTool"
+            },
+            "result": {
+              "$ref": "#/definitions/TextTool"
+            }
+          },
+          "required": ["toolName", "result"]
+        },
+        "tagTool": {
+          "type": "object",
+          "properties": {
+            "toolName": {
+              "type": "string",
+              "const": "tagTool"
+            },
+            "result": {
+              "$ref": "#/definitions/TagTool"
+            }
+          },
+          "required": ["toolName", "result"]
+        }
+      }
+    }
+  },
+  "required": ["sample_name", "annotations", "config"],
+  "definitions": {
+    "LabelItem": {
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "标签颜色"
+        },
+        "key": {
+          "type": "string",
+          "description": "标签名称"
+        },
+        "value": {
+          "type": "string",
+          "description": "标签值"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TextAttribute"
+              },
+              {
+                "$ref": "#/definitions/EnumAttribute"
+              }
+            ]
+          }
+        }
+      },
+      "required": ["key", "value"]
+    },
+    "TextAttribute": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "string",
+          "description": "标签属性为文本类型",
+          "default": "string"
+        },
+        "max_length": {
+          "type": ["number", "null"],
+          "description": "最大字符长度"
+        },
+        "regexp": {
+          "type": "string",
+          "description": "字符正则验证"
+        },
+        "stringType": {
+          "type": "string",
+          "enum": ["text", "number", "regexp", "english", "order"],
+          "default": "text",
+          "description": "字符类型"
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "默认值"
+        }
+      },
+      "required": ["type"]
+    },
+    "EnumAttribute": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["array", "enum"],
+          "description": "标签属性为选择类型",
+          "default": "enum"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "isDefault": {
+                "type": "boolean",
+                "default": false
+              },
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": ["key", "value"]
+          }
+        }
+      }
+    },
+    "FrameTool": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识"
+        },
+        "time": {
+          "type": "number",
+          "description": "时间点"
+        },
+        "order": {
+          "type": "integer",
+          "description": "标注顺序",
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "description": "标注类别",
+          "default": "none"
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attribute"
+        }
+      },
+      "required": ["time", "id", "order", "label"]
+    },
+    "SegmentTool": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一标识"
+        },
+        "start": {
+          "type": "number",
+          "description": "开始时间点"
+        },
+        "end": {
+          "type": "number",
+          "description": "结束时间点"
+        },
+        "order": {
+          "type": "integer",
+          "description": "标注顺序",
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "description": "标注类别",
+          "default": "none"
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attribute"
+        }
+      },
+      "required": ["start", "end", "id", "order", "label"]
+    },
+    "TextTool": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "唯一标识"
+          },
+          "type": {
+            "type": "string",
+            "const": "text",
+            "description": "文本类型: text（文本）"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "文本内容"
+          }
+        }
+      }
+    },
+    "TagTool": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "唯一标识"
+          },
+          "type": {
+            "type": "string",
+            "const": "tag"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "Attribute": {
+      "type": "object",
+      "description": "类别属性，键值对",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "Point": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "x坐标"
+        },
+        "y": {
+          "type": "number",
+          "description": "y坐标"
+        }
+      },
+      "required": ["x", "y"]
+    }
+  }
+}

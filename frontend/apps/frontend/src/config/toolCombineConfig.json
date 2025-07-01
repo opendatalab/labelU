@@ -1,0 +1,205 @@
+{
+  "tools": [
+    {
+      "tool": "rectTool",
+      "config": {
+        "isShowCursor": false,
+        "showConfirm": false,
+        "skipWhileNoDependencies": false,
+        "drawOutsideTarget": false,
+        "copyBackwardResult": true,
+        "minWidth": 1,
+        "attributeConfigurable": true,
+        "textConfigurable": false,
+        "textCheckType": 0,
+        "customFormat": "",
+        "attributeList": [
+          {
+            "key": "",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "tool": "polygonTool",
+      "config": {
+        "isShowCursor": false,
+        "lineType": 0,
+        "lineColor": 0,
+        "drawOutsideTarget": false,
+        "edgeAdsorption": false,
+        "copyBackwardResult": true,
+        "attributeConfigurable": true,
+        "textConfigurable": false,
+        "textCheckType": 0,
+        "customFormat": "",
+        "attributeList": [
+          {
+            "key": "",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "tool": "pointTool",
+      "config": {
+        "isShowCursor": false,
+        "attributeConfigurable": true,
+        "copyBackwardResult": true,
+        "textConfigurable": false,
+        "textCheckType": 0,
+        "customFormat": "",
+        "attributeList": [
+          {
+            "key": "pointTool",
+            "value": "pointTool"
+          },
+          {
+            "key": "类别hO",
+            "value": "class-hO"
+          },
+          {
+            "key": "类别Uy",
+            "value": "class-Uy"
+          },
+          {
+            "key": "类别Aw",
+            "value": "class-Aw"
+          },
+          {
+            "key": "类别4p",
+            "value": "class-4p"
+          },
+          {
+            "key": "类别Ev",
+            "value": "class-Ev"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "tagTool",
+      "config": {
+        "textConfigurable": false,
+        "textCheckType": 0,
+        "customFormat": ""
+      }
+    },
+    {
+      "tool": "lineTool",
+      "config": {
+        "isShowCursor": false,
+        "lineType": 0,
+        "lineColor": 1,
+        "edgeAdsorption": false,
+        "drawOutsideTarget": true,
+        "copyBackwardResult": true,
+        "attributeConfigurable": true,
+        "textConfigurable": false,
+        "textCheckType": 0,
+        "customFormat": "",
+        "lowerLimitPointNum": 2,
+        "upperLimitPointNum": "",
+        "attributeList": [
+          {
+            "key": "lineTool",
+            "value": "lineTool"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "textTool",
+      "config": {
+        "textConfigurable": false,
+        "textCheckType": 0,
+        "customFormat": ""
+      }
+    }
+  ],
+  "tagList": [
+    {
+      "key": "类别1",
+      "value": "class1",
+      "isMulti": true,
+      "subSelected": [
+        {
+          "key": "选项1",
+          "value": "option1",
+          "isDefault": true
+        },
+        {
+          "key": "选项2",
+          "value": "option2",
+          "isDefault": false
+        }
+      ]
+    },
+    {
+      "key": "类别2",
+      "value": "class2",
+      "isMulti": true,
+      "subSelected": [
+        {
+          "key": "a选项1",
+          "value": "aoption1",
+          "isDefault": true
+        },
+        {
+          "key": "a选项2",
+          "value": "aoption2",
+          "isDefault": false
+        }
+      ]
+    }
+  ],
+  "attribute": [
+    {
+      "key": "",
+      "value": ""
+    },
+    {
+      "key": "类别bA",
+      "value": "class-bA"
+    },
+    {
+      "key": "类别6O",
+      "value": "class-6O"
+    },
+    {
+      "key": "类别i6",
+      "value": "class-i6"
+    },
+    {
+      "key": "类别ah",
+      "value": "class-ah"
+    },
+    {
+      "key": "类别cy",
+      "value": "class-cy"
+    },
+    {
+      "key": "类别La",
+      "value": "class-La"
+    },
+    {
+      "key": "类别fw",
+      "value": "class-fw"
+    },
+    {
+      "key": "类别Yv",
+      "value": "class-Yv"
+    }
+  ],
+  "textConfig": [
+    {
+      "label": "文本1",
+      "key": "text1",
+      "required": true,
+      "default": "",
+      "maxLength": 200
+    }
+  ]
+}

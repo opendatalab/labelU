@@ -1,0 +1,17 @@
+{
+  "step": 1,
+  "dataSourceStep": 0,
+  "tool": "rectTool",
+  "config": {
+    "showConfirm": false,
+    "skipWhileNoDependencies": false,
+    "drawOutsideTarget": false,
+    "copyBackwardResult": true,
+    "minWidth": 1,
+    "minHeight": 1,
+    "attributeConfigurable": true,
+    "textConfigurable": false,
+    "textCheckType": 4,
+    "customFormat": ""
+  }
+}

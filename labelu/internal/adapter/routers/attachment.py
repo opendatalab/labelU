@@ -20,7 +20,6 @@ from labelu.internal.application.response.base import OkResp
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.attachment import AttachmentResponse
 
-
 router = APIRouter(prefix="/tasks", tags=["attachments"])
 
 
@@ -30,11 +29,11 @@ router = APIRouter(prefix="/tasks", tags=["attachments"])
     status_code=status.HTTP_201_CREATED,
 )
 async def create(
-    task_id: int,
-    file: UploadFile = File(...),
-    authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
-    current_user: User = Depends(get_current_user),
+        task_id: int,
+        file: UploadFile = File(...),
+        authorization: HTTPAuthorizationCredentials = Security(security),
+        db: Session = Depends(db.get_db),
+        current_user: User = Depends(get_current_user),
 ):
     """
     Create attechment as annnotation sample.
@@ -48,6 +47,7 @@ async def create(
     # response
     return OkResp[AttachmentResponse](data=data)
 
+
 @router.get(
     "/attachment/{file_path:path}",
     response_class=FileResponse,
@@ -60,8 +60,9 @@ async def download_attachment(file_path: str):
 
     # business logic
     data = await service.download_attachment(file_path=file_path)
-    
+
     return data
+
 
 @router.get(
     "/partial/{file_path:path}",
@@ -72,78 +73,91 @@ async def get_content(file_path: str, range: str = Header(None)):
     """
     partial content
     """
-    
+
     try:
         full_path = await service.download_attachment(file_path=file_path)
-        full_path = Path(full_path) 
+        full_path = Path(full_path)
     except Exception:
         raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
-    
+
     if not full_path.exists():
         raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    # Handle HLS streaming files
+    if file_path.endswith('.m3u8'):
+        return FileResponse(
+            full_path,
+            media_type="application/vnd.apple.mpegurl",
+            headers={"Cache-Control": "no-cache"}
+        )
+    elif file_path.endswith('.ts'):
+        return FileResponse(
+            full_path,
+            media_type="video/mp2t",
+            headers={"Cache-Control": "max-age=3600"}
+        )
+
     # Business logic
     file_size = full_path.stat().st_size
     media_type = mimetypes.guess_type(str(full_path))[0] or "application/octet-stream"
-    
+
     if not range:
         return FileResponse(
             path=str(full_path),
             media_type=media_type,
             headers={"Accept-Ranges": "bytes"}
         )
-        
+
     try:
         range_match = re.match(r'bytes=(\d+)-(\d*)', range)
         if not range_match:
             raise ValueError("Invalid range format")
-        
+
         start = int(range_match.group(1))
         end_str = range_match.group(2)
         end = int(end_str) if end_str else min(start + 1024 * 1024, file_size - 1)
-        
+
         # 验证范围
         if start < 0 or start >= file_size:
             raise ValueError(f"Start position {start} out of bounds")
-        
+
         if end >= file_size:
             end = file_size - 1
-        
+
         content_length = end - start + 1
-        
+
     except ValueError:
         return FileResponse(
             path=str(full_path),
             media_type=media_type,
             headers={"Accept-Ranges": "bytes"}
         )
-        
-        
+
     async def file_stream():
         async with aiofiles.open(str(full_path), 'rb') as f:
             await f.seek(start)
             remaining = content_length
             chunk_size = min(64 * 1024, remaining)
-            
+
             while remaining > 0:
                 chunk = await f.read(min(chunk_size, remaining))
                 if not chunk:
                     break
                 remaining -= len(chunk)
                 yield chunk
-    
+
     headers = {
         "Accept-Ranges": "bytes",
         "Content-Range": f"bytes {start}-{end}/{file_size}",
         "Content-Length": str(content_length),
     }
-    
+
     return StreamingResponse(
         file_stream(),
         status_code=206,
@@ -158,11 +172,11 @@ async def get_content(file_path: str, range: str = Header(None)):
     status_code=status.HTTP_200_OK,
 )
 async def delete(
-    task_id: int,
-    cmd: AttachmentDeleteCommand,
-    authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
-    current_user: User = Depends(get_current_user),
+        task_id: int,
+        cmd: AttachmentDeleteCommand,
+        authorization: HTTPAuthorizationCredentials = Security(security),
+        db: Session = Depends(db.get_db),
+        current_user: User = Depends(get_current_user),
 ):
     """
     delete task.
@@ -175,3 +189,46 @@ async def delete(
 
     # response
     return OkResp[CommonDataResp](data=data)
+
+
+from labelu.internal.common.video_streamer import VideoStreamer
+
+
+@router.get(
+    "/stream/{file_path:path}",
+    status_code=status.HTTP_200_OK,
+)
+async def stream_video(file_path: str):
+    """
+    Stream video content using HLS
+    """
+    try:
+        full_path = await service.download_attachment(file_path=file_path)
+        full_path = Path(full_path)
+
+        if not full_path.exists():
+            raise LabelUException(
+                code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Check if it's a video file
+        if VideoStreamer.is_video_file(str(full_path)):
+            # Convert to HLS if not already done
+            hls_playlist = await VideoStreamer.convert_to_hls(str(full_path))
+            if hls_playlist and Path(hls_playlist).exists():
+                return FileResponse(
+                    hls_playlist,
+                    media_type="application/vnd.apple.mpegurl",
+                    headers={"Cache-Control": "no-cache"}
+                )
+
+        # Fall back to regular file serving
+        return FileResponse(full_path)
+
+    except Exception as e:
+        logger.error(f"Error streaming video: {str(e)}")
+        raise LabelUException(
+            code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )

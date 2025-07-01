@@ -1,0 +1,30 @@
+{
+  "token": {
+    "colorPrimary": "#0d53de",
+    "colorPrimaryHover": "#3477EB",
+    "colorPrimaryActive": "#0238B8",
+    "colorPrimaryBg": "#E6F2FF",
+    "colorSuccess": "#00b365",
+    "colorSuccessHover": "#1FBF74",
+    "colorSuccessActive": "#008C54",
+    "colorSuccessBg": "#DAF2E4",
+    "colorWarning": "#ff8800",
+    "colorWarningActive": "#D96C00",
+    "colorWarningBg": "#FFF7E6",
+    "colorError": "#f5483b",
+    "colorErrorActive": "#CF2D27",
+    "colorTextBase": "#121316",
+    "colorText": "rgba(18, 19, 22, 0.8)",
+    "colorTextSecondary": "rgba(18, 19, 22, 0.5)",
+    "colorTextTertiary": "rgba(18, 19, 22, 0.25)",
+    "colorTextQuaternary": "rgba(18, 19, 22, 0.20)",
+    "colorBorder": "#D7D8DD",
+    "colorBorderSecondary": "#EBECF0",
+    "colorInfo": "#0d53de",
+    "borderRadius": 2,
+    "borderRadiusLG": 4,
+    "boxShadow": "      0 8px 26px 0 rgba(18, 19, 22, 0.12),      0 3px 6px -4px rgba(0, 0, 0, 0.12),      0 9px 28px 8px rgba(0, 0, 0, 0.05)    ",
+    "boxShadowSecondary": "      0 4px 12px 0 rgba(0, 0, 0, 0.08),      0 3px 6px -4px rgba(0, 0, 0, 0.12),      0 9px 28px 8px rgba(0, 0, 0, 0.05)    ",
+    "wireframe": false
+  }
+}

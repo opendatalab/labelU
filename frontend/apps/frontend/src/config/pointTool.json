@@ -1,0 +1,11 @@
+{
+  "step": 1,
+  "dataSourceStep": 0,
+  "tool": "pointTool",
+  "config": {
+    "attributeConfigurable": true,
+    "textConfigurable": false,
+    "textCheckType": 0,
+    "customFormat": ""
+  }
+}

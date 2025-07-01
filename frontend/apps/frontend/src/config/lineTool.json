@@ -1,0 +1,17 @@
+{
+  "step": 1,
+  "dataSourceStep": 0,
+  "tool": "lineTool",
+  "config": {
+    "lineType": 0,
+    "lineColor": 1,
+    "edgeAdsorption": false,
+    "drawOutsideTarget": true,
+    "attributeConfigurable": true,
+    "textConfigurable": false,
+    "textCheckType": 4,
+    "customFormat": "^[\\s\\S]{1,3}$",
+    "lowerLimitPointNum": 2,
+    "upperLimitPointNum": ""
+  }
+}

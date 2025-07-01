@@ -1,0 +1,14 @@
+{
+  "step": 1,
+  "dataSourceStep": 0,
+  "tool": "polygonTool",
+  "config": {
+    "lineType": 0,
+    "lineColor": 0,
+    "edgeAdsorption": false,
+    "attributeConfigurable": true,
+    "textConfigurable": false,
+    "textCheckType": 0,
+    "customFormat": ""
+  }
+}

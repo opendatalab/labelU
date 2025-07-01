@@ -1,0 +1,36 @@
+[
+  {
+    "key": "类别1",
+    "value": "class1",
+    "isMulti": false,
+    "subSelected": [
+      {
+        "key": "选项1",
+        "value": "option1",
+        "isDefault": true
+      },
+      {
+        "key": "选项2",
+        "value": "option1-2",
+        "isDefault": false
+      }
+    ]
+  },
+  {
+    "key": "类别2",
+    "value": "class2",
+    "isMulti": false,
+    "subSelected": [
+      {
+        "key": "选项2",
+        "value": "option2",
+        "isDefault": true
+      },
+      {
+        "key": "选项2-2",
+        "value": "option2-2",
+        "isDefault": false
+      }
+    ]
+  }
+]

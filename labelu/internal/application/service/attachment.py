@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
+from labelu.internal.common.video_streamer import VideoStreamer
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.attachment import TaskAttachment
 from labelu.internal.adapter.persistence import crud_task
@@ -22,9 +23,8 @@ from labelu.internal.application.response.attachment import AttachmentResponse
 
 
 async def create(
-    db: Session, task_id: int, cmd: AttachmentCommand, current_user: User
+        db: Session, task_id: int, cmd: AttachmentCommand, current_user: User
 ) -> AttachmentResponse:
-
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
         logger.error("cannot find task: {}", task_id)
@@ -35,7 +35,7 @@ async def create(
 
         # file relative path
     path_filename = cmd.file.filename.split("/")
-    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1] NOTE: If you want keep filename safe, you can use uuid as filename 
+    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1] NOTE: If you want keep filename safe, you can use uuid as filename
     filename = path_filename[-1]
     sanitized = re.sub(r'%', '_pct_', filename)
     sanitized = re.sub(r'[\\/*?:"<>|#]', '_', sanitized)
@@ -60,10 +60,10 @@ async def create(
             code=ErrorCode.CODE_51002_TASK_ATTACHMENT_ALREADY_EXISTS,
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-        
+
     # create dicreatory
     attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
-    
+
     CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
     logger.info(attachment_full_path)
     try:
@@ -105,9 +105,18 @@ async def create(
             image = image.convert("RGB")
         image.save(tumbnail_full_path)
 
+    # convert video to HLS streaming format
+    if cmd.file.content_type.startswith("video/") or VideoStreamer.is_video_file(sanitized):
+        logger.info(f"Converting video to HLS streaming format: {attachment_full_path}")
+        hls_playlist = await VideoStreamer.convert_to_hls(str(attachment_full_path))
+        if hls_playlist:
+            logger.info(f"Video converted to HLS: {hls_playlist}")
+        else:
+            logger.warning(f"Failed to convert video to HLS: {attachment_full_path}")
+
     # check file already saved
     if not attachment_full_path.exists() or (
-        cmd.file.content_type.startswith("image/") and not tumbnail_full_path.exists()
+            cmd.file.content_type.startswith("image/") and not tumbnail_full_path.exists()
     ):
         logger.error(
             "cannot find saved images, path is:{}, image content-type is:{}, thumbnail path is:{}",
@@ -121,7 +130,15 @@ async def create(
         )
 
     attachment_url_path = attachment_relative_path.replace("\\", "/")
-    attachment_api_url = f"{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}"
+
+    # Use streaming URL for videos
+    if cmd.file.content_type.startswith("video/") or VideoStreamer.is_video_file(sanitized):
+        attachment_api_url = VideoStreamer.get_streaming_url(
+            attachment_url_path,
+            f"{settings.API_V1_STR}/tasks/attachment"
+        )
+    else:
+        attachment_api_url = f"{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}"
     # add a task file record
     with db.begin():
         attachment = crud_attachment.create(
@@ -145,7 +162,6 @@ async def create(
 
 
 async def download_attachment(file_path: str) -> str:
-
     # check file exist
     file_full_path = settings.MEDIA_ROOT.joinpath(file_path.lstrip("/"))
     if not file_full_path.is_file() or not file_full_path.exists():
@@ -160,9 +176,8 @@ async def download_attachment(file_path: str) -> str:
 
 
 async def delete(
-    db: Session, task_id: int, cmd: AttachmentDeleteCommand, current_user: User
+        db: Session, task_id: int, cmd: AttachmentDeleteCommand, current_user: User
 ) -> CommonDataResp:
-
     # get task
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
