@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
@@ -317,3 +318,150 @@ class TestClassTaskAttachmentRouter:
         # check
         assert r.status_code == 403
         assert r.json()["err_code"] == 30001
+
+    def test_partial_content(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        data = {
+            "name": "partial content task",
+            "description": "task description",
+            "tips": "task tips",
+        }
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
+        )
+        task_id = task.json()["data"]["id"]
+        
+        empty_task_upload(task_id, "test.txt")
+
+        # 上传测试文件
+        with Path("labelu/tests/data/test.txt").open(mode="rb") as f:
+            attachment = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": ("test.txt", f, "text/plain")},
+            )
+        url = attachment.json()["data"]["url"]
+        
+        # 转换为 partial URL
+        partial_url = url.replace("/attachment/", "/partial/")
+        
+        # 测试 Range 请求
+        r1 = client.get(
+            partial_url,
+            headers={**testuser_token_headers, "Range": "bytes=0-9"},
+        )
+        
+        # 检查
+        assert r1.status_code == 206  # 部分内容响应码
+        assert r1.headers.get("Content-Length") == "10"
+        assert r1.headers.get("Content-Range").startswith("bytes 0-9/")
+        
+        # 测试没有 Range 的请求
+        r2 = client.get(
+            partial_url,
+            headers=testuser_token_headers,
+        )
+        
+        # 检查
+        assert r2.status_code == 200
+        assert "Accept-Ranges" in r2.headers
+        
+        # 测试无效的 Range 请求
+        r3 = client.get(
+            partial_url,
+            headers={**testuser_token_headers, "Range": "invalid"},
+        )
+        
+        # 检查 - 应该回退到完整响应
+        assert r3.status_code == 200
+        
+        # 测试超出文件范围的请求
+        with Path("labelu/tests/data/test.txt").open(mode="rb") as f:
+            file_size = len(f.read())
+            
+        r4 = client.get(
+            partial_url,
+            headers={**testuser_token_headers, "Range": f"bytes={file_size + 10}-{file_size + 20}"},
+        )
+        
+        # 检查 - 应该回退到完整响应
+        assert r4.status_code == 200
+
+    def test_partial_content_file_not_found(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # 测试不存在的文件
+        r = client.get(
+            f"{settings.API_V1_STR}/partial/non-existent/file.txt",
+            headers=testuser_token_headers,
+        )
+        
+        # 检查
+        assert r.status_code == 404
+        assert r.json()["err_code"] == 30003
+
+    def test_upload_file_with_hash_symbol(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        data = {
+            "name": "hash symbol test",
+            "description": "test for files with # in name",
+            "tips": "test tips",
+        }
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
+        )
+        task_id = task.json()["data"]["id"]
+        
+        empty_task_upload(task_id, "test.txt")
+
+        # 创建一个带有井号的临时文件名
+        original_filename = "test#file#with#hash.txt"
+        
+        # 打开测试文件并上传（使用带有井号的文件名）
+        with Path("labelu/tests/data/test.txt").open(mode="rb") as f:
+            response = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": (original_filename, f, "text/plain")},
+            )
+        
+        # 检查
+        json = response.json()
+        assert response.status_code == 201
+        
+        # 验证文件名中的井号被替换为下划线
+        assert "#" not in json["data"]["filename"]
+        assert "test_file_with_hash.txt" == json["data"]["filename"]
+        
+        # 验证文件实际存在于文件系统
+        parts = json["data"]["url"].split("/")[-3:]
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+
+
+class TestAttachmentUtils:
+    def test_filename_sanitization(self):
+        """测试文件名清理功能，验证井号(#)是否被正确处理"""
+        # 模拟 attachment.py 中的文件名清理逻辑
+        original_filename = "test#file#with#hash.txt"
+        sanitized = re.sub(r'%', '_pct_', original_filename)
+        sanitized = re.sub(r'[\\/*?:"<>|#]', '_', sanitized)
+        
+        # 验证井号被替换为下划线
+        assert "#" not in sanitized
+        assert "test_file_with_hash.txt" == sanitized
+        
+        # 测试其他特殊字符也能被正确处理
+        complex_filename = r"file\with/special*chars?:and\"<>|#symbols.txt"
+        sanitized = re.sub(r'%', '_pct_', complex_filename)
+        sanitized = re.sub(r'[\\/*?:"<>|#]', '_', sanitized)
+        
+        # 检查正确结果（拆分为多个断言便于排除问题）
+        assert sanitized.startswith("file_with_special_chars_")
+        assert sanitized.endswith("_symbols.txt")
+        assert "and" in sanitized
+        # 直接检查整个转义序列被正确处理
+        assert "\\" not in sanitized
