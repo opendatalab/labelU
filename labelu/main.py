@@ -80,8 +80,8 @@ app = FastAPI(
     terms_of_service="",
     contact={
         "name": "labelu",
-        "url": "http://labelu.example.com/contact/",
-        "email": "labelu@example.com",
+        "url": "https://github.com/opendatalab/labelU/issues",
+        "email": "shenguanlin@pjlab.org.cn",
     },
     license_info={
         "name": "Apache 2.0",
