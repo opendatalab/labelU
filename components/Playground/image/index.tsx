@@ -837,6 +837,16 @@ export default function ImagePage({
         }]
       }
 
+      if (tool === 'line') {
+        return [toolName, {
+          ...config,
+          style: {
+            arrowType: config.arrowType,
+          },
+          labels: config.attributes,
+        }]
+      }
+
       return [toolName, {
         ...config,
         labels: config.attributes
