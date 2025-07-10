@@ -7,13 +7,15 @@ import type { TabsProps } from 'antd';
 import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { Button, Drawer, Form, Tabs } from 'antd';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Modal from 'antd/es/modal/Modal';
 import message from 'antd/es/message';
 import { i18n, useTranslation } from '@labelu/i18n';
+import '@labelu/components-react/dist/style.css';
 
 import lineTemplate from '../../constant/templates/line.template';
 import rectTemplate from '../../constant/templates/rect.template';
+import relationTemplate from '../../constant/templates/relation.template';
 import polygonTemplate from '../../constant/templates/polygon.template';
 import pointTemplate from '../../constant/templates/point.template';
 import cuboidTemplate from '../../constant/templates/cuboid.template';
@@ -34,6 +36,7 @@ const templateMapping: Record<ToolName | 'tag' | 'text', any> = {
   cuboid: cuboidTemplate,
   tag: tagTemplate,
   text: textTemplate,
+  relation: relationTemplate,
 };
 
 const toolNameMapping = {
@@ -44,6 +47,7 @@ const toolNameMapping = {
   cuboid: i18n.t('cuboid'),
   tag: i18n.t('tag'),
   text: i18n.t('textDescription'),
+  relation: i18n.t('relation'),
 };
 
 const presetSamples = [
@@ -153,6 +157,64 @@ const presetSamples = [
       cuboid: [],
       text: [],
       tag: [],
+    },
+  },
+  {
+    url: '/labelU/assets/relation.png',
+    name: 'relation',
+    id: 'relation',
+    meta: {
+      rotate: 0,
+    },
+    data: {
+      "rect": [
+        {
+          "id": "9ccec57jpm",
+          "x": 19.206680584551147,
+          "y": 31.90501043841337,
+          "label": "reactant",
+          "width": 153.65344467640918,
+          "height": 177.03549060542798,
+          "order": 1
+        },
+        {
+          "id": "x4fwcunrhwf",
+          "x": 459.2901878914405,
+          "y": 4.34759916492694,
+          "label": "product",
+          "width": 324.00835073068896,
+          "height": 209.60334029227556,
+          "order": 2
+        },
+        {
+          "id": "2mtrsm5x6x3",
+          "x": 250.52192066805844,
+          "y": 41.09081419624218,
+          "label": "catalyst",
+          "width": 132.77661795407099,
+          "height": 65.1356993736952,
+          "order": 3
+        },
+        {
+          "id": "l5zakxh5hcj",
+          "x": 252.1920668058455,
+          "y": 135.45407098121086,
+          "label": "catalyst",
+          "width": 146.13778705636744,
+          "height": 74.32150313152401,
+          "order": 4
+        }
+      ],
+      "relation": [
+        {
+          "id": "k7zxqrvyezn",
+          "sourceId": "9ccec57jpm",
+          "targetId": "x4fwcunrhwf",
+          "order": 5,
+          "attributes": {},
+          "label": "hit"
+        }
+      ]
     },
   },
   {
@@ -699,13 +761,31 @@ const defaultConfig = {
     edgeAdsorptive: false,
     labels: [{ color: '#ff0000', key: 'Lane', value: 'lane' }],
   },
-  rect: { minWidth: 1, minHeight: 1, labels: [{ color: '#00ff1e', key: 'Human', value: 'human' }, { color: '#ff00ff', key: 'Bicycle', value: 'bicycle' }, { color: '#2e5fff', key: 'Traffic-sign', value: 'traffic_sign' }] },
+  rect: {
+    minWidth: 1,
+    minHeight: 1,
+    labels: [
+      { color: '#03ba18ba', key: 'Human', value: 'human' },
+      { color: '#ff00ff', key: 'Bicycle', value: 'bicycle' },
+      { color: '#2e5fff', key: 'Traffic-sign', value: 'traffic_sign' },
+      { color: '#662eff', key: 'Reactant', value: 'reactant' },
+      { color: '#ffb62e', key: 'Catalyst', value: 'catalyst' },
+      { color: '#ff2ea4', key: 'Product', value: 'product' },
+    ]
+  },
   polygon: {
     lineType: 'line',
     minPointAmount: 2,
     maxPointAmount: 100,
     edgeAdsorptive: false,
     labels: [{ color: '#8400ff', key: 'House', value: 'house' }],
+  },
+  relation: {
+    style: {
+      lineStyle: 'dashed',
+      arrowType: 'single',
+    },
+    labels: [{ color: '#741a2a', key: 'Hit', value: 'hit' }],
   },
   cuboid: {
     labels: [{ color: '#ff6d2e', key: 'Car', value: 'car' }],
@@ -724,6 +804,12 @@ export default function ImagePage({
   const [result, setResult] = useState<any>({});
   const [form] = Form.useForm();
 
+  useEffect(() => {
+    return () => {
+      annotatorRef.current?.destroy();
+    }
+  }, []);
+
   const showDrawer = useCallback(() => {
     setConfigOpen(true);
   }, [config, form]);
@@ -738,6 +824,19 @@ export default function ImagePage({
   const onFinish = (values: any) => {
     setConfig(_.chain(values.tools).toPairs().map(([toolName, value]) => {
       const { config, tool } = value;
+
+      if (tool === 'relation') {
+        console.log(config);
+        return [toolName, {
+          ...config,
+          style: {
+            lineStyle: config.lineStyle,
+            arrowType: config.arrowType,
+          },
+          labels: config.attributes,
+        }]
+      }
+
       return [toolName, {
         ...config,
         labels: config.attributes
@@ -812,6 +911,10 @@ export default function ImagePage({
     };
   }, []);
 
+  const requestEdit = useCallback((annotation: any) => {
+    return true;
+  }, []);
+
   return (
     <LocaleWrapper>
       <ImageAnnotator
@@ -822,8 +925,10 @@ export default function ImagePage({
         offsetTop={180}
         editingSample={currentSample}
         config={config}
+        disabled={false}
         onLoad={onLoad}
         onError={onError}
+        requestEdit={requestEdit}
       />
       <Drawer width={480} title={t('annotationConfig')} onClose={onClose} open={configOpen}>
         <Form form={form} layout="vertical" onFinish={onFinish} initialValues={initialValues}>

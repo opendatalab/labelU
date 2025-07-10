@@ -2,6 +2,7 @@ import type { FormItemProps } from 'antd';
 import { Form } from 'antd';
 import type { NamePath } from 'antd/es/form/interface';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import FancyInput from '../FancyInput';
 import type { FancyItemIdentifier } from '../FancyInput/types';
@@ -22,6 +23,35 @@ export interface FancyGroupProps {
 export interface FancyFormItemProps extends FormItemProps {
   children: React.ReactNode;
 }
+
+const StyledGroupFormItem = styled<
+  React.FC<
+    FormItemProps & {
+      layout?: 'vertical' | 'horizontal';
+    }
+  >
+>(Form.Item)`
+  ${({ layout }) =>
+    layout === 'horizontal'
+      ? css`
+          .ant-form-item-control-input-content {
+            display: flex;
+          }
+          .ant-form-item {
+            margin-right: 0.5rem;
+            margin-bottom: 0;
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+        `
+      : ''}
+
+      .ant-col {
+        min-height: auto;
+      }
+`;
 
 export const FancyGroup: React.FC<FancyGroupProps> = ({ group, disabled, value, name }) => {
   const form = Form.useFormInstance();
@@ -73,7 +103,7 @@ export const FancyGroup: React.FC<FancyGroupProps> = ({ group, disabled, value, 
           }
 
           return (
-            <Form.Item
+            <StyledGroupFormItem
               key={key}
               layout={layout}
               label={label}
@@ -83,7 +113,7 @@ export const FancyGroup: React.FC<FancyGroupProps> = ({ group, disabled, value, 
               hidden={hidden}
             >
               <FancyGroup key={key} disabled={disabled} group={children} value={value} name={finalName} />
-            </Form.Item>
+            </StyledGroupFormItem>
           );
         }
 

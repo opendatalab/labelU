@@ -1,0 +1,30 @@
+import jsonschema from './relation-schema.json';
+import JsonSchemaTable from 'components/SchemaTable';
+
+# Relation tool annotation schema
+
+## Schema
+
+<JsonSchemaTable schema={jsonschema} />
+
+## Example
+
+```json
+{
+  "toolName": "relationTool",
+  "result": [
+    {
+      "id": "m78uazpc4dm",
+      "sourceId": "aexlp2kyeev",
+      "targetId": "n916qaottj",
+      "order": 13,
+      "attributes": {
+        "description": [
+          "This is a description"
+        ]
+      },
+      "label": "hit"
+    }
+  ]
+}
+```

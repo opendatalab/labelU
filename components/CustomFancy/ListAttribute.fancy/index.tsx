@@ -12,6 +12,7 @@ import type { CategoryAttributeItem } from '../CategoryAttribute.fancy';
 import AttributeConfiguration from './AttributeConfiguration';
 import { duplicatedValueValidator, listOmitWithId, listWrapWithId, wrapWithId } from '../utils';
 import { FlexLayout } from '@labelu/components-react';
+import styled from 'styled-components';
 
 const colorPalette = new ColorPalette();
 
@@ -36,6 +37,68 @@ export interface FancyAttributeListProps extends FancyInputProps {
 // ====================== style ======================
 
 
+const StyledAttributeItem = styled.div`
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+`;
+
+const StyledAttributesWrapper = styled.div`
+  .ant-form-item {
+    margin-bottom: 0;
+    margin-right: 0.5rem;
+  }
+
+  .input {
+    flex-grow: 1;
+  }
+
+  .sn {
+    flex-basis: 1rem;
+  }
+
+  .color {
+    width: 1.25rem;
+    height: 1.4rem;
+    border: 0;
+    appearance: none;
+    background-color: transparent;
+    cursor: pointer;
+
+    &::-webkit-color-swatch {
+      border-radius: var(--border-radius);
+      border: none;
+    }
+  }
+
+  .add {
+    padding-left: 0;
+  }
+
+  .add-wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 0.5rem;
+
+    .ant-badge-count {
+      color: var(--text-color);
+      margin-left: 0.5rem;
+    }
+  }
+
+  .remove-wrapper {
+    height: 100%;
+  }
+
+  .remove {
+    font-size: 1rem;
+    color: var(--color-text-tertiary);
+
+    &:hover {
+      color: var(--color-error);
+    }
+  }
+`;
 
 // ======================= end =======================
 
@@ -153,7 +216,7 @@ export function FancyAttributeList({
         });
 
         return (
-          <FlexLayout flex="row" key={item.id}>
+          <StyledAttributeItem key={item.id}>
             <div className="sn">{index + 1}</div>
             <Form.Item name={[...preFields, index, 'color']} rules={[{ required: true }]}>
               <input type="color" className="color" value={item.color} onChange={handleOnChange(`[${index}].color`)} />
@@ -187,14 +250,14 @@ export function FancyAttributeList({
                 </div>
               </Tooltip>
             )}
-          </FlexLayout>
+          </StyledAttributeItem>
         );
       }),
     [t, deletable, handleOnChange, handleOpenAttributeConfiguration, handleRemoveAttribute, preFields, stateValue],
   );
 
   return (
-    <div className="attribute-wrapper">
+    <StyledAttributesWrapper className="attribute-wrapper">
       {attributes}
       <Button className="add" icon={<PlusOutlined />} type="link" onClick={handleAddAttribute}>
         {t('add')}
@@ -205,6 +268,6 @@ export function FancyAttributeList({
         onClose={handleCloseAttributeConfiguration}
         onChange={handleChangeAttributes}
       />
-    </div>
+    </StyledAttributesWrapper>
   );
 }

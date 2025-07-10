@@ -12,6 +12,7 @@ import type { FancyInputProps } from '../../FancyInput/types';
 
 import { duplicatedValueValidator, listOmitWithId, listWrapWithId, wrapWithId } from '../utils';
 import TagSwitcher from './TagSwitcher';
+import styled from 'styled-components';
 
 export enum CategoryType {
   Enum = 'enum',
@@ -66,6 +67,108 @@ export interface FancyCategoryAttributeRef {
   removeCategory: (category: CategoryAttributeStateItem) => () => void;
 }
 
+
+const StyledTree = styled<React.FC<TreeProps>>(Tree)`
+  .ant-tree-switcher {
+    /* height: 1.5rem; */
+  }
+  .ant-tree-treenode {
+    padding-left: 0.6rem;
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0.5rem;
+  }
+  .ant-tree-node-content-wrapper {
+    &:hover {
+      background-color: transparent;
+    }
+
+    cursor: default;
+  }
+
+  .category {
+    display: flex;
+    align-items: baseline;
+  }
+
+  .option {
+    display: flex;
+    align-items: baseline;
+  }
+
+  .sn {
+    position: absolute;
+    top: 0.3rem;
+    left: -2rem;
+  }
+
+  .icon {
+    font-size: 2rem !important;
+  }
+
+  .category .ant-form-item,
+  .option .ant-form-item {
+    margin-bottom: 0;
+    flex-grow: 1;
+    margin-right: 0.5rem;
+  }
+
+  .add-option {
+    padding-left: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .remove {
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--color-text-tertiary);
+
+    &:hover {
+      color: var(--color-error);
+    }
+  }
+
+  .multiple-switcher {
+    cursor: pointer;
+  }
+
+  .text-form-wrapper {
+    .ant-form-item {
+      margin-bottom: 0.5rem;
+    }
+    .ant-form-item-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .ant-form-item-control {
+      min-height: auto;
+      width: 100%;
+    }
+  }
+
+  .should-align-center {
+    display: flex;
+    align-items: center;
+  }
+`;
+
+export const StyledFancyAttributeWrapper = styled.div`
+  .buttons {
+    background-color: #fff;
+  }
+`;
+
+const StyledStar = styled<React.FC<ButtonProps & { active: boolean }>>(Button)`
+  color: ${(props) => (props.active ? 'var(--color-warning)' : 'var(--color-text-tertiary)')};
+  margin-right: 0.5rem;
+
+  &:hover .star-icon,
+  &:active .star-icon {
+    color: ${(props) => (props.active ? 'var(--color-warning)' : 'var(--color-text-tertiary)')};
+  }
+`;
 
 // ======================= end =======================
 
@@ -502,7 +605,7 @@ export const FancyCategoryAttribute = forwardRef<FancyCategoryAttributeRef, Fanc
                   <Input placeholder={t('value')} onChange={handleOnChange(`[${preIndex}]options[${index}].value`)} />
                 </Form.Item>
                 <Tooltip title={t('setAsDefault')}>
-                  <Button
+                  <StyledStar
                     icon={<StarFilled className="star-icon" />}
                     size="small"
                     type="text"
@@ -561,14 +664,14 @@ export const FancyCategoryAttribute = forwardRef<FancyCategoryAttributeRef, Fanc
     );
 
     return (
-      <div className={className} style={style}>
-        <Tree
+      <StyledFancyAttributeWrapper className={className} style={style}>
+        <StyledTree
           treeData={treeData}
           selectable={false}
           blockNode
         />
         {affixProps ? <Affix {...affixProps}>{buttons}</Affix> : buttons}
-      </div>
+      </StyledFancyAttributeWrapper>
     );
   },
 );

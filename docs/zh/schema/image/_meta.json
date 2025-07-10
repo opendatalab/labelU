@@ -22,6 +22,11 @@
   },
   {
     "type": "file",
+    "name": "relation",
+    "label": "关联关系(v1.3.0+)"
+  },
+  {
+    "type": "file",
     "name": "cuboid",
     "label": "立体框"
   }

@@ -19,13 +19,6 @@ export default [
     type: 'group',
     children: [
       {
-        field: 'attributeConfigurable',
-        key: 'attributeConfigurable',
-        type: 'boolean',
-        hidden: true,
-        initialValue: true,
-      },
-      {
         field: 'lineType',
         key: 'lineType',
         type: 'enum',
@@ -36,6 +29,29 @@ export default [
             { label: i18n.t('straightLine'), value: 0 },
             { label: i18n.t('spline'), value: 1 },
           ],
+        },
+      },
+      {
+        field: 'arrowType',
+        key: 'arrowType',
+        type: 'enum',
+        label: i18n.t('arrowType'),
+        initialValue: 'none',
+        antProps: {
+          options: [
+            { label: i18n.t('single'), value: 'single' },
+            { label: i18n.t('double'), value: 'double' },
+            { label: i18n.t('none'), value: 'none' },
+          ],
+        },
+        renderFormItem({ antProps, ...props }, form, fullField) {
+          const lineType = form.getFieldValue([...(fullField as any[]).slice(0, -1), 'lineType']);
+
+          if (lineType === 1) {
+            return null;
+          }
+
+          return <FancyInput {...props} {...antProps} />;
         },
       },
       {
