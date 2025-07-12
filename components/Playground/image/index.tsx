@@ -866,6 +866,9 @@ export default function ImagePage({
   }, []);
 
   const onLoad = useCallback((engine: Annotator) => {
+    engine.container.querySelectorAll('div').forEach((div) => {
+      div.remove();
+    });
     const updateSampleData = () => {
       setResult(() => ({
         ...annotatorRef.current?.getAnnotations(),
