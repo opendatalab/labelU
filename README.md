@@ -99,7 +99,7 @@ labelu
 DATABASE_URL=mysql://<username>:<password>@<host>/<your dbname> labelu migrate_to_mysql
 ```
 
-1. Visit [http://localhost:8000/](http://localhost:8000/) and ready to go.
+6. Visit [http://localhost:8000/](http://localhost:8000/) and ready to go.
 
 ### Local development
 
