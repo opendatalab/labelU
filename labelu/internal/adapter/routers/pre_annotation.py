@@ -78,6 +78,7 @@ async def list_pre_annotation_files_request(
         page=page,
         size=size,
         sorting=sort,
+        current_user=current_user,
     )
 
     # response

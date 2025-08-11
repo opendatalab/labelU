@@ -144,18 +144,19 @@ async def list_pre_annotation_files(
     page: Optional[int],
     size: int,
     sorting: Optional[str],
+    current_user: User,
 ) -> Tuple[List[TaskAttachment], int]:
     try:
-        pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id(db=db, task_id=task_id)
-        file_ids = [pre_annotation.file_id for pre_annotation in pre_annotations]
+        pre_annotations = crud_pre_annotation.list_by_task_id_and_owner_id_lightweight(db=db, task_id=task_id, owner_id=current_user.id)
+        file_ids = [pre_annotation['file_id'] for pre_annotation in pre_annotations]
         
         attachments, total = crud_attachment.list_by(db=db, ids=file_ids, after=after, before=before, page=page, size=size, sorting=sorting)
         _attachment_ids = [attachment.id for attachment in attachments]
         sample_names_those_has_pre_annotations = []
         
         for pre_annotation in pre_annotations:
-            if pre_annotation.file_id in _attachment_ids and pre_annotation.sample_name is not None:
-                sample_names_those_has_pre_annotations.append(pre_annotation.sample_name)
+            if pre_annotation['file_id'] in _attachment_ids and pre_annotation['sample_name'] is not None:
+                sample_names_those_has_pre_annotations.append(pre_annotation['sample_name'])
 
         return [
             PreAnnotationFileResponse(
