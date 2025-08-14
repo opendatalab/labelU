@@ -29,6 +29,7 @@ MANIFEST
 node_modules
 test.db
 frontend/*
+.DS_Store
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
