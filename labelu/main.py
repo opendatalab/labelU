@@ -1,5 +1,6 @@
 from typing import Any
 from loguru import logger
+import typer
 import uvicorn
 from typer import Typer
 from fastapi import FastAPI, Response
@@ -80,8 +81,8 @@ app = FastAPI(
     terms_of_service="",
     contact={
         "name": "labelu",
-        "url": "https://github.com/opendatalab/labelU/issues",
-        "email": "shenguanlin@pjlab.org.cn",
+        "url": "http://labelu.example.com/contact/",
+        "email": "labelu@example.com",
     },
     license_info={
         "name": "Apache 2.0",
@@ -134,7 +135,9 @@ def to_mysql():
 
 @cli.callback(invoke_without_command=True)
 def main(
-    host: str = "localhost", port: int = 8000, media_host: str = "http://localhost:8000"
+    host: str = typer.Option("localhost", "--host", help="Server host"),
+    port: int = typer.Option(8000, "--port", help="Server port"),
+    media_host: str = typer.Option("http://localhost:8000", "--media-host", help="Media URL")
 ):
     if port:
         settings.PORT = port
