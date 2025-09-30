@@ -143,6 +143,8 @@ def main(
         settings.PORT = port
     if host:
         settings.HOST = host
+
+    settings.MEDIA_HOST = f"http://{settings.HOST}:{settings.PORT}"
     if media_host:
         settings.MEDIA_HOST = media_host
         
