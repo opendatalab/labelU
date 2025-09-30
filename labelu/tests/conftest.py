@@ -20,7 +20,9 @@ DEFAULT_TEST_PASSWORD = "test@123"
 def _resolve_test_password() -> str:
     configured = getattr(settings, "TEST_USER_PASSWORD", None)
     password = configured if configured else DEFAULT_TEST_PASSWORD
-    return password[:72]
+    raw_bytes = password.encode("utf-8")
+    safe_bytes = raw_bytes[:72]
+    return safe_bytes.decode("utf-8", errors="ignore")
 
 
 TEST_USER_PASSWORD = _resolve_test_password()

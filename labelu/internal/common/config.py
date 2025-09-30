@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from loguru import logger
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings, Field, validator
 
 from labelu.internal.common.io import get_data_dir
 
@@ -41,6 +41,12 @@ class Settings(BaseSettings):
         default=None,
         description="Optional override for the test user's password."
     )
+
+    @validator("TEST_USER_PASSWORD", pre=True)
+    def _truncate_test_user_password(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return value[:72]
 
     @property
     def need_migration_to_mysql(self) -> bool:
