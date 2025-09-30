@@ -45,6 +45,12 @@ def db() -> Generator:
         db.close()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def ensure_test_user() -> Generator:
+    init_db()
+    yield
+
+
 @pytest.fixture(autouse=True)
 def run_around_tests():
     # Code that will run before your test, for example:
