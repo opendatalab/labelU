@@ -20,9 +20,17 @@ DEFAULT_TEST_PASSWORD = "test@123"
 def _resolve_test_password() -> str:
     configured = getattr(settings, "TEST_USER_PASSWORD", None)
     password = configured if configured else DEFAULT_TEST_PASSWORD
-    raw_bytes = password.encode("utf-8")
-    safe_bytes = raw_bytes[:72]
-    return safe_bytes.decode("utf-8", errors="ignore")
+    
+    # Ensure password is not longer than 72 bytes for bcrypt
+    password_bytes = password.encode("utf-8")
+    if len(password_bytes) > 72:
+        # Truncate to 72 bytes and decode, ensuring valid UTF-8
+        truncated = password_bytes[:72].decode("utf-8", errors="ignore")
+        # Re-encode to verify it's still within limit after decode
+        while len(truncated.encode("utf-8")) > 72:
+            truncated = truncated[:-1]
+        return truncated
+    return password
 
 
 TEST_USER_PASSWORD = _resolve_test_password()
