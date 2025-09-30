@@ -56,11 +56,17 @@ def db() -> Generator:
         db.close()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def ensure_test_user() -> Generator:
+    # Initialize test user once per test session
+    init_db()
+    yield
+
+
 @pytest.fixture(autouse=True)
 def run_around_tests():
     # Code that will run before your test, for example:
     print("start up")
-    init_db()
     # A test function will be run at this point
     yield
     # Code that will run after your test, for example:
@@ -93,7 +99,16 @@ def get_testuser_token_headers(client: TestClient) -> Dict[str, str]:
         "password": TEST_USER_PASSWORD,
     }
     r = client.post(f"{settings.API_V1_STR}/users/login", json=data)
-    token = r.json()["data"]["token"]
+    response_json = r.json()
+    
+    # Add debugging info for CI failures
+    if "data" not in response_json:
+        print(f"Login failed. Response: {response_json}")
+        print(f"Status code: {r.status_code}")
+        print(f"Password length (bytes): {len(TEST_USER_PASSWORD.encode('utf-8'))}")
+        raise ValueError(f"Login failed with response: {response_json}")
+    
+    token = response_json["data"]["token"]
     headers = {"Authorization": f"{token}"}
     return headers
 
