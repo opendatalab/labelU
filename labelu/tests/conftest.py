@@ -19,18 +19,7 @@ DEFAULT_TEST_PASSWORD = "test@123"
 
 def _resolve_test_password() -> str:
     configured = getattr(settings, "TEST_USER_PASSWORD", None)
-    password = configured if configured else DEFAULT_TEST_PASSWORD
-    
-    # Ensure password is not longer than 72 bytes for bcrypt
-    password_bytes = password.encode("utf-8")
-    if len(password_bytes) > 72:
-        # Truncate to 72 bytes and decode, ensuring valid UTF-8
-        truncated = password_bytes[:72].decode("utf-8", errors="ignore")
-        # Re-encode to verify it's still within limit after decode
-        while len(truncated.encode("utf-8")) > 72:
-            truncated = truncated[:-1]
-        return truncated
-    return password
+    return configured if configured else DEFAULT_TEST_PASSWORD
 
 
 TEST_USER_PASSWORD = _resolve_test_password()
@@ -127,11 +116,9 @@ def init_db() -> None:
         with db.begin():
             user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
             if not user:
-                print("Creating test user:", TEST_USERNAME)
-                print("Test user password length (bytes):", len(TEST_USER_PASSWORD.encode('utf-8')))
                 user_in = User(
                     username=TEST_USERNAME,
-                    hashed_password=get_password_hash(TEST_USER_PASSWORD[:72]),
+                    hashed_password=get_password_hash(TEST_USER_PASSWORD),
                 )
                 user = crud_user.create(db=db, user=user_in)
     finally:
