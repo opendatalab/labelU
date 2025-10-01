@@ -42,13 +42,15 @@ class AccessToken(BaseModel):
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    plain_password = _truncate_password_for_bcrypt(plain_password)
-    return pwd_context.verify(plain_password, hashed_password)
+    safe_password = plain_password[:72]
+    plain_password = _truncate_password_for_bcrypt(safe_password)
+    return pwd_context.verify(safe_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    password = _truncate_password_for_bcrypt(password)
-    return pwd_context.hash(password)
+    safe_password = password[:72]
+    password = _truncate_password_for_bcrypt(safe_password)
+    return pwd_context.hash(safe_password)
 
 
 # create access token for user login
