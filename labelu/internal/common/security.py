@@ -8,8 +8,6 @@ from fastapi.security import HTTPBearer
 
 from labelu.internal.common.config import settings
 
-BCRYPT_MAX_BYTES = 72
-
 security = HTTPBearer()
 
 pwd_context = CryptContext(
@@ -18,16 +16,6 @@ pwd_context = CryptContext(
     bcrypt__truncate_error=False,
 )
 
-
-def _normalize_password(password: str) -> str:
-    """Clamp password to the maximum length bcrypt accepts (72 bytes)."""
-    password_bytes = password.encode("utf-8")
-    if len(password_bytes) <= BCRYPT_MAX_BYTES:
-        return password
-
-    truncated_bytes = password_bytes[:BCRYPT_MAX_BYTES]
-    return truncated_bytes.decode("utf-8", errors="ignore")
-
 class AccessToken(BaseModel):
     id: int
     username: str
@@ -35,11 +23,11 @@ class AccessToken(BaseModel):
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(_normalize_password(plain_password), hashed_password)
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(_normalize_password(password))
+    return pwd_context.hash(password)
 
 
 # create access token for user login

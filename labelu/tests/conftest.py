@@ -14,15 +14,7 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
 
 TEST_USERNAME = "test@example.com"
-DEFAULT_TEST_PASSWORD = "test@123"
-
-
-def _resolve_test_password() -> str:
-    configured = getattr(settings, "TEST_USER_PASSWORD", None)
-    return configured if configured else DEFAULT_TEST_PASSWORD
-
-
-TEST_USER_PASSWORD = _resolve_test_password()
+TEST_USER_PASSWORD = "test@123"
 
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"

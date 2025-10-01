@@ -27,10 +27,11 @@ appdirs = "^1.4.4"
 mysqlclient = { version = "^2.1.1", optional = true }
 aiofiles = "^22.1.0"
 pillow = "^9.3.0"
-alembic = "^1.9.4"
+alembic = "1.15.2"
 httpx = "^0.27.0"
 tfrecord = "^1.14.5"
 websockets = "^10.0.0"
+bcrypt = "4.3.0"
 
 [tool.poetry.extras]
 mysql = ["mysqlclient"]
