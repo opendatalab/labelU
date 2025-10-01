@@ -1,8 +1,8 @@
 from typing import Any
+
 from loguru import logger
-import typer
+import click
 import uvicorn
-from typer import Typer
 from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 
@@ -126,30 +126,23 @@ class NoCacheStaticFiles(StaticFiles):
 
 app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))
 
-cli = Typer()
+@click.group(invoke_without_command=True)
+@click.option('--host', default='localhost', help='Server host')
+@click.option('--port', default=8000, help='Server port')
+@click.option('--media-host', default='http://localhost:8000', help='Media Host')
+@click.pass_context
+def cli(ctx: click.Context, host: str, port: int, media_host: str):
+    if ctx.invoked_subcommand is None:
+        settings.PORT = port
+        settings.HOST = host
+        settings.MEDIA_HOST = media_host
+        
+        uvicorn.run(app=app, host=settings.HOST, port=settings.PORT, ws="websockets")
 
 @cli.command('migrate_to_mysql')
 def to_mysql():
     """Migrate database to MySQL"""
     migrate_to_mysql()
-
-@cli.callback(invoke_without_command=True)
-def main(
-    host: str = typer.Option("localhost", "--host", help="Server host"),
-    port: int = typer.Option(8000, "--port", help="Server port"),
-    media_host: str = typer.Option("http://localhost:8000", "--media-host", help="Media URL")
-):
-    if port:
-        settings.PORT = port
-    if host:
-        settings.HOST = host
-
-    settings.MEDIA_HOST = f"http://{settings.HOST}:{settings.PORT}"
-    if media_host:
-        settings.MEDIA_HOST = media_host
-        
-    uvicorn.run(app=app, host=settings.HOST, port=settings.PORT, ws="websockets")
-        
 
 if __name__ == "__main__":
     cli()
