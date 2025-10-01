@@ -32,7 +32,11 @@ from labelu.internal.application.response.attachment import AttachmentResponse
 from labelu.internal.clients.ws import sampleConnectionManager
 from labelu.internal.common.websocket import Message, MessageType
 from labelu.internal.adapter.ws.sample import TaskSampleWsPayload
+from labelu.scripts.migrate_to_mysql import timer
+from labelu.internal.common.cache_manager import CacheManager
 
+# 创建缓存管理实例
+cache = CacheManager()
 def is_sample_pre_annotated(db: Session, task_id: int, sample_name: str | None = None) -> Tuple[List[TaskPreAnnotation], int]:
     if sample_name is None:
         return False
@@ -172,25 +176,25 @@ async def patch(
     cmd: PatchSampleCommand,
     current_user: User,
 ) -> SampleResponse:
-
-    # check task exist
-    task = crud_task.get(db=db, task_id=task_id)
-    if not task:
-        logger.error("cannot find task:{}", task_id)
-        raise LabelUException(
-            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-
-    # get sample
-    sample = crud_sample.get(db=db, sample_id=sample_id)
-    if not sample:
-        logger.error("cannot find sample:{}", sample_id)
-        raise LabelUException(
-            code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-
+    with timer("check task exist"):
+        # check task exist
+        task = crud_task.get(db=db, task_id=task_id)
+        if not task:
+            logger.error("cannot find task:{}", task_id)
+            raise LabelUException(
+                code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+    with timer("get sample"):
+        # get sample
+        sample = crud_sample.get(db=db, sample_id=sample_id)
+        if not sample:
+            logger.error("cannot find sample:{}", sample_id)
+            raise LabelUException(
+                code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        
     # update
     sample_obj_in = {}
     if cmd.state == SampleState.SKIPPED.value:
@@ -207,9 +211,18 @@ async def patch(
     with db.begin():
         # update task status
         if task.status != TaskStatus.FINISHED.value:
-            statics = crud_sample.statics(
-                db=db, task_ids=[task_id]
-            )
+            with timer("get task sample statics"):
+                cache_key = cache.get_cache_key("task_sample_statics", task_id)
+                # 检查缓存
+                cached_data = cache.get(cache_key)
+                if cached_data is not None:
+                    statics = cached_data
+                else:
+                    logger.info(f"task sample statics Cache miss for task_id: {task_id}")
+                    statics = crud_sample.statics(
+                        db=db, task_ids=[task_id]
+                    )
+                    cache.set(cache_key, statics)
             task_obj_in = {Task.status.key: TaskStatus.INPROGRESS.value}
             new_sample_cnt = statics.get(f"{task.id}_{SampleState.NEW.value}", 0)
             if new_sample_cnt == 0 or (
@@ -217,12 +230,15 @@ async def patch(
             ):
                 task_obj_in[Task.status.key] = TaskStatus.FINISHED.value
             if task.status != task_obj_in[Task.status.key]:
-                crud_task.update(db=db, db_obj=task, obj_in=task_obj_in)
+                with timer("update task status"):
+                    crud_task.update(db=db, db_obj=task, obj_in=task_obj_in)
+                    cache.clear(cache_key)
         # updaters
         if current_user not in sample.updaters:
             sample.updaters.append(current_user)
-        # update task sample result
-        updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=sample_obj_in)
+        with timer("update task sample result"):
+            # update task sample result
+            updated_sample = crud_sample.update(db=db, db_obj=sample, obj_in=sample_obj_in)
     
     # tell other clients in the same sample page to refresh data
     await sampleConnectionManager.send_message(
