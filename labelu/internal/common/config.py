@@ -37,16 +37,6 @@ class Settings(BaseSettings):
     TOKEN_GENERATE_ALGORITHM: str = "HS256"
     TOKEN_ACCESS_EXPIRE_MINUTES: int = 30
     TOKEN_TYPE: str = "Bearer"
-    TEST_USER_PASSWORD: str | None = Field(
-        default=None,
-        description="Optional override for the test user's password."
-    )
-
-    @validator("TEST_USER_PASSWORD", pre=True)
-    def _truncate_test_user_password(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
-        return value[:72]
 
     @property
     def need_migration_to_mysql(self) -> bool:

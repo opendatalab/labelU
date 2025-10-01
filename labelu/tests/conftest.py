@@ -127,9 +127,11 @@ def init_db() -> None:
         with db.begin():
             user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
             if not user:
+                print("Creating test user:", TEST_USERNAME)
+                print("Test user password length (bytes):", len(TEST_USER_PASSWORD.encode('utf-8')))
                 user_in = User(
                     username=TEST_USERNAME,
-                    hashed_password=get_password_hash(TEST_USER_PASSWORD),
+                    hashed_password=get_password_hash(TEST_USER_PASSWORD[:72]),
                 )
                 user = crud_user.create(db=db, user=user_in)
     finally:

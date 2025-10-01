@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
-from labelu.internal.common.security import verify_password
 from labelu.internal.common.security import get_password_hash
 
 from labelu.tests.utils.utils import random_username
