@@ -21,6 +21,7 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-6-thinking
           prompt: |
             你是 LabelU 项目的代码审查助手。请对这个 PR 进行严格的代码审查。
 
