@@ -39,10 +39,8 @@ jobs:
 
       - name: Run Claude Code to fix issue
         run: |
-          claude --print \
-            --model claude-sonnet-4-6-thinking \
-            --allowedTools "Bash(poetry*),Bash(git*),Read,Write,Edit,Glob,Grep" \
-            "你是 LabelU 项目的自动修复助手。请根据以下 issue 修复问题。
+          cat <<'PROMPT' > /tmp/claude-prompt.txt
+          你是 LabelU 项目的自动修复助手。请根据以下 issue 修复问题。
 
           ## Issue #${{ github.event.issue.number }}
           标题: ${{ github.event.issue.title }}
@@ -54,7 +52,11 @@ jobs:
           3. 按照项目的分层架构（adapter/application/domain/common）修复代码
           4. 运行测试确保通过: poetry run pytest
           5. 如果修复涉及新的行为，请添加相应的测试用例
-          6. 用 git add 和 git commit 提交修改，commit message 遵循 conventional commits 格式"
+          6. 用 git add 和 git commit 提交修改，commit message 遵循 conventional commits 格式
+          PROMPT
+          cat /tmp/claude-prompt.txt | claude --print \
+            --model claude-sonnet-4-6-thinking \
+            --allowedTools "Bash(poetry*),Bash(git*),Read,Write,Edit,Glob,Grep"
 
       - name: Push and create PR
         env:

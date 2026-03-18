@@ -32,12 +32,9 @@ jobs:
           gh pr diff ${{ github.event.pull_request.number }} > /tmp/pr-diff.txt
 
       - name: Run Claude Code to review PR
-        id: review
         run: |
-          REVIEW=$(claude --print \
-            --model claude-sonnet-4-6-thinking \
-            --allowedTools "Read,Glob,Grep" \
-            "你是 LabelU 项目的代码审查助手。请对以下 PR diff 进行严格的代码审查。
+          cat <<PROMPT > /tmp/claude-review-prompt.txt
+          你是 LabelU 项目的代码审查助手。请对以下 PR diff 进行严格的代码审查。
 
           ## PR #${{ github.event.pull_request.number }}
           标题: ${{ github.event.pull_request.title }}
@@ -54,9 +51,11 @@ jobs:
           5. 是否符合 Python 最佳实践？
           6. commit message 是否遵循 conventional commits？
 
-          请直接输出审查意见，包含总体评价: APPROVE 或 REQUEST_CHANGES")
-
-          echo "$REVIEW" > /tmp/review.txt
+          请直接输出审查意见，包含总体评价: APPROVE 或 REQUEST_CHANGES
+          PROMPT
+          cat /tmp/claude-review-prompt.txt | claude --print \
+            --model claude-sonnet-4-6-thinking \
+            --allowedTools "Read,Glob,Grep" > /tmp/review.txt
 
       - name: Post review comment
         env:
