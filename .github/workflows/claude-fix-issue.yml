@@ -1,0 +1,46 @@
+name: 'Claude Auto Fix Issue'
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  fix-issue:
+    if: github.event.label.name == 'claude-fix'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: pip install poetry==1.2.2
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            你是 LabelU 项目的自动修复助手。请根据以下 issue 修复问题。
+
+            ## Issue #${{ github.event.issue.number }}
+            标题: ${{ github.event.issue.title }}
+            内容: ${{ github.event.issue.body }}
+
+            ## 要求
+            1. 仔细分析问题根因
+            2. 按照项目的分层架构（adapter/application/domain/common）修复代码
+            3. 运行测试确保通过: `poetry run pytest --cov=./ --cov-report=xml`
+            4. 如果修复涉及新的行为，请添加相应的测试用例
+            5. Commit message 必须遵循 conventional commits 格式（fix: / feat: / refactor: 等）
+            6. PR 描述中包含 `Closes #${{ github.event.issue.number }}`
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}

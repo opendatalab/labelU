@@ -1,0 +1,39 @@
+name: 'Claude Auto Review PR'
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+
+jobs:
+  review-pr:
+    if: startsWith(github.head_ref, 'claude/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            你是 LabelU 项目的代码审查助手。请对这个 PR 进行严格的代码审查。
+
+            ## 审查要点
+            1. **问题解决**: 代码是否真正解决了关联的 issue？是否存在遗漏的边界情况？
+            2. **安全性**: 是否存在 SQL 注入、XSS、命令注入等 OWASP Top 10 漏洞？
+            3. **测试覆盖**: 修复是否有对应的测试？测试是否覆盖了关键场景？
+            4. **架构合规**: 是否遵循项目的分层架构（adapter → application → domain）？是否有层级穿透？
+            5. **代码质量**: 是否符合 Python 最佳实践？是否有不必要的复杂性？
+            6. **Commit 规范**: commit message 是否遵循 conventional commits？
+
+            ## 输出格式
+            - 如果发现问题，请明确指出文件和行号，并给出修复建议
+            - 如果代码质量良好，也请简要确认通过
+            - 给出总体评价: APPROVE / REQUEST_CHANGES
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
