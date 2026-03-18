@@ -26,6 +26,11 @@ jobs:
       - name: Install Poetry
         run: pip install poetry==1.2.2
 
+      - name: Debug env vars
+        run: |
+          echo "ANTHROPIC_BASE_URL is set: ${{ secrets.ANTHROPIC_BASE_URL != '' }}"
+          echo "ANTHROPIC_API_KEY is set: ${{ secrets.ANTHROPIC_API_KEY != '' }}"
+
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
