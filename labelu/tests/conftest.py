@@ -19,7 +19,7 @@ TEST_USER_PASSWORD = "test@123"
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 TestingSessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
@@ -48,12 +48,10 @@ def db() -> Generator:
 @pytest.fixture(autouse=True)
 def run_around_tests():
     # Code that will run before your test, for example:
-    print("start up")
     init_db()
     # A test function will be run at this point
     yield
     # Code that will run after your test, for example:
-    print("tear down")
     try:
         db = TestingSessionLocal()
         meta = Base.metadata

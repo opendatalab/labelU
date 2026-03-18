@@ -17,7 +17,12 @@ from labelu.internal.adapter.persistence import crud_user
 
 class SpecialOAuth2PasswordBearer:
     def __call__(self, request: Request) -> Optional[str]:
-        authorization: str = request.headers.get("Authorization")
+        authorization: str = request.headers.get("Authorization", "")
+        if not authorization:
+            raise LabelUException(
+                code=ErrorCode.CODE_40003_CREDENTIAL_ERROR,
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
         _, _, param = authorization.partition(" ")
         return param
 
@@ -33,7 +38,7 @@ def get_current_user(
             token,
             settings.PASSWORD_SECRET_KEY,
             algorithms=[settings.TOKEN_GENERATE_ALGORITHM],
-            options={"verify_exp": False},
+            options={"verify_exp": True},
         )
         token_data = AccessToken(**payload)
     except (jwt.JWTError, ValidationError):
@@ -59,9 +64,9 @@ async def verify_ws_token(websocket: WebSocket, db: Session = Depends(db.get_db)
             token,
             settings.PASSWORD_SECRET_KEY,
             algorithms=[settings.TOKEN_GENERATE_ALGORITHM],
-            options={"verify_exp": False},
+            options={"verify_exp": True},
         )
-        
+
         token_data = AccessToken(**payload)
         user = crud_user.get(db, id=token_data.id)
         

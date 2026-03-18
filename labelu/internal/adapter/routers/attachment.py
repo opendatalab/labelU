@@ -76,7 +76,7 @@ async def get_content(file_path: str, range: str = Header(None)):
     try:
         full_path = await service.download_attachment(file_path=file_path)
         full_path = Path(full_path) 
-    except Exception:
+    except (FileNotFoundError, OSError, LabelUException):
         raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,

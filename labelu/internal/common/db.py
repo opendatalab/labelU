@@ -18,7 +18,6 @@ else:
     engine = create_engine(
         database_url,
         connect_args={"check_same_thread": False},
-        echo=True,
     )
 
 SessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)

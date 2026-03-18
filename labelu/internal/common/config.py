@@ -18,8 +18,6 @@ class Settings(BaseSettings):
     MEDIA_ROOT: Path = Path(BASE_DATA_DIR).joinpath("media")
     UPLOAD_DIR: str = "upload"
     EXPORT_DIR: str = "export"
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-    logger.info("Database and media directory: {}", BASE_DATA_DIR)
     UPLOAD_FILE_MAX_SIZE: int = 200_000_000  # ~200MB
     THUMBNAIL_HEIGH_PIXEL: int = 120
 
@@ -30,8 +28,9 @@ class Settings(BaseSettings):
     )
     # or using MySQL DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb
 
-    PASSWORD_SECRET_KEY: str = (
-        "e5b7d00a59aaa2a5ea86a7c4d72f856b20bafa1b8d0e66124082ada81f6340bd"
+    PASSWORD_SECRET_KEY: str = Field(
+        default="",
+        description="JWT secret key. Generate with: openssl rand -hex 32. MUST be set in production."
     )
 
     TOKEN_GENERATE_ALGORITHM: str = "HS256"
@@ -53,3 +52,5 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+logger.info("Database and media directory: {}", settings.BASE_DATA_DIR)

@@ -98,11 +98,13 @@ async def logout(
     current_user: User = Depends(get_current_user),
 ):
     """
-    User logout
-    """
+    User logout.
 
-    # business logic
-    pass
+    Note: With JWT token expiration enabled (30min TTL), server-side
+    token invalidation is not strictly necessary. The client should
+    discard the token on logout. For stricter security, implement
+    a token blacklist with Redis.
+    """
 
     # response
     data = LogoutResponse(msg="succeeded")
