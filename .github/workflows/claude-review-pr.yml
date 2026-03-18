@@ -13,30 +13,59 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      id-token: write
     env:
       ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-      ANTHROPIC_MODEL: claude-sonnet-4-6-thinking
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: "--model claude-sonnet-4-6-thinking"
-          prompt: |
-            你是 LabelU 项目的代码审查助手。请对这个 PR 进行严格的代码审查。
+          fetch-depth: 0
 
-            ## 审查要点
-            1. **问题解决**: 代码是否真正解决了关联的 issue？是否存在遗漏的边界情况？
-            2. **安全性**: 是否存在 SQL 注入、XSS、命令注入等 OWASP Top 10 漏洞？
-            3. **测试覆盖**: 修复是否有对应的测试？测试是否覆盖了关键场景？
-            4. **架构合规**: 是否遵循项目的分层架构（adapter → application → domain）？是否有层级穿透？
-            5. **代码质量**: 是否符合 Python 最佳实践？是否有不必要的复杂性？
-            6. **Commit 规范**: commit message 是否遵循 conventional commits？
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
 
-            ## 输出格式
-            - 如果发现问题，请明确指出文件和行号，并给出修复建议
-            - 如果代码质量良好，也请简要确认通过
-            - 给出总体评价: APPROVE / REQUEST_CHANGES
+      - name: Get PR diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr diff ${{ github.event.pull_request.number }} > /tmp/pr-diff.txt
+
+      - name: Run Claude Code to review PR
+        id: review
+        run: |
+          REVIEW=$(claude --print \
+            --model claude-sonnet-4-6-thinking \
+            --allowedTools "Read,Glob,Grep" \
+            "你是 LabelU 项目的代码审查助手。请对以下 PR diff 进行严格的代码审查。
+
+          ## PR #${{ github.event.pull_request.number }}
+          标题: ${{ github.event.pull_request.title }}
+          描述: ${{ github.event.pull_request.body }}
+
+          ## Diff 内容
+          $(cat /tmp/pr-diff.txt)
+
+          ## 审查要点
+          1. 代码是否真正解决了关联的 issue？是否存在遗漏的边界情况？
+          2. 是否存在 SQL 注入、XSS、命令注入等安全漏洞？
+          3. 修复是否有对应的测试？测试是否覆盖了关键场景？
+          4. 是否遵循项目的分层架构（adapter → application → domain）？
+          5. 是否符合 Python 最佳实践？
+          6. commit message 是否遵循 conventional commits？
+
+          请直接输出审查意见，包含总体评价: APPROVE 或 REQUEST_CHANGES")
+
+          echo "$REVIEW" > /tmp/review.txt
+
+      - name: Post review comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "$(cat <<EOF
+          ## 🤖 Claude Code Review
+
+          $(cat /tmp/review.txt)
+          EOF
+          )"
