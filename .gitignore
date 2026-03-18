@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+.mcp.json
+
 # Distribution / packaging
 .Python
 build/
@@ -164,6 +166,6 @@ cython_debug/
 .idea/
 
 # vscode local history plugin
-# if the local history plugin is installed in vscode, when we modify or add code, a folder 
+# if the local history plugin is installed in vscode, when we modify or add code, a folder
 # .history will be added in project, but it is not the needed file.
 .history/
