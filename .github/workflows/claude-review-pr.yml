@@ -14,6 +14,9 @@ jobs:
       contents: read
       pull-requests: write
       id-token: write
+    env:
+      ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      ANTHROPIC_MODEL: claude-sonnet-4-6-thinking
 
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +24,7 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--model claude-sonnet-4-6-thinking"
           prompt: |
             你是 LabelU 项目的代码审查助手。请对这个 PR 进行严格的代码审查。
 
@@ -36,6 +40,3 @@ jobs:
             - 如果发现问题，请明确指出文件和行号，并给出修复建议
             - 如果代码质量良好，也请简要确认通过
             - 给出总体评价: APPROVE / REQUEST_CHANGES
-        env:
-          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-          ANTHROPIC_MODEL: claude-sonnet-4-6-thinking
