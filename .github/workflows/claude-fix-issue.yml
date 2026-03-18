@@ -29,7 +29,6 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-6-thinking
           prompt: |
             你是 LabelU 项目的自动修复助手。请根据以下 issue 修复问题。
 
@@ -46,3 +45,4 @@ jobs:
             6. PR 描述中包含 `Closes #${{ github.event.issue.number }}`
         env:
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_MODEL: claude-sonnet-4-6-thinking
