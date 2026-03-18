@@ -55,7 +55,7 @@ jobs:
           6. 用 git add 和 git commit 提交修改，commit message 遵循 conventional commits 格式
           PROMPT
           cat /tmp/claude-prompt.txt | claude --print \
-            --model claude-sonnet-4-6-thinking \
+            --model claude-opus-4-6 \
             --allowedTools "Bash(poetry*),Bash(git*),Read,Write,Edit,Glob,Grep"
 
       - name: Push and create PR

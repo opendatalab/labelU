@@ -54,7 +54,7 @@ jobs:
           请直接输出审查意见，包含总体评价: APPROVE 或 REQUEST_CHANGES
           PROMPT
           cat /tmp/claude-review-prompt.txt | claude --print \
-            --model claude-sonnet-4-6-thinking \
+            --model claude-opus-4-6 \
             --allowedTools "Read,Glob,Grep" > /tmp/review.txt
 
       - name: Post review comment
