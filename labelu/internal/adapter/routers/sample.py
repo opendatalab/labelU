@@ -1,4 +1,5 @@
 from typing import List, Union
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
@@ -23,6 +24,8 @@ from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.sample import CreateSampleResponse
+from labelu.internal.application.response.export import ExportJobResponse
+from labelu.internal.adapter.persistence import crud_export_job
 
 
 router = APIRouter(prefix="/tasks", tags=["samples"])
@@ -174,6 +177,7 @@ async def delete(
 
 @router.post(
     "/{task_id}/samples/export",
+    response_model=OkResp[ExportJobResponse],
     status_code=status.HTTP_200_OK,
 )
 async def export(
@@ -185,11 +189,10 @@ async def export(
     current_user: User = Depends(get_current_user),
 ):
     """
-    export data.
+    Create an async export job.
     """
 
-    # business logic
-    data = await service.export(
+    job_id = await service.create_export_job(
         db=db,
         task_id=task_id,
         export_type=export_type,
@@ -197,8 +200,77 @@ async def export(
         current_user=current_user,
     )
 
-    # response
-    media_type = ".json" if data.suffix == ".json" else data.suffix.strip(".")
+    return OkResp[ExportJobResponse](data=ExportJobResponse(
+        id=job_id,
+        task_id=task_id,
+        export_type=export_type.value,
+        status="PENDING",
+        sample_count=len(cmd.sample_ids),
+        processed_count=0,
+    ))
+
+
+@router.get(
+    "/{task_id}/samples/export/{job_id}",
+    response_model=OkResp[ExportJobResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_export_status(
+    task_id: int,
+    job_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get export job status.
+    """
+
+    job = crud_export_job.get(db=db, job_id=job_id)
+    if not job:
+        raise LabelUException(
+            code=ErrorCode.CODE_61000_NO_DATA,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    return OkResp[ExportJobResponse](data=ExportJobResponse(
+        id=job.id,
+        task_id=job.task_id,
+        export_type=job.export_type,
+        status=job.status,
+        sample_count=job.sample_count,
+        processed_count=job.processed_count,
+        file_path=job.file_path,
+        error_message=job.error_message,
+        created_at=job.created_at,
+        updated_at=job.updated_at,
+    ))
+
+
+@router.get(
+    "/{task_id}/samples/export/{job_id}/download",
+    status_code=status.HTTP_200_OK,
+)
+async def download_export(
+    task_id: int,
+    job_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Download completed export file.
+    """
+
+    job = crud_export_job.get(db=db, job_id=job_id)
+    if not job or job.status != "COMPLETED":
+        raise LabelUException(
+            code=ErrorCode.CODE_61000_NO_DATA,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    file_path = Path(job.file_path)
+    media_type = ".json" if file_path.suffix == ".json" else file_path.suffix.strip(".")
     return FileResponse(
-        path=data, filename=data.name, media_type=f"application/{media_type}"
+        path=file_path, filename=file_path.name, media_type=f"application/{media_type}"
     )

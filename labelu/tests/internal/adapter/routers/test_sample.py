@@ -649,5 +649,78 @@ class TestClassTaskSampleRouter:
             json={"sample_ids": [1]},
         )
 
-        # check
+        # check - async export returns job info
         assert r.status_code == 200
+        data = r.json()
+        assert "data" in data
+        assert data["data"]["status"] == "PENDING"
+        assert data["data"]["sample_count"] == 1
+        assert "id" in data["data"]
+
+    def test_export_includes_all_states(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        """Verify NEW, DONE, SKIPPED samples are all included in export job."""
+
+        # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
+        task = crud_task.create(
+            db=db,
+            task=Task(
+                name="name",
+                description="description",
+                tips="tips",
+                config='{"tools":[{"tool":"rectTool","config":{"attributes":[{"key":"RT","value":"RT"}]}}],"tagList":[],"attributes":[],"textConfig":[],"fileInfo":{"type":"img","list":[]},"commonAttributeConfigurable":true}',
+                created_by=0,
+                updated_by=0,
+            ),
+        )
+        result_data = '{"result": "{\\"width\\":100,\\"height\\":100,\\"valid\\":true,\\"rotate\\":0,\\"rectTool\\":{\\"toolName\\":\\"rectTool\\",\\"result\\":[{\\"x\\":10,\\"y\\":10,\\"width\\":50,\\"height\\":50,\\"label\\":\\"RT\\",\\"valid\\":true,\\"isVisible\\":true,\\"id\\":\\"test1\\",\\"order\\":1}]}}"}'
+        samples = crud_sample.batch(
+            db=db,
+            samples=[
+                TaskSample(
+                    task_id=task.id,
+                    file_id=1,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data=result_data,
+                    annotated_count=1,
+                    state="DONE",
+                ),
+                TaskSample(
+                    task_id=task.id,
+                    file_id=1,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data=result_data,
+                    annotated_count=0,
+                    state="NEW",
+                ),
+                TaskSample(
+                    task_id=task.id,
+                    file_id=1,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                    data=result_data,
+                    annotated_count=0,
+                    state="SKIPPED",
+                ),
+            ],
+        )
+
+        sample_ids = [s.id for s in samples]
+
+        # run - create export job
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/export?export_type=JSON",
+            headers=testuser_token_headers,
+            json={"sample_ids": sample_ids},
+        )
+
+        # check - all 3 samples should be counted
+        assert r.status_code == 200
+        data = r.json()
+        assert data["data"]["sample_count"] == 3
