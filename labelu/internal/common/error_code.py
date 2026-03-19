@@ -118,7 +118,7 @@ class LabelUException(HTTPException):
     ):
         self.msg = code.value[1]
         self.code = code.value[0]
-        self.status_code = status_code
+        super().__init__(status_code=status_code, detail=self.msg)
 
 
 async def labelu_exception_handler(request: Request, exc: LabelUException):

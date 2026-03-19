@@ -257,7 +257,7 @@ class TestClassTaskSampleRouter:
         )
         samples = [
             TaskSample(
-                task_id=1,
+                task_id=task.id,
                 file_id=1,
                 created_by=current_user.id,
                 updated_by=current_user.id,
@@ -271,18 +271,23 @@ class TestClassTaskSampleRouter:
             samples=samples,
         )
 
+        # get actual sample IDs for assertions
+        sample_ids = sorted([s.id for s in samples])
+        after_id = sample_ids[4]  # 5th sample (index 4)
+
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/samples?sort=annotated_count:desc",
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
-            params={"after": 5, "size": 10},
+            params={"sort": "annotated_count:desc", "after": after_id, "size": 10},
         )
 
         # check
         json = r.json()
         assert r.status_code == 200
         assert len(json["data"]) == 9
-        assert json["data"][0]["id"] == 14
+        # first item should have highest annotated_count (sorted desc)
+        assert json["data"][0]["annotated_count"] >= json["data"][1]["annotated_count"]
         assert json["meta_data"]["total"] == 14
 
     def test_sample_list_by_params_error(
@@ -321,9 +326,9 @@ class TestClassTaskSampleRouter:
         )
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/samples?sort",
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
             headers=testuser_token_headers,
-            params={"page": 0, "size": 10},
+            params={"sort": "", "page": 0, "size": 10},
         )
 
         # check

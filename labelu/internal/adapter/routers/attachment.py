@@ -4,7 +4,7 @@ import aiofiles
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
 from fastapi import File, Header, UploadFile
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials
 import mimetypes
 
@@ -118,8 +118,8 @@ async def get_content(file_path: str, range: str = Header(None)):
         content_length = end - start + 1
         
     except ValueError:
-        return FileResponse(
-            path=str(full_path),
+        return Response(
+            content=full_path.read_bytes(),
             media_type=media_type,
             headers={"Accept-Ranges": "bytes"}
         )
