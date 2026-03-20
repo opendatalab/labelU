@@ -41,7 +41,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.11]
-        poetry-version: ['1.2.2']
         os: [ubuntu-24.04]
         node-version: [20.8.1]
     runs-on: ${{ matrix.os }}
@@ -58,6 +57,9 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
       - name: Download frontend
         env:
@@ -99,7 +101,7 @@ jobs:
               );
               const backendInfo = {
                   version: process.env.NEXT_VERSION,
-                  name: projectInfo.tool.poetry.name || 'LabelU',
+                  name: (projectInfo.project && projectInfo.project.name) || (projectInfo.tool && projectInfo.tool.poetry && projectInfo.tool.poetry.name) || 'LabelU',
                   build_time: new Date().toISOString(),
                   commit: process.env.GITHUB_SHA,
                 };
@@ -122,15 +124,11 @@ jobs:
               process.exit(1);
             }
 
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: ${{ matrix.poetry-version }}
-
       - name: Install dependencies
-        run: poetry install --without dev
+        run: uv sync --frozen --group test
 
       - name: Run tests
-        run: poetry run pytest --cov=./ --cov-report=xml
+        run: uv run --group test pytest --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -148,10 +146,10 @@ jobs:
         # main or alpha
         if: ${{ github.ref_name == 'main' || github.ref_name == 'alpha' }}
         env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config pypi-token.pypi $PYPI_TOKEN
-          poetry publish --build --skip-existing
+          uv build
+          uv publish --skip-existing
 
       - name: Semantic Release
         run: |

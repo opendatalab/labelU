@@ -25,8 +25,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Poetry
-        run: pip install poetry==1.2.2
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
@@ -50,13 +50,13 @@ jobs:
           1. 仔细阅读 CLAUDE.md 了解项目架构
           2. 分析问题根因
           3. 按照项目的分层架构（adapter/application/domain/common）修复代码
-          4. 运行测试确保通过: poetry run pytest
+          4. 运行测试确保通过: uv run --group test pytest
           5. 如果修复涉及新的行为，请添加相应的测试用例
           6. 用 git add 和 git commit 提交修改，commit message 遵循 conventional commits 格式
           PROMPT
           cat /tmp/claude-prompt.txt | claude --print \
             --model claude-opus-4-6 \
-            --allowedTools "Bash(poetry*),Bash(git*),Read,Write,Edit,Glob,Grep"
+            --allowedTools "Bash(uv*),Bash(git*),Read,Write,Edit,Glob,Grep"
 
       - name: Push and create PR
         env:
