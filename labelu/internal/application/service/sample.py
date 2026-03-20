@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+import asyncio
 from datetime import datetime
 from typing import List, Tuple, Union
 
@@ -9,18 +10,21 @@ from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
 from labelu.internal.adapter.persistence import crud_attachment, crud_pre_annotation, crud_task
 from labelu.internal.adapter.persistence import crud_sample
+from labelu.internal.adapter.persistence import crud_export_job
 from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import TaskSample
 from labelu.internal.domain.models.sample import SampleState
+from labelu.internal.domain.models.export_job import ExportStatus
 from labelu.internal.application.command.sample import ExportType
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
@@ -50,7 +54,7 @@ async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
 ) -> CreateSampleResponse:
     obj_in = {}
-    with db.begin():
+    with begin_transaction(db):
         # check task exist
         task = crud_task.get(db=db, task_id=task_id, lock=True)
         if not task:
@@ -204,7 +208,7 @@ async def patch(
         sample_obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
         sample_obj_in[TaskSample.state.key] = SampleState.DONE.value
 
-    with db.begin():
+    with begin_transaction(db):
         # update task status
         if task.status != TaskStatus.FINISHED.value:
             statics = crud_sample.statics(
@@ -263,9 +267,9 @@ async def delete(
     db: Session, sample_ids: List[int], current_user: User
 ) -> CommonDataResp:
 
-    with db.begin():
+    with begin_transaction(db):
         # delete media
-        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
+        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
         attachment_ids = [sample.file_id for sample in samples if sample.file_id]
         attachments = crud_attachment.get_by_ids(db=db, attachment_ids=attachment_ids)
         
@@ -281,6 +285,105 @@ async def delete(
     return CommonDataResp(ok=True)
 
 
+async def create_export_job(
+    db: Session,
+    task_id: int,
+    export_type: ExportType,
+    sample_ids: List[int],
+    current_user: User,
+) -> int:
+    """Create an export job and start background processing. Returns job_id immediately."""
+
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    with begin_transaction(db):
+        job = crud_export_job.create(
+            db=db,
+            task_id=task_id,
+            user_id=current_user.id,
+            export_type=export_type.value,
+            sample_ids=sample_ids,
+        )
+        job_id = job.id
+
+    # Run blocking export work in a thread pool to avoid blocking the event loop
+    asyncio.get_event_loop().run_in_executor(
+        None, _run_export_sync, job_id, task_id, export_type, sample_ids
+    )
+    return job_id
+
+
+def _run_export_sync(job_id: int, task_id: int, export_type: ExportType, sample_ids: List[int]):
+    """Run export in a thread. All operations here are synchronous and blocking."""
+    from labelu.internal.common.db import SessionLocal
+
+    db = SessionLocal()
+    try:
+        job = crud_export_job.get(db=db, job_id=job_id)
+        with begin_transaction(db):
+            crud_export_job.update_status(db, job, ExportStatus.PROCESSING.value)
+
+        task = crud_task.get(db=db, task_id=task_id)
+        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
+
+        data = []
+        for sample in samples:
+            file_dict = {}
+            if sample.file:
+                file_dict = {
+                    "id": sample.file.id,
+                    "filename": sample.file.filename,
+                    "url": sample.file.url,
+                    "path": sample.file.path if hasattr(sample.file, "path") else "",
+                }
+            data.append({
+                "id": sample.id,
+                "inner_id": sample.inner_id,
+                "state": sample.state,
+                "data": sample.data,
+                "annotated_count": sample.annotated_count,
+                "file": file_dict,
+            })
+
+        out_data_dir = Path(settings.MEDIA_ROOT).joinpath(
+            settings.EXPORT_DIR,
+            f"task-{task_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}-{str(uuid.uuid4())[0:8]}",
+        )
+
+        file_full_path = converter.convert(
+            config=json.loads(task.config),
+            input_data=data,
+            out_data_dir=out_data_dir,
+            out_data_file_name_prefix=task_id,
+            format=export_type.value,
+        )
+
+        with begin_transaction(db):
+            crud_export_job.update_status(
+                db, job, ExportStatus.COMPLETED.value,
+                file_path=str(file_full_path),
+                processed_count=len(data),
+            )
+    except Exception as e:
+        logger.error("Export job {} failed: {}", job_id, str(e))
+        try:
+            job = crud_export_job.get(db=db, job_id=job_id)
+            with begin_transaction(db):
+                crud_export_job.update_status(
+                    db, job, ExportStatus.FAILED.value,
+                    error_message=str(e),
+                )
+        except Exception:
+            logger.error("Failed to update export job status for job {}", job_id)
+    finally:
+        db.close()
+
+
 async def export(
     db: Session,
     task_id: int,
@@ -288,17 +391,28 @@ async def export(
     sample_ids: List[int],
     current_user: User,
 ) -> str:
+    """Legacy synchronous export. Kept for backward compatibility."""
 
     task = crud_task.get(db=db, task_id=task_id)
-    samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
+    samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
     data = []
     for sample in samples:
-       data_dict = sample.__dict__.get('data')
-       if data_dict is None:
-           data_dict = {}
-       file_dict = sample.file.__dict__ if hasattr(sample.file, '__dict__') else {}
-       data.append({ **sample.__dict__, 'file': file_dict})
-       
+        file_dict = {}
+        if sample.file:
+            file_dict = {
+                "id": sample.file.id,
+                "filename": sample.file.filename,
+                "url": sample.file.url,
+                "path": sample.file.path if hasattr(sample.file, "path") else "",
+            }
+        data.append({
+            "id": sample.id,
+            "inner_id": sample.inner_id,
+            "state": sample.state,
+            "data": sample.data,
+            "annotated_count": sample.annotated_count,
+            "file": file_dict,
+        })
 
     # output data path
     out_data_dir = Path(settings.MEDIA_ROOT).joinpath(

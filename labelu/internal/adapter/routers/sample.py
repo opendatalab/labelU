@@ -1,11 +1,12 @@
 from typing import List, Union
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.common.security import security
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -23,9 +24,22 @@ from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.sample import CreateSampleResponse
+from labelu.internal.application.response.export import ExportJobResponse
+from labelu.internal.adapter.persistence import crud_export_job
 
 
 router = APIRouter(prefix="/tasks", tags=["samples"])
+
+
+def _export_progress(sample_count: int, processed_count: int, status: str) -> tuple[int | None, str | None]:
+    if status not in {"COMPLETED", "FAILED"}:
+        return None, None
+    skipped_count = max(sample_count - processed_count, 0)
+    if skipped_count == 0:
+        return 0, None
+    return skipped_count, (
+        f"Requested {sample_count} samples, exported {processed_count}, skipped {skipped_count}."
+    )
 
 
 @router.post(
@@ -37,7 +51,7 @@ async def create(
     task_id: int,
     cmd: List[CreateSampleCommand],
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -65,10 +79,10 @@ async def list_by(
     page: Union[int, None] = Query(default=None, ge=0),
     size: Union[int, None] = 100,
     sort: Union[str, None] = Query(
-        default=None, regex="(annotated_count|state|inner_id|updated_at):(desc|asc)"
+        default=None, pattern="(annotated_count|state|inner_id|updated_at):(desc|asc)"
     ),
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -106,7 +120,7 @@ async def get(
     task_id: int,
     sample_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -132,7 +146,7 @@ async def update(
     sample_id: int,
     cmd: PatchSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -156,7 +170,7 @@ async def update(
 async def delete(
     cmd: DeleteSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -174,6 +188,7 @@ async def delete(
 
 @router.post(
     "/{task_id}/samples/export",
+    response_model=OkResp[ExportJobResponse],
     status_code=status.HTTP_200_OK,
 )
 async def export(
@@ -181,15 +196,14 @@ async def export(
     export_type: ExportType,
     cmd: ExportSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
-    export data.
+    Create an async export job.
     """
 
-    # business logic
-    data = await service.export(
+    job_id = await service.create_export_job(
         db=db,
         task_id=task_id,
         export_type=export_type,
@@ -197,8 +211,87 @@ async def export(
         current_user=current_user,
     )
 
-    # response
-    media_type = ".json" if data.suffix == ".json" else data.suffix.strip(".")
+    return OkResp[ExportJobResponse](data=ExportJobResponse(
+        id=job_id,
+        task_id=task_id,
+        export_type=export_type.value,
+        status="PENDING",
+        sample_count=len(cmd.sample_ids),
+        processed_count=0,
+        skipped_count=None,
+        warning_message=None,
+    ))
+
+
+@router.get(
+    "/{task_id}/samples/export/{job_id}",
+    response_model=OkResp[ExportJobResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_export_status(
+    task_id: int,
+    job_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get export job status.
+    """
+
+    job = crud_export_job.get(db=db, job_id=job_id)
+    if not job:
+        raise LabelUException(
+            code=ErrorCode.CODE_61000_NO_DATA,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    skipped_count, warning_message = _export_progress(
+        sample_count=job.sample_count,
+        processed_count=job.processed_count,
+        status=job.status,
+    )
+
+    return OkResp[ExportJobResponse](data=ExportJobResponse(
+        id=job.id,
+        task_id=job.task_id,
+        export_type=job.export_type,
+        status=job.status,
+        sample_count=job.sample_count,
+        processed_count=job.processed_count,
+        skipped_count=skipped_count,
+        warning_message=warning_message,
+        file_path=job.file_path,
+        error_message=job.error_message,
+        created_at=job.created_at,
+        updated_at=job.updated_at,
+    ))
+
+
+@router.get(
+    "/{task_id}/samples/export/{job_id}/download",
+    status_code=status.HTTP_200_OK,
+)
+async def download_export(
+    task_id: int,
+    job_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Download completed export file.
+    """
+
+    job = crud_export_job.get(db=db, job_id=job_id)
+    if not job or job.status != "COMPLETED":
+        raise LabelUException(
+            code=ErrorCode.CODE_61000_NO_DATA,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    file_path = Path(job.file_path)
+    media_type = ".json" if file_path.suffix == ".json" else file_path.suffix.strip(".")
     return FileResponse(
-        path=data, filename=data.name, media_type=f"application/{media_type}"
+        path=file_path, filename=file_path.name, media_type=f"application/{media_type}"
     )

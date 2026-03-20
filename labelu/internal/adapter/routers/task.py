@@ -5,7 +5,7 @@ from fastapi import APIRouter, status, Depends, Security
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.application.response.user import UserResponse
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
@@ -31,7 +31,7 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 async def create(
     cmd: BasicConfigCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -54,7 +54,7 @@ async def list_by(
     page: int = 0,
     size: int = 100,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -79,7 +79,7 @@ async def list_by(
 async def get(
     task_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -100,7 +100,7 @@ async def get(
 async def get_collaborators(
     task_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -122,7 +122,7 @@ async def add_collaborator(
     task_id: int,
     cmd: CollaboratorUpdateCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -144,7 +144,7 @@ async def batch_add_collaborator_request(
     task_id: int,
     cmd: CollaboratorBatchCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -166,7 +166,7 @@ async def batch_remove_collaborator_request(
     task_id: int,
     cmd: CollaboratorBatchCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -189,7 +189,7 @@ async def remove_collaborator(
     task_id: int,
     user_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -212,7 +212,7 @@ async def update(
     task_id: int,
     cmd: UpdateCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -234,7 +234,7 @@ async def update(
 async def delete(
     task_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """

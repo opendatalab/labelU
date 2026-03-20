@@ -9,6 +9,7 @@ from labelu.internal.common.config import settings
 from labelu.internal.common.security import AccessToken
 from labelu.internal.common.security import get_password_hash
 from labelu.internal.common.security import create_access_token
+from labelu.internal.common.db import begin_transaction
 
 from labelu.tests.utils.utils import random_username
 from labelu.tests.utils.utils import random_lower_string
@@ -37,10 +38,11 @@ class TestClassUserRouter:
         username = random_username()
         password = random_lower_string()
         data = {"username": username, "password": password}
-        crud_user.create(
-            db=db,
-            user=User(username=username, hashed_password=get_password_hash(password)),
-        )
+        with begin_transaction(db):
+            crud_user.create(
+                db=db,
+                user=User(username=username, hashed_password=get_password_hash(password)),
+            )
 
         # run
         r = client.post(f"{settings.API_V1_STR}/users/signup", json=data)
@@ -55,10 +57,11 @@ class TestClassUserRouter:
         username = random_username()
         password = random_lower_string()
         data = {"username": username, "password": password}
-        crud_user.create(
-            db=db,
-            user=User(username=username, hashed_password=get_password_hash(password)),
-        )
+        with begin_transaction(db):
+            crud_user.create(
+                db=db,
+                user=User(username=username, hashed_password=get_password_hash(password)),
+            )
 
         # run
         r = client.post(f"{settings.API_V1_STR}/users/login", json=data)
@@ -101,7 +104,7 @@ class TestClassUserRouter:
         r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
 
         # check
-        assert r.status_code == 403
+        assert r.status_code == 401
         assert r.json()["err_code"] == 40003
 
     def test_cannot_not_found_token(self, client: TestClient, db: Session) -> None:
@@ -110,7 +113,7 @@ class TestClassUserRouter:
         r = client.post(f"{settings.API_V1_STR}/users/logout")
 
         # check
-        assert r.status_code == 403
+        assert r.status_code == 401
         assert r.json()["err_code"] == 30003
 
     def test_user_not_found(self, client: TestClient, db: Session) -> None:

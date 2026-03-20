@@ -91,6 +91,11 @@ app = FastAPI(
     openapi_tags=tags_metadata,
 )
 
+if not settings.PASSWORD_SECRET_KEY:
+    import secrets
+    settings.PASSWORD_SECRET_KEY = secrets.token_hex(32)
+    logger.warning("PASSWORD_SECRET_KEY not set, using auto-generated key. Set it in .env for production.")
+
 init_logging()
 init_tables()
 run_db_migrations()

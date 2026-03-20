@@ -2,12 +2,19 @@ import os
 from pathlib import Path
 
 from loguru import logger
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from labelu.internal.common.io import get_data_dir
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+    )
+
     SCHEME: str = "http"
     HOST: str = "localhost"
     PORT: str = "8000"
@@ -18,8 +25,6 @@ class Settings(BaseSettings):
     MEDIA_ROOT: Path = Path(BASE_DATA_DIR).joinpath("media")
     UPLOAD_DIR: str = "upload"
     EXPORT_DIR: str = "export"
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-    logger.info("Database and media directory: {}", BASE_DATA_DIR)
     UPLOAD_FILE_MAX_SIZE: int = 200_000_000  # ~200MB
     THUMBNAIL_HEIGH_PIXEL: int = 120
 
@@ -30,13 +35,15 @@ class Settings(BaseSettings):
     )
     # or using MySQL DATABASE_URL=mysql://labelu:labelupass@localhost/labeludb
 
-    PASSWORD_SECRET_KEY: str = (
-        "e5b7d00a59aaa2a5ea86a7c4d72f856b20bafa1b8d0e66124082ada81f6340bd"
+    PASSWORD_SECRET_KEY: str = Field(
+        default="",
+        description="JWT secret key. Generate with: openssl rand -hex 32. MUST be set in production."
     )
 
     TOKEN_GENERATE_ALGORITHM: str = "HS256"
     TOKEN_ACCESS_EXPIRE_MINUTES: int = 30
     TOKEN_TYPE: str = "Bearer"
+    EXPOSE_INTERNAL_ERRORS: bool = False
 
     @property
     def need_migration_to_mysql(self) -> bool:
@@ -46,10 +53,8 @@ class Settings(BaseSettings):
             sqlite_path.exists()
         )
 
-    class Config:
-        env_prefix = ""
-        env_file_encoding = "utf-8"
-        case_sensitive = True
 
 
 settings = Settings()
+os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+logger.info("Database and media directory: {}", settings.BASE_DATA_DIR)

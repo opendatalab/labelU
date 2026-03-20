@@ -8,6 +8,7 @@ from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -123,7 +124,7 @@ async def create(
     attachment_url_path = attachment_relative_path.replace("\\", "/")
     attachment_api_url = f"{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}"
     # add a task file record
-    with db.begin():
+    with begin_transaction(db):
         attachment = crud_attachment.create(
             db=db,
             attachment=TaskAttachment(
@@ -195,7 +196,7 @@ async def delete(
         logger.error(e)
 
     # delete
-    with db.begin():
+    with begin_transaction(db):
         crud_attachment.delete(db=db, attachment_ids=cmd.attachment_ids)
 
     # response

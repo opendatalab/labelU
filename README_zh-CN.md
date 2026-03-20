@@ -101,26 +101,28 @@ DATABASE_URL=mysql://<username>:<password>@<host>/<your dbname> labelu migrate_t
 ### 本地开发
 
 ```bash
-# 安装miniconda
-# https://docs.conda.io/en/latest/miniconda.html
+# 安装 uv
+# https://docs.astral.sh/uv/getting-started/installation/
 
-# 创建虚拟环境(python = 3.11)
-conda create -n labelu python=3.11
+# 克隆项目
+git clone https://github.com/opendatalab/labelU.git
+cd labelU
 
-# 激活虚拟环境
-conda activate labelu
+# 创建虚拟环境并安装所有依赖包 (Python >= 3.11)
+uv sync
 
-# 安装 peotry
-# https://python-poetry.org/docs/#installing-with-the-official-installer
-
-# 安装所有依赖包
-poetry install
+# 复制环境变量示例文件并根据实际情况修改
+cp .env.example .env
+# 编辑 .env 并设置以下变量：
+#   PASSWORD_SECRET_KEY  - JWT 密钥，可通过以下命令生成：openssl rand -hex 32
+#   MEDIA_HOST           - 媒体服务器地址（默认：http://localhost:8000）
+#   DATABASE_URL         - 数据库连接地址（默认：sqlite:///data/labelu.sqlite）
 
 # 从 LabelU-kit 下载前端资源
 sh ./scripts/resolve_frontend.sh true
 
 # 启动labelu, 默认访问地址: http://localhost:8000
-uvicorn labelu.main:app --reload
+uv run uvicorn labelu.main:app --reload
 ```
 
 ## 快速上手

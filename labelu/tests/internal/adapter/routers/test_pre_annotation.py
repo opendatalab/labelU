@@ -249,9 +249,9 @@ class TestClassTaskPreAnnotationRouter:
 
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations?sample_name={img.json()['data']['filename']}",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
-            params={"page": 0},
+            params={"sample_name": img.json()['data']['filename'], "page": 0},
         )
 
         # check
@@ -324,9 +324,9 @@ class TestClassTaskPreAnnotationRouter:
 
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations?sample_name=asdasd.png",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
-            params={"page": 0},
+            params={"sample_name": "asdasd.png", "page": 0},
         )
 
         # check
@@ -370,9 +370,9 @@ class TestClassTaskPreAnnotationRouter:
         )
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations?sample_name=",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
-            params={"page": 0, "size": 10},
+            params={"sample_name": "", "page": 0, "size": 10},
         )
 
         # check

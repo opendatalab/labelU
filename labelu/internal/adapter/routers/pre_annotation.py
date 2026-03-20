@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
 from fastapi.security import HTTPAuthorizationCredentials
 
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.common.security import security
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -33,7 +33,7 @@ async def create(
     task_id: int,
     cmd: List[CreatePreAnnotationCommand],
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -60,10 +60,10 @@ async def list_pre_annotation_files_request(
     page: Union[int, None] = Query(default=None, ge=0),
     size: Union[int, None] = 100,
     sort: Union[str, None] = Query(
-        default=None, regex="(created_at):(desc|asc)"
+        default=None, pattern="(created_at):(desc|asc)"
     ),
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -94,7 +94,7 @@ async def delete_pre_annotation_file_request(
     task_id: int,
     file_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -121,10 +121,10 @@ async def list_by(
     page: Union[int, None] = Query(default=None, ge=0),
     size: Union[int, None] = 100,
     sort: Union[str, None] = Query(
-        default=None, regex="(annotated_count|state):(desc|asc)"
+        default=None, pattern="(annotated_count|state):(desc|asc)"
     ),
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -164,7 +164,7 @@ async def get(
     task_id: int,
     pre_annotation_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -188,7 +188,7 @@ async def get(
 async def delete(
     cmd: DeletePreAnnotationCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """

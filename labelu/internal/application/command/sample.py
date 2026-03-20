@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Union
+from typing import Annotated, List, Union
 from pydantic import BaseModel, Field
 
 from labelu.internal.domain.models.sample import SampleState
@@ -34,7 +34,7 @@ class CreateSampleCommand(BaseModel):
 
 class DeleteSampleCommand(BaseModel):
     sample_ids: List[int] = Field(
-        min_items=1,
+        min_length=1,
         description="description: attachment file id",
     )
 
@@ -53,8 +53,7 @@ class PatchSampleCommand(BaseModel):
 
 
 class ExportSampleCommand(BaseModel):
-    sample_ids: Union[List[int], None] = Field(
-        min_items=1,
-        gt=0,
+    sample_ids: Union[List[Annotated[int, Field(gt=0)]], None] = Field(
+        min_length=1,
         description="description: sample id",
     )

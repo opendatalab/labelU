@@ -2,12 +2,14 @@ import pytest
 from typing import Dict, Generator
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 from labelu.main import app
 from labelu.internal.common.config import settings
 from labelu.internal.common.db import Base
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.db import get_db
 from labelu.internal.common.security import get_password_hash
 from labelu.internal.domain.models.user import User
@@ -19,18 +21,21 @@ TEST_USER_PASSWORD = "test@123"
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False, "timeout": 30},
 )
-TestingSessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
 
 
 def override_get_db():
+    db = None
     try:
         db = TestingSessionLocal()
         yield db
     finally:
-        db.close()
+        if db is not None:
+            db.close()
 
 
 app.dependency_overrides[get_db] = override_get_db
@@ -38,31 +43,33 @@ app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture(autouse=True, scope="session")
 def db() -> Generator:
+    db = None
     try:
         db = TestingSessionLocal()
         yield db
     finally:
-        db.close()
+        if db is not None:
+            db.close()
 
 
 @pytest.fixture(autouse=True)
-def run_around_tests():
-    # Code that will run before your test, for example:
-    print("start up")
+def run_around_tests(db: Session):
     init_db()
-    # A test function will be run at this point
     yield
-    # Code that will run after your test, for example:
-    print("tear down")
+    # Release any autobegin transaction on the session-scoped fixture so SQLite
+    # teardown and TestClient requests do not deadlock.
+    db.rollback()
+    cleanup = None
     try:
-        db = TestingSessionLocal()
+        cleanup = TestingSessionLocal()
         meta = Base.metadata
-        with db.begin():
+        with begin_transaction(cleanup):
             for table in reversed(meta.sorted_tables):
                 if table.key != "user":
-                    db.execute(table.delete())
+                    cleanup.execute(table.delete())
     finally:
-        db.close()
+        if cleanup is not None:
+            cleanup.close()
 
 
 @pytest.fixture(scope="module")
@@ -88,9 +95,10 @@ def get_testuser_token_headers(client: TestClient) -> Dict[str, str]:
 
 
 def init_db() -> None:
+    db = None
     try:
         db = TestingSessionLocal()
-        with db.begin():
+        with begin_transaction(db):
             user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
             if not user:
                 user_in = User(
@@ -99,4 +107,5 @@ def init_db() -> None:
                 )
                 user = crud_user.create(db=db, user=user_in)
     finally:
-        db.close()
+        if db is not None:
+            db.close()
