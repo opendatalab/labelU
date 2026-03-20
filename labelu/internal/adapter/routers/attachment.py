@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse, StreamingResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials
 import mimetypes
 
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.common.error_code import ErrorCode, LabelUException
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
@@ -33,7 +33,7 @@ async def create(
     task_id: int,
     file: UploadFile = File(...),
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -161,7 +161,7 @@ async def delete(
     task_id: int,
     cmd: AttachmentDeleteCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """

@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_sample
@@ -15,16 +16,17 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
         data = [{"file_id": 1, "data": {}}]
 
         # run
@@ -35,8 +37,8 @@ class TestClassTaskSampleRouter:
         )
 
         # check
-        with db.begin():
-            updated_task = crud_task.get(db=db, task_id=task.id)
+        db.expire_all()
+        updated_task = crud_task.get(db=db, task_id=task.id)
         json = r.json()
         assert r.status_code == 201
         assert len(json["data"]["ids"]) == 1
@@ -47,17 +49,18 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-                status="CONFIGURED",
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                    status="CONFIGURED",
+                ),
+            )
         data = [{"file_id": 1, "data": {}}]
 
         # run
@@ -68,8 +71,8 @@ class TestClassTaskSampleRouter:
         )
 
         # check
-        with db.begin():
-            updated_task = crud_task.get(db=db, task_id=task.id)
+        db.expire_all()
+        updated_task = crud_task.get(db=db, task_id=task.id)
         json = r.json()
         assert r.status_code == 201
         assert len(json["data"]["ids"]) == 1

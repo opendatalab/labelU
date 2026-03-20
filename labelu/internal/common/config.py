@@ -2,12 +2,19 @@ import os
 from pathlib import Path
 
 from loguru import logger
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from labelu.internal.common.io import get_data_dir
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+    )
+
     SCHEME: str = "http"
     HOST: str = "localhost"
     PORT: str = "8000"
@@ -45,10 +52,6 @@ class Settings(BaseSettings):
             sqlite_path.exists()
         )
 
-    class Config:
-        env_prefix = ""
-        env_file_encoding = "utf-8"
-        case_sensitive = True
 
 
 settings = Settings()

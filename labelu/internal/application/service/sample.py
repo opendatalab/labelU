@@ -10,6 +10,7 @@ from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
@@ -53,7 +54,7 @@ async def create(
     db: Session, task_id: int, cmd: List[CreateSampleCommand], current_user: User
 ) -> CreateSampleResponse:
     obj_in = {}
-    with db.begin():
+    with begin_transaction(db):
         # check task exist
         task = crud_task.get(db=db, task_id=task_id, lock=True)
         if not task:
@@ -207,7 +208,7 @@ async def patch(
         sample_obj_in[TaskSample.annotated_count.key] = cmd.annotated_count
         sample_obj_in[TaskSample.state.key] = SampleState.DONE.value
 
-    with db.begin():
+    with begin_transaction(db):
         # update task status
         if task.status != TaskStatus.FINISHED.value:
             statics = crud_sample.statics(
@@ -266,7 +267,7 @@ async def delete(
     db: Session, sample_ids: List[int], current_user: User
 ) -> CommonDataResp:
 
-    with db.begin():
+    with begin_transaction(db):
         # delete media
         samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
         attachment_ids = [sample.file_id for sample in samples if sample.file_id]
@@ -300,7 +301,7 @@ async def create_export_job(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         job = crud_export_job.create(
             db=db,
             task_id=task_id,
@@ -324,7 +325,7 @@ def _run_export_sync(job_id: int, task_id: int, export_type: ExportType, sample_
     db = SessionLocal()
     try:
         job = crud_export_job.get(db=db, job_id=job_id)
-        with db.begin():
+        with begin_transaction(db):
             crud_export_job.update_status(db, job, ExportStatus.PROCESSING.value)
 
         task = crud_task.get(db=db, task_id=task_id)
@@ -362,7 +363,7 @@ def _run_export_sync(job_id: int, task_id: int, export_type: ExportType, sample_
             format=export_type.value,
         )
 
-        with db.begin():
+        with begin_transaction(db):
             crud_export_job.update_status(
                 db, job, ExportStatus.COMPLETED.value,
                 file_path=str(file_full_path),
@@ -372,7 +373,7 @@ def _run_export_sync(job_id: int, task_id: int, export_type: ExportType, sample_
         logger.error("Export job {} failed: {}", job_id, str(e))
         try:
             job = crud_export_job.get(db=db, job_id=job_id)
-            with db.begin():
+            with begin_transaction(db):
                 crud_export_job.update_status(
                     db, job, ExportStatus.FAILED.value,
                     error_message=str(e),

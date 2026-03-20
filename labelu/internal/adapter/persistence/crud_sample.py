@@ -36,8 +36,8 @@ def list_by(
     query = db.query(TaskSample).filter(*query_filter)
 
     # case when for state enum
-    whens = {state: index for index, state in enumerate(SampleState)}
-    sort_logic = case(value=TaskSample.state, whens=whens).label(TaskSample.state.key)
+    whens = {state.value: index for index, state in enumerate(SampleState)}
+    sort_logic = case(whens, value=TaskSample.state).label(TaskSample.state.key)
 
     if sorting:
         sort_strings = sorting.split(",")

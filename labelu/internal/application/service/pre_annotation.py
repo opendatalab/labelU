@@ -7,6 +7,7 @@ from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -52,7 +53,7 @@ def read_pre_annotation_file(attachment: TaskAttachment) -> List[dict]:
 async def create(
     db: Session, task_id: int, cmd: List[CreatePreAnnotationCommand], current_user: User
 ) -> CreatePreAnnotationResponse:
-    with db.begin():
+    with begin_transaction(db):
         # check task exist
         task = crud_task.get(db=db, task_id=task_id, lock=True)
         if not task:
@@ -210,7 +211,7 @@ async def get(
 async def delete_pre_annotation_file(
     db: Session, task_id: int, file_id: int, current_user: User
 ) -> CommonDataResp:
-    with db.begin():
+    with begin_transaction(db):
         task = crud_task.get(db=db, task_id=task_id, lock=True)
         if not task:
             logger.error("cannot find task:{}", task_id)
@@ -246,7 +247,7 @@ async def delete(
     db: Session, pre_annotation_ids: List[int], current_user: User
 ) -> CommonDataResp:
 
-    with db.begin():
+    with begin_transaction(db):
         crud_pre_annotation.delete(db=db, pre_annotation_ids=pre_annotation_ids)
     # response
     return CommonDataResp(ok=True)

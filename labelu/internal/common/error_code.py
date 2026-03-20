@@ -8,8 +8,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from labelu.internal.common.config import settings
 
-import pkg_resources
 import os
+from importlib.resources import files
 
 # common init error code
 COMMON_INIT_CODE = 30000
@@ -138,7 +138,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     ):
         return FileResponse(
             os.path.join(
-                pkg_resources.resource_filename('labelu.internal', 'statics'),
+                str(files('labelu.internal').joinpath('statics')),
                 'index.html'
                 ),
             status_code=200,

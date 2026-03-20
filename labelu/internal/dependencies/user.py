@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from fastapi import HTTPException, WebSocket, status, Depends, Request
 
 from labelu.internal.domain.models.user import User
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.common.config import settings
 from labelu.internal.common.security import AccessToken
 from labelu.internal.common.error_code import ErrorCode
@@ -31,7 +31,7 @@ reusable_oauth2 = SpecialOAuth2PasswordBearer()
 
 
 def get_current_user(
-    db: Session = Depends(db.get_db), token: str = Depends(reusable_oauth2)
+    db: Session = Depends(db_module.get_db), token: str = Depends(reusable_oauth2)
 ) -> User:
     try:
         payload = jwt.decode(
@@ -52,7 +52,7 @@ def get_current_user(
     return user
 
 
-async def verify_ws_token(websocket: WebSocket, db: Session = Depends(db.get_db)):
+async def verify_ws_token(websocket: WebSocket, db: Session = Depends(db_module.get_db)):
     try:
         token = websocket.query_params.get('token')
         

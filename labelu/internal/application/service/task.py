@@ -6,6 +6,7 @@ from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -29,7 +30,7 @@ async def create(
 ) -> TaskResponse:
     # new a task
 
-    with db.begin():
+    with begin_transaction(db):
         new_task = crud_task.create(
             db=db,
             task=Task(
@@ -196,7 +197,7 @@ async def add_collaborator(db: Session, task_id: int, user_id: int, current_user
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         task.collaborators.append(user)
 
     return UserResp(id=user.id, username=user.username)
@@ -230,7 +231,7 @@ async def batch_add_collaborators(db: Session, task_id: int, user_ids: List[int]
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         task.collaborators.extend(users)
 
     return [UserResp(id=user.id, username=user.username) for user in users]
@@ -270,7 +271,7 @@ async def remove_collaborator(db: Session, task_id: int, user_id: int, current_u
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         task.collaborators.remove(user)
 
     return CommonDataResp(ok=True)
@@ -303,7 +304,7 @@ async def batch_remove_collaborators(db: Session, task_id: int, user_ids: List[i
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         for user in users:
             if user in task.collaborators:
                 task.collaborators.remove(user)
@@ -327,7 +328,7 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
         obj_in[Task.status.key] = TaskStatus.CONFIGURED
     else:
         obj_in[Task.config.key] = None
-    with db.begin():
+    with begin_transaction(db):
         updated_task = crud_task.update(db=db, db_obj=task, obj_in=obj_in)
 
     # response
@@ -370,7 +371,7 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
         )
 
     # delete
-    with db.begin():
+    with begin_transaction(db):
         crud_task.delete(db=db, db_obj=task)
 
     # delete media

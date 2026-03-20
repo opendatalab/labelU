@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query, status, Security
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.common.security import security
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -40,7 +40,7 @@ async def create(
     task_id: int,
     cmd: List[CreateSampleCommand],
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -71,7 +71,7 @@ async def list_by(
         default=None, pattern="(annotated_count|state|inner_id|updated_at):(desc|asc)"
     ),
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -109,7 +109,7 @@ async def get(
     task_id: int,
     sample_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -135,7 +135,7 @@ async def update(
     sample_id: int,
     cmd: PatchSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -159,7 +159,7 @@ async def update(
 async def delete(
     cmd: DeleteSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -185,7 +185,7 @@ async def export(
     export_type: ExportType,
     cmd: ExportSampleCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -219,7 +219,7 @@ async def get_export_status(
     task_id: int,
     job_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -255,7 +255,7 @@ async def download_export(
     task_id: int,
     job_id: int,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """

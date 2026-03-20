@@ -1,7 +1,9 @@
 from typing import Generator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 from labelu.internal.common.config import settings
 
 engine = None
@@ -17,10 +19,10 @@ else:
     # connect_args is needed only for SQLite. It's not needed for other databases
     engine = create_engine(
         database_url,
-        connect_args={"check_same_thread": False},
+        connect_args={"check_same_thread": False, "timeout": 30},
     )
 
-SessionLocal = sessionmaker(autocommit=True, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autoflush=False, bind=engine)
 
 Base = declarative_base()
 
@@ -29,9 +31,18 @@ def init_tables() -> None:
     Base.metadata.create_all(bind=engine)
 
 
+def begin_transaction(session: Session):
+    """Begin a writable transaction after any SQLAlchemy 2.0 autobegin-only work."""
+    if session.in_transaction():
+        session.rollback()
+    return session.begin()
+
+
 def get_db() -> Generator:
+    db = None
     try:
         db = SessionLocal()
         yield db
     finally:
-        db.close()
+        if db is not None:
+            db.close()

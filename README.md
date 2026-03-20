@@ -104,26 +104,28 @@ DATABASE_URL=mysql://<username>:<password>@<host>/<your dbname> labelu migrate_t
 ### Local development
 
 ```bash
-# Download and Install miniconda
-# https://docs.conda.io/en/latest/miniconda.html
+# Install uv
+# https://docs.astral.sh/uv/getting-started/installation/
 
-# Create virtual environment(python = 3.11)
-conda create -n labelu python=3.11
+# Clone the repository
+git clone https://github.com/opendatalab/labelU.git
+cd labelU
 
-# Activate virtual environment
-conda activate labelu
+# Create virtual environment and install all dependencies (Python >= 3.11)
+uv sync
 
-# Install peotry
-# https://python-poetry.org/docs/#installing-with-the-official-installer
-
-# Install all package dependencies
-poetry install
+# Copy the example environment file and configure it
+cp .env.example .env
+# Edit .env and set your values:
+#   PASSWORD_SECRET_KEY  - JWT secret key, generate with: openssl rand -hex 32
+#   MEDIA_HOST           - Media server URL (default: http://localhost:8000)
+#   DATABASE_URL         - Database connection URL (default: sqlite:///data/labelu.sqlite)
 
 # Download the frontend statics from labelu-kit repo
 sh ./scripts/resolve_frontend.sh true
 
 # Start labelu, server: http://localhost:8000
-uvicorn labelu.main:app --reload
+uv run uvicorn labelu.main:app --reload
 ```
 
 
