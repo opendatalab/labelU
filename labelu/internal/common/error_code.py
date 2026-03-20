@@ -112,6 +112,20 @@ class ErrorCode(Enum):
     )
 
 
+
+
+def _public_error_message(default_message: str, exc: Exception) -> str:
+    if settings.EXPOSE_INTERNAL_ERRORS:
+        return str(exc)
+    return default_message
+
+
+def _request_context(request: Request) -> str:
+    method = getattr(request, "method", "UNKNOWN")
+    path = request.url.path if getattr(request, "url", None) else "UNKNOWN"
+    return f"{method} {path}"
+
+
 class LabelUException(HTTPException):
     def __init__(
         self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -122,7 +136,7 @@ class LabelUException(HTTPException):
 
 
 async def labelu_exception_handler(request: Request, exc: LabelUException):
-    logger.error(exc)
+    logger.warning("{} - {}", _request_context(request), exc)
     return JSONResponse(
         status_code=exc.status_code,
         content={"msg": exc.msg, "err_code": exc.code},
@@ -131,7 +145,7 @@ async def labelu_exception_handler(request: Request, exc: LabelUException):
 
 # customize http exception
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    logger.error(exc)
+    logger.warning("{} - {}", _request_context(request), exc)
     if (
         exc.status_code == status.HTTP_404_NOT_FOUND
         and not request.url.path.startswith(settings.API_V1_STR)
@@ -145,7 +159,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             headers={'Content-Type': 'text/html', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive'}
             )
     elif exc.status_code == status.HTTP_403_FORBIDDEN:
-        JSONResponse(
+        return JSONResponse(
             status_code=exc.status_code,
             content={
                 "msg": str(exc.detail),
@@ -163,33 +177,34 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 # only for sqlalchemy
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
-    logger.error(exc)
+    logger.opt(exception=exc).error("{} - sql exception", _request_context(request))
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
-            "msg": str(exc),
+            "msg": _public_error_message(ErrorCode.CODE_30000_SQL_ERROR.value[1], exc),
             "err_code": ErrorCode.CODE_30000_SQL_ERROR.value[0],
         },
     )
 
 
 # for http request
-async def validation_exception_handler(request, exc):
-    logger.error(exc)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logger.warning("{} - validation error: {}", _request_context(request), exc.errors())
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={
-            "msg": str(exc),
+            "msg": ErrorCode.CODE_30002_VALIDATION_ERROR.value[1],
             "err_code": ErrorCode.CODE_30002_VALIDATION_ERROR.value[0],
+            "errors": exc.errors(),
         },
     )
 
 async def unexpected_exception_handler(request: Request, exc: Exception):
-    logger.error(exc)
+    logger.opt(exception=exc).error("{} - unexpected exception", _request_context(request))
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
-            "msg": str(exc),
+            "msg": _public_error_message(ErrorCode.UNEXPECTED_ERROR.value[1], exc),
             "err_code": ErrorCode.UNEXPECTED_ERROR.value[0],
         },
     )

@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     TOKEN_GENERATE_ALGORITHM: str = "HS256"
     TOKEN_ACCESS_EXPIRE_MINUTES: int = 30
     TOKEN_TYPE: str = "Bearer"
+    EXPOSE_INTERNAL_ERRORS: bool = False
 
     @property
     def need_migration_to_mysql(self) -> bool:
