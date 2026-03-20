@@ -10,6 +10,8 @@ class ExportJobResponse(BaseModel):
     status: str
     sample_count: int
     processed_count: int
+    skipped_count: Optional[int] = None
+    warning_message: Optional[str] = None
     file_path: Optional[str] = None
     error_message: Optional[str] = None
     created_at: Optional[datetime] = None

@@ -31,6 +31,17 @@ from labelu.internal.adapter.persistence import crud_export_job
 router = APIRouter(prefix="/tasks", tags=["samples"])
 
 
+def _export_progress(sample_count: int, processed_count: int, status: str) -> tuple[int | None, str | None]:
+    if status not in {"COMPLETED", "FAILED"}:
+        return None, None
+    skipped_count = max(sample_count - processed_count, 0)
+    if skipped_count == 0:
+        return 0, None
+    return skipped_count, (
+        f"Requested {sample_count} samples, exported {processed_count}, skipped {skipped_count}."
+    )
+
+
 @router.post(
     "/{task_id}/samples",
     response_model=OkResp[CreateSampleResponse],
@@ -207,6 +218,8 @@ async def export(
         status="PENDING",
         sample_count=len(cmd.sample_ids),
         processed_count=0,
+        skipped_count=None,
+        warning_message=None,
     ))
 
 
@@ -233,6 +246,12 @@ async def get_export_status(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    skipped_count, warning_message = _export_progress(
+        sample_count=job.sample_count,
+        processed_count=job.processed_count,
+        status=job.status,
+    )
+
     return OkResp[ExportJobResponse](data=ExportJobResponse(
         id=job.id,
         task_id=job.task_id,
@@ -240,6 +259,8 @@ async def get_export_status(
         status=job.status,
         sample_count=job.sample_count,
         processed_count=job.processed_count,
+        skipped_count=skipped_count,
+        warning_message=warning_message,
         file_path=job.file_path,
         error_message=job.error_message,
         created_at=job.created_at,

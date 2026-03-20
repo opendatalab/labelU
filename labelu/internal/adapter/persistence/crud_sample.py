@@ -74,12 +74,11 @@ def get(db: Session, sample_id: int) -> TaskSample:
     )
 
 
-def get_by_ids(db: Session, sample_ids: List[int]) -> List[TaskSample]:
-    return (
-        db.query(TaskSample)
-        .filter(TaskSample.id.in_(sample_ids), TaskSample.deleted_at == None)
-        .all()
-    )
+def get_by_ids(db: Session, sample_ids: List[int], task_id: Union[int, None] = None) -> List[TaskSample]:
+    query_filter = [TaskSample.id.in_(sample_ids), TaskSample.deleted_at == None]
+    if task_id is not None:
+        query_filter.append(TaskSample.task_id == task_id)
+    return db.query(TaskSample).filter(*query_filter).all()
 
 
 def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSample:
