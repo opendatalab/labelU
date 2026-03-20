@@ -44,7 +44,7 @@ def get_current_user(
     except (jwt.JWTError, ValidationError):
         raise LabelUException(
             code=ErrorCode.CODE_40003_CREDENTIAL_ERROR,
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
         )
     user = crud_user.get(db, id=token_data.id)
     if not user:

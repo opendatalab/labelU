@@ -104,7 +104,7 @@ class TestClassUserRouter:
         r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
 
         # check
-        assert r.status_code == 403
+        assert r.status_code == 401
         assert r.json()["err_code"] == 40003
 
     def test_cannot_not_found_token(self, client: TestClient, db: Session) -> None:
