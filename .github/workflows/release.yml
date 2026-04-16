@@ -81,48 +81,30 @@ jobs:
           echo $PYPI_URL
 
       - name: Inject backend info into frontend
-        uses: satackey/action-js-inline@v0.0.2
-        id: InjectBackend
         env:
           NEXT_VERSION: ${{ env.NEXT_VERSION }}
-        with:
-          required-packages: '@iarna/toml'
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            const toml = require('@iarna/toml');
-            const rootPath = path.join(process.cwd(), '');
+        run: |
+          python3 << 'PYEOF'
+          import json, datetime, os, tomllib
 
-            console.log('rootPath', rootPath);
+          with open('pyproject.toml', 'rb') as f:
+              cfg = tomllib.load(f)
 
-            try {
-              const projectInfo = toml.parse(
-                fs.readFileSync(path.join(rootPath, 'pyproject.toml'), 'utf8')
-              );
-              const backendInfo = {
-                  version: process.env.NEXT_VERSION,
-                  name: (projectInfo.project && projectInfo.project.name) || (projectInfo.tool && projectInfo.tool.poetry && projectInfo.tool.poetry.name) || 'LabelU',
-                  build_time: new Date().toISOString(),
-                  commit: process.env.GITHUB_SHA,
-                };
+          name = cfg.get('project', {}).get('name') or 'LabelU'
+          info = {
+              'version': os.environ['NEXT_VERSION'],
+              'name': name,
+              'build_time': datetime.datetime.utcnow().isoformat() + 'Z',
+              'commit': os.environ.get('GITHUB_SHA', ''),
+          }
 
-                const code = `
-                              (function () {
-                                window.__backend = ${JSON.stringify(backendInfo, null, 2)};
-                              })();
-                            `;
+          js = '(function () {\n  window.__backend = ' + json.dumps(info, indent=2) + ';\n})();\n'
 
-                fs.writeFileSync(
-                  path.join(rootPath, 'labelu/internal/statics/backend_version.js'),
-                  code,
-                  'utf-8'
-                );
+          with open('labelu/internal/statics/backend_version.js', 'w') as f:
+              f.write(js)
 
-                console.log('Update backend_version.js success!');
-            } catch (e) {
-              console.error(e);
-              process.exit(1);
-            }
+          print('Update backend_version.js success!')
+          PYEOF
 
       - name: Install dependencies
         run: uv sync --frozen --group test
