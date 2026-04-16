@@ -127,7 +127,7 @@ def upgrade() -> None:
     )
     
     conn = op.get_bind()
-    for row in conn.execute(sa.select([task_sample.c.id, task_sample.c.updated_by, task_sample.c.updated_at])):
+    for row in conn.execute(sa.select(task_sample.c.id, task_sample.c.updated_by, task_sample.c.updated_at)):
         if row.updated_by:
             conn.execute(
                 task_sample_updater.insert().values(
