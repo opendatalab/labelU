@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.domain.models.task import Task
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
@@ -91,17 +92,18 @@ class TestClassTaskAttachmentRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                config="config",
-                media_type="IMAGE",
-                status="FINISHED",
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    config="config",
+                    media_type="IMAGE",
+                    status="FINISHED",
+                ),
+            )
 
         empty_task_upload(task.id, "test.png")
         # run
@@ -235,16 +237,17 @@ class TestClassTaskAttachmentRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=current_user.id,
-                updated_by=current_user.id,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         empty_task_upload(task.id, "test.png")
         
@@ -296,16 +299,17 @@ class TestClassTaskAttachmentRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
 
         # run
         data = {"attachment_ids": [1]}

@@ -127,10 +127,11 @@ class TestClassTaskSampleRouter:
             )
             for i in range(14)
         ]
-        crud_sample.batch(
-            db=db,
-            samples=samples,
-        )
+        with begin_transaction(db):
+            crud_sample.batch(
+                db=db,
+                samples=samples,
+            )
 
         # run
         r = client.get(
@@ -175,10 +176,11 @@ class TestClassTaskSampleRouter:
             )
             for i in range(14)
         ]
-        crud_sample.batch(
-            db=db,
-            samples=samples,
-        )
+        with begin_transaction(db):
+            crud_sample.batch(
+                db=db,
+                samples=samples,
+            )
 
         # run
         r = client.get(
@@ -203,16 +205,17 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
         samples = [
             TaskSample(
                 task_id=1,
@@ -223,10 +226,11 @@ class TestClassTaskSampleRouter:
             )
             for i in range(14)
         ]
-        crud_sample.batch(
-            db=db,
-            samples=samples,
-        )
+        with begin_transaction(db):
+            crud_sample.batch(
+                db=db,
+                samples=samples,
+            )
 
         # run
         r = client.get(
@@ -251,16 +255,17 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
         samples = [
             TaskSample(
                 task_id=task.id,
@@ -272,10 +277,11 @@ class TestClassTaskSampleRouter:
             )
             for i in range(14)
         ]
-        crud_sample.batch(
-            db=db,
-            samples=samples,
-        )
+        with begin_transaction(db):
+            crud_sample.batch(
+                db=db,
+                samples=samples,
+            )
 
         # get actual sample IDs for assertions
         sample_ids = sorted([s.id for s in samples])
@@ -320,16 +326,17 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
         # run
         r = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/samples",
@@ -348,28 +355,30 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
-        samples = crud_sample.batch(
-            db=db,
-            samples=[
-                TaskSample(
-                    task_id=task.id,
-                    file_id=1,
-                    created_by=current_user.id,
-                    updated_by=current_user.id,
-                    data="{}",
-                )
-            ],
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
+        with begin_transaction(db):
+            samples = crud_sample.batch(
+                db=db,
+                samples=[
+                    TaskSample(
+                        task_id=task.id,
+                        file_id=1,
+                        created_by=current_user.id,
+                        updated_by=current_user.id,
+                        data="{}",
+                    )
+                ],
+            )
         
         print(samples)
 
@@ -391,16 +400,17 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
 
         # run
         r = client.get(
@@ -421,28 +431,30 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
-        samples = crud_sample.batch(
-            db=db,
-            samples=[
-                TaskSample(
-                    task_id=1,
-                    file_id=1,
-                    created_by=current_user.id,
-                    updated_by=current_user.id,
-                    data="{}",
-                )
-            ],
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
+        with begin_transaction(db):
+            samples = crud_sample.batch(
+                db=db,
+                samples=[
+                    TaskSample(
+                        task_id=1,
+                        file_id=1,
+                        created_by=current_user.id,
+                        updated_by=current_user.id,
+                        data="{}",
+                    )
+                ],
+            )
 
         # run
         data = {
@@ -468,28 +480,30 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
-        samples = crud_sample.batch(
-            db=db,
-            samples=[
-                TaskSample(
-                    task_id=1,
-                    file_id=1,
-                    created_by=current_user.id,
-                    updated_by=current_user.id,
-                    data="{}",
-                )
-            ],
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
+        with begin_transaction(db):
+            samples = crud_sample.batch(
+                db=db,
+                samples=[
+                    TaskSample(
+                        task_id=1,
+                        file_id=1,
+                        created_by=current_user.id,
+                        updated_by=current_user.id,
+                        data="{}",
+                    )
+                ],
+            )
 
         # run
         data = {"state": "SKIPPED"}
@@ -527,16 +541,17 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
 
         # run
         data = {"state": "SKIPPED"}
@@ -558,28 +573,30 @@ class TestClassTaskSampleRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
-        samples = crud_sample.batch(
-            db=db,
-            samples=[
-                TaskSample(
-                    task_id=1,
-                    file_id=1,
-                    created_by=current_user.id,
-                    updated_by=current_user.id,
-                    data="{}",
-                )
-            ],
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
+        with begin_transaction(db):
+            samples = crud_sample.batch(
+                db=db,
+                samples=[
+                    TaskSample(
+                        task_id=1,
+                        file_id=1,
+                        created_by=current_user.id,
+                        updated_by=current_user.id,
+                        data="{}",
+                    )
+                ],
+            )
 
         # run
         data = {"sample_ids": [samples[0].id]}
@@ -597,16 +614,17 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
 
         # run
         data = {"sample_ids": [1, 2]}

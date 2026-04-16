@@ -19,6 +19,7 @@ from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
 from labelu.internal.application.response.base import UserResp
+from labelu.internal.application.response.user import UserResponse
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.task import TaskStatics
 from labelu.internal.application.response.task import TaskResponse
@@ -159,7 +160,7 @@ async def get_collaborators(db: Session, task_id: int, current_user: User):
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    return [UserResp(id=user.id, username=user.username) for user in task.collaborators]
+    return [UserResponse(id=user.id, username=user.username) for user in task.collaborators]
 
 async def add_collaborator(db: Session, task_id: int, user_id: int, current_user: User):
     task = crud_task.get(db=db, task_id=task_id)
@@ -200,7 +201,7 @@ async def add_collaborator(db: Session, task_id: int, user_id: int, current_user
     with begin_transaction(db):
         task.collaborators.append(user)
 
-    return UserResp(id=user.id, username=user.username)
+    return UserResponse(id=user.id, username=user.username)
 
 async def batch_add_collaborators(db: Session, task_id: int, user_ids: List[int], current_user: User):
     task = crud_task.get(db=db, task_id=task_id)
@@ -234,7 +235,7 @@ async def batch_add_collaborators(db: Session, task_id: int, user_ids: List[int]
     with begin_transaction(db):
         task.collaborators.extend(users)
 
-    return [UserResp(id=user.id, username=user.username) for user in users]
+    return [UserResponse(id=user.id, username=user.username) for user in users]
 
 async def remove_collaborator(db: Session, task_id: int, user_id: int, current_user: User):
     task = crud_task.get(db=db, task_id=task_id)

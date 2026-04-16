@@ -48,6 +48,7 @@ class PatchSampleCommand(BaseModel):
         default=0, description="description: annotate result count"
     )
     state: Union[SampleState, None] = Field(
+        default=None,
         description="description: sample file state, must be 'SKIPPED', 'NEW', or None",
     )
 

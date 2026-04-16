@@ -269,7 +269,7 @@ async def delete(
 
     with begin_transaction(db):
         # delete media
-        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
+        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
         attachment_ids = [sample.file_id for sample in samples if sample.file_id]
         attachments = crud_attachment.get_by_ids(db=db, attachment_ids=attachment_ids)
         
@@ -329,7 +329,7 @@ def _run_export_sync(job_id: int, task_id: int, export_type: ExportType, sample_
             crud_export_job.update_status(db, job, ExportStatus.PROCESSING.value)
 
         task = crud_task.get(db=db, task_id=task_id)
-        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
+        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
 
         data = []
         for sample in samples:
@@ -394,7 +394,7 @@ async def export(
     """Legacy synchronous export. Kept for backward compatibility."""
 
     task = crud_task.get(db=db, task_id=task_id)
-    samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
+    samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
     data = []
     for sample in samples:
         file_dict = {}

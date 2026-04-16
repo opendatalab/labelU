@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
@@ -61,17 +62,18 @@ class TestClassTaskRouter:
         )
         page = 0
         size = 10
-        for i in range(15):
-            crud_task.create(
-                db=db,
-                task=Task(
-                    name="name",
-                    description="description",
-                    tips="tips",
-                    created_by=current_user.id,
-                    updated_by=current_user.id,
-                ),
-            )
+        with begin_transaction(db):
+            for i in range(15):
+                crud_task.create(
+                    db=db,
+                    task=Task(
+                        name="name",
+                        description="description",
+                        tips="tips",
+                        created_by=current_user.id,
+                        updated_by=current_user.id,
+                    ),
+                )
 
         # run
         r = client.get(
@@ -285,16 +287,17 @@ class TestClassTaskRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=current_user.id,
-                updated_by=current_user.id,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
 
         # run
         r = client.request("delete",
@@ -327,16 +330,17 @@ class TestClassTaskRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
 
         # run
         r = client.request("delete",
@@ -383,6 +387,7 @@ class TestClassTaskRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
+        db.rollback()
         data = {
             "name": "collaborative task",
             "description": "task description",
@@ -417,13 +422,16 @@ class TestClassTaskRouter:
         # 获取或创建测试用户
         new_user = crud_user.get_user_by_username(db=db, username="collaborator@example.com")
         if not new_user:
-            new_user = crud_user.create(
-                db=db,
-                user=User(
-                    username="collaborator@example.com",
-                    hashed_password="hashed_password",
-                ),
-            )
+            with begin_transaction(db):
+                new_user = crud_user.create(
+                    db=db,
+                    user=User(
+                        username="collaborator@example.com",
+                        hashed_password="hashed_password",
+                    ),
+                )
+        else:
+            db.rollback()
         
         data = {
             "name": "batch collaborative task",
@@ -462,13 +470,16 @@ class TestClassTaskRouter:
         # 获取或创建测试用户
         new_user = crud_user.get_user_by_username(db=db, username="to_remove@example.com")
         if not new_user:
-            new_user = crud_user.create(
-                db=db,
-                user=User(
-                    username="to_remove@example.com",
-                    hashed_password="hashed_password",
-                ),
-            )
+            with begin_transaction(db):
+                new_user = crud_user.create(
+                    db=db,
+                    user=User(
+                        username="to_remove@example.com",
+                        hashed_password="hashed_password",
+                    ),
+                )
+        else:
+            db.rollback()
         
         data = {
             "name": "remove collaborative task",
@@ -515,13 +526,16 @@ class TestClassTaskRouter:
         # 获取或创建测试用户
         new_user = crud_user.get_user_by_username(db=db, username="single_remove@example.com")
         if not new_user:
-            new_user = crud_user.create(
-                db=db,
-                user=User(
-                    username="single_remove@example.com",
-                    hashed_password="hashed_password",
-                ),
-            )
+            with begin_transaction(db):
+                new_user = crud_user.create(
+                    db=db,
+                    user=User(
+                        username="single_remove@example.com",
+                        hashed_password="hashed_password",
+                    ),
+                )
+        else:
+            db.rollback()
         
         data = {
             "name": "single remove task",
