@@ -1,4 +1,5 @@
 from typing import Any
+from contextlib import asynccontextmanager
 
 from loguru import logger
 import click
@@ -74,7 +75,16 @@ tags_metadata = [
     },
 ]
 
+@asynccontextmanager
+async def lifespan(app):
+    if settings.need_migration_to_mysql:
+        logger.info("Migrating database to MySQL")
+        migrate_to_mysql()
+    yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="labelU",
     description=description,
     version=labelu_version,
@@ -103,13 +113,6 @@ add_exception_handler(app=app)
 add_router(app=app)
 add_ws_router(app=app)
 add_middleware(app=app)
-
-def startup():
-    if settings.need_migration_to_mysql:
-        logger.info("Migrating database to MySQL")
-        migrate_to_mysql()
-
-app.add_event_handler("startup", startup)
 
 class NoCacheStaticFiles(StaticFiles):
     def __init__(self, *args: Any, **kwargs: Any):
