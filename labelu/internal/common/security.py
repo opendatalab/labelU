@@ -3,14 +3,14 @@ from datetime import datetime, timedelta, timezone
 
 from jose import jwt
 from pydantic import BaseModel
-from passlib.context import CryptContext
+import bcrypt
 from fastapi.security import HTTPBearer
 
 from labelu.internal.common.config import settings
 
 security = HTTPBearer()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 
 class AccessToken(BaseModel):
@@ -20,11 +20,15 @@ class AccessToken(BaseModel):
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
+    )
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(
+        password.encode("utf-8"), bcrypt.gensalt()
+    ).decode("utf-8")
 
 
 # create access token for user login
