@@ -10,7 +10,7 @@ from typing import Optional
 
 from alembic import context, op
 from pydantic import BaseModel
-from sqlalchemy import update
+from sqlalchemy import update, text
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 
@@ -103,7 +103,7 @@ def upgrade() -> None:
     # replace the key with value in a transaction
     with context.begin_transaction():
         sample_items = session.execute(
-            'SELECT id, data FROM task_sample WHERE data IS NOT NULL AND data != ""'
+            text('SELECT id, data FROM task_sample WHERE data IS NOT NULL AND data != ""')
         )
 
         for sample_item in sample_items:

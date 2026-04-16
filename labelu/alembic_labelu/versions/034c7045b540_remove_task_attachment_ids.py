@@ -6,6 +6,7 @@ Create Date: 2025-03-13 22:43:30.564428
 
 """
 from alembic import op
+from sqlalchemy import text
 
 from labelu.alembic_labelu.alembic_labelu_tools import column_exist_in_table
 
@@ -25,4 +26,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     if not column_exist_in_table('task_sample', 'task_attachment_ids'):
-        op.execute('ALTER TABLE task_sample ADD COLUMN task_attachment_ids TEXT COMMENT "task attachment ids"')
+        op.execute(text('ALTER TABLE task_sample ADD COLUMN task_attachment_ids TEXT'))

@@ -7,7 +7,7 @@ Create Date: 2024-02-01 19:26:24.048019
 """
 import json
 from alembic import context, op
-from sqlalchemy import update
+from sqlalchemy import update, text
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 
@@ -52,14 +52,15 @@ def upgrade() -> None:
 
     with context.begin_transaction():
         task_items = session.execute(
-            'SELECT id, config FROM task WHERE config IS NOT NULL AND config != ""'
+            text('SELECT id, config FROM task WHERE config IS NOT NULL AND config != ""')
         )
 
         for task_item in task_items:
             task_id = task_item[0]
             
             sample_items = session.execute(
-                f"SELECT id, data, annotated_count FROM task_sample WHERE task_id={task_id}"
+                text("SELECT id, data, annotated_count FROM task_sample WHERE task_id=:tid"),
+                {"tid": task_id},
             )
             
             for sample_item in sample_items:
