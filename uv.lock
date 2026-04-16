@@ -747,7 +747,7 @@ wheels = [
 
 [[package]]
 name = "labelu"
-version = "1.3.2"
+version = "1.3.3"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
@@ -794,8 +794,8 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.9.4" },
     { name = "appdirs", specifier = ">=1.4.4" },
     { name = "bcrypt", specifier = "==4.3.0" },
-    { name = "email-validator", specifier = ">=1.3.0" },
-    { name = "fastapi", specifier = ">=0.90.0" },
+    { name = "email-validator", specifier = ">=2.0.0" },
+    { name = "fastapi", specifier = ">=0.100.0" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "loguru", specifier = ">=0.6.0" },
     { name = "mysqlclient", marker = "extra == 'mysql'", specifier = ">=2.1.1" },
@@ -806,7 +806,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=0.21.0" },
     { name = "python-jose", extras = ["cryptography"], specifier = ">=3.3.0" },
     { name = "python-multipart", specifier = ">=0.0.5" },
-    { name = "sqlalchemy", specifier = ">=1.4.43" },
+    { name = "sqlalchemy", specifier = ">=2.0.0" },
     { name = "tfrecord", specifier = ">=1.14.5" },
     { name = "typer", specifier = ">=0.7.0" },
     { name = "uvicorn", specifier = ">=0.19.0" },
