@@ -55,6 +55,7 @@ class LabelItem(BaseModel):
 class Constraints(BaseModel):
     allowed_tools: list[str] = []
     max_results_per_label: int = 100
+    filter_by_labels: bool = False
 
 
 class PredictRequest(BaseModel):
@@ -128,6 +129,7 @@ def _detect_with_grounding(
     image: Image.Image,
     labels: list[LabelItem],
     max_per_label: int,
+    filter_by_labels: bool = False,
 ) -> list[ResultItem]:
     """Use <CAPTION_TO_PHRASE_GROUNDING> for open-vocabulary detection."""
     caption = ". ".join(lbl.name for lbl in labels)
@@ -138,17 +140,14 @@ def _detect_with_grounding(
 
     label_name_set = {lbl.name.lower() for lbl in labels}
     label_tool_map = {lbl.name.lower(): lbl.tool for lbl in labels}
-    counts: dict[str, int] = {}
-    results: list[ResultItem] = []
+    default_tool = labels[0].tool if labels else "rectTool"
 
+    results: list[ResultItem] = []
     for bbox, det_label in zip(bboxes, detected_labels):
         det_clean = det_label.strip().lower()
-        if det_clean not in label_name_set:
+        if filter_by_labels and det_clean not in label_name_set:
             continue
-        counts[det_clean] = counts.get(det_clean, 0) + 1
-        if counts[det_clean] > max_per_label:
-            continue
-        tool = label_tool_map.get(det_clean, "rectTool")
+        tool = label_tool_map.get(det_clean, default_tool)
         results.append(ResultItem(
             toolName=tool,
             label=det_clean,
@@ -208,7 +207,7 @@ async def predict(req: PredictRequest) -> PredictResponse:
     if need_detect:
         detect_labels = [l for l in req.labels if l.tool != "polygonTool"] if need_segment else req.labels
         if detect_labels:
-            results.extend(_detect_with_grounding(image, detect_labels, max_per))
+            results.extend(_detect_with_grounding(image, detect_labels, max_per, req.constraints.filter_by_labels))
 
     if need_segment:
         seg_labels = [l for l in req.labels if l.tool == "polygonTool"]
@@ -226,7 +225,7 @@ async def health():
 
 # ── entrypoint ────────────────────────────────────────────────────────
 def main():
-    global model, processor, device
+    global model, processor, device, MODEL_NAME
 
     parser = argparse.ArgumentParser(description="LabelU Florence-2 Model Server")
     parser.add_argument("--port", type=int, default=5000)
@@ -236,7 +235,6 @@ def main():
     args = parser.parse_args()
 
     device = args.device
-    global MODEL_NAME
     MODEL_NAME = args.model
 
     logger.info("Loading %s on %s ...", MODEL_NAME, device)

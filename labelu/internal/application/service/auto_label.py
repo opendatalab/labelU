@@ -175,10 +175,15 @@ def _normalize_results(model_data: dict[str, Any], sample_name: str, task_config
         grouped_annotations[tool_name]["result"].append(_normalize_single_result(tool_name, item, index))
 
     _, config_by_tool = _extract_tool_configs(task_config)
+    # Pre-annotation config format: { toolName: [{key, value, color}, ...] }
+    pre_annotation_config = {
+        tool_name: tool_cfg.get("attributes", [])
+        for tool_name, tool_cfg in config_by_tool.items()
+    }
     return {
         "sample_name": sample_name,
         "annotations": grouped_annotations,
-        "config": config_by_tool,
+        "config": pre_annotation_config,
         "meta": {
             "source_type": "ai_generated",
             "provider": settings.AI_PROVIDER,
@@ -264,12 +269,19 @@ async def create(
     try:
         async with httpx.AsyncClient(timeout=settings.AI_MODEL_TIMEOUT_SECONDS) as client:
             response = await client.post(settings.AI_MODEL_ENDPOINT, json=model_payload)
+            if response.status_code >= 400:
+                logger.error(
+                    "model service returned {}: {}",
+                    response.status_code,
+                    response.text,
+                )
             response.raise_for_status()
             model_data = response.json()
     except Exception as exc:
         logger.opt(exception=exc).error("auto label model request failed")
         raise LabelUException(
             code=ErrorCode.CODE_56003_AUTO_LABEL_MODEL_ERROR,
+            message=response.text,
             status_code=status.HTTP_502_BAD_GATEWAY,
         )
 

@@ -164,9 +164,9 @@ def _request_context(request: Request) -> str:
 
 class LabelUException(HTTPException):
     def __init__(
-        self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, message: str = None
     ):
-        self.msg = code.value[1]
+        self.msg = message or code.value[1]
         self.code = code.value[0]
         super().__init__(status_code=status_code, detail=self.msg)
 
