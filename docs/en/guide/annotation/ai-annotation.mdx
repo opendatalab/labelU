@@ -5,8 +5,9 @@ LabelU supports integrating AI model services to automatically annotate image da
 ## Overview
 
 - Currently only supports auto-annotation for **image tasks**
-- Supported annotation tools: Rectangle (rectTool), Polygon (polygonTool), Point (pointTool), Line (lineTool)
+- Supported annotation tools: Rectangle (rectTool), Polygon (polygonTool)
 - AI annotation results are presented as pre-annotations that annotators can modify and refine
+- Supports "Only keep configured labels" option — when enabled, only results matching task labels are returned; when disabled, the model detects all objects freely
 
 ## Prerequisites
 
@@ -19,7 +20,7 @@ Set the following environment variables when deploying LabelU:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `AI_AUTO_LABEL_ENABLED` | Enable AI auto-annotation | `false` |
-| `AI_MODEL_ENDPOINT` | AI model service URL | None |
+| `AI_MODEL_ENDPOINT` | AI model service URL (root path) | None |
 | `AI_MODEL_TIMEOUT_SECONDS` | Model request timeout (seconds) | `60` |
 | `AI_PROVIDER` | AI service provider identifier | None |
 | `AI_MODEL_NAME` | Model name identifier | None |
@@ -28,22 +29,98 @@ Example configuration:
 
 ```bash
 export AI_AUTO_LABEL_ENABLED=true
-export AI_MODEL_ENDPOINT=http://your-model-service:8080/predict
-export AI_MODEL_TIMEOUT_SECONDS=120
-export AI_PROVIDER=openai
-export AI_MODEL_NAME=gpt-4-vision
+export AI_MODEL_ENDPOINT=http://localhost:5000/
+export AI_MODEL_TIMEOUT_SECONDS=60
+export AI_PROVIDER=labelu
+export AI_MODEL_NAME=florence-2-base
 ```
 
 ### Annotation Configuration Requirements
 
-The task's annotation configuration must include at least one supported annotation tool (Rectangle, Polygon, Point, or Line) with label attributes configured. The AI model generates annotation results based on these labels.
+The task's annotation configuration must include at least one supported annotation tool (Rectangle or Polygon) with label attributes configured. The AI model generates annotation results based on these labels.
+
+## Reference Model Servers
+
+LabelU provides three open-source reference model server implementations, all following the same unified API protocol.
+
+### Comparison
+
+| | Florence-2 | GroundingDINO + EfficientSAM | SAM 3 |
+|---|---|---|---|
+| Architecture | Single model (detect + segment) | Two models in pipeline | Single unified model |
+| Open vocabulary | Yes | Yes | Yes (4M+ concepts) |
+| Detection (rectTool) | Fair | Good | Good |
+| Segmentation (polygonTool) | Supported | High precision | Highest precision |
+| Min VRAM | ~4GB | ~4GB | ~8GB |
+| CPU support | Yes (slow) | Not recommended | Not supported |
+| Model size | ~500MB | ~900MB | ~1.7GB |
+| Python | 3.8+ | 3.8+ | 3.12+ |
+| CUDA | Optional | Recommended | 12.6+ (required) |
+
+**Recommendations**:
+
+- High-end GPU (4090/A100) → **SAM 3** (best quality, single model simplicity)
+- Mid-range GPU (1660/2060) → **GroundingDINO + EfficientSAM**
+- CPU only or low VRAM → **Florence-2**
+
+### Quick Start
+
+#### Florence-2
+
+```bash
+cd model_server/florence2
+pip install -r requirements.txt
+python server.py --device cpu --port 5000
+```
+
+#### GroundingDINO + EfficientSAM
+
+```bash
+cd model_server/grounding_dino_sam
+pip install -r requirements.txt
+python server.py --device cuda --port 5000
+
+# Detection only (skip SAM to save VRAM)
+python server.py --device cuda --port 5000 --no-sam
+```
+
+#### SAM 3
+
+```bash
+# Requires Python 3.12+, CUDA 12.6+, SM 80+ GPU (Ampere/Ada)
+conda create -n sam3 python=3.12
+conda activate sam3
+
+cd model_server/sam3
+pip install -r requirements.txt
+python server.py --device cuda --port 5000
+```
+
+### Docker Deployment
+
+```bash
+# Florence-2
+cd model_server/florence2
+docker build -t labelu-florence2 .
+docker run -p 5000:5000 labelu-florence2
+
+# GroundingDINO + EfficientSAM (GPU)
+cd model_server/grounding_dino_sam
+docker build -t labelu-dino-sam .
+docker run --gpus all -p 5000:5000 labelu-dino-sam python server.py --device cuda
+
+# SAM 3 (GPU, CUDA 12.6+)
+cd model_server/sam3
+docker build -t labelu-sam3 .
+docker run --gpus all -p 5000:5000 labelu-sam3
+```
 
 ## Usage
 
 ### Trigger AI Annotation
 
 1. Enter the image annotation page
-2. Click the "AI Annotation" button in the top-right toolbar
+2. Click the "AI Annotate" button in the top-right toolbar
 
 {/* TODO: Screenshot - AI Annotation button in the top-right corner of annotation page */}
 
@@ -52,10 +129,19 @@ The task's annotation configuration must include at least one supported annotati
 
 {/* TODO: Screenshot - Annotation results after AI annotation completes */}
 
+### "Only Keep Configured Labels" Option
+
+Click the dropdown arrow on the right side of the AI Annotate button to toggle this option:
+
+- **Enabled** (default): Only keeps detection results matching the label names in the task configuration
+- **Disabled**: The model freely detects all objects; label names are auto-generated by the model
+
+This setting is automatically persisted and retained after page refresh.
+
 ### Result Handling
 
 - AI annotation results are loaded as **pre-annotations** that annotators can adjust directly
-- Clicking "AI Annotation" again will overwrite previous AI annotation results
+- Clicking "AI Annotate" again will overwrite previous AI annotation results
 - Manual annotations are not affected; AI annotation results are stored independently
 
 :::tip
@@ -74,84 +160,84 @@ You may encounter the following messages when using AI annotation:
 | AI model endpoint is not configured | Model URL not set | Contact admin to set `AI_MODEL_ENDPOINT` |
 | AI model service request failed | Model service error | Check if the model service is running properly |
 
-## Model Service API Specification
+## Model Service API Protocol
 
-To build your own AI model service, implement the following API:
+To integrate a custom model, simply implement the following HTTP API protocol.
 
-### Request Format
+### POST /
+
+**Request:**
 
 ```json
-POST /predict
-Content-Type: application/json
-
 {
   "request_id": "uuid",
-  "image_url": "https://presigned-url-to-image",
-  "task": {
-    "id": 1,
-    "name": "Task Name"
-  },
+  "image_url": "https://presigned-or-public-url/image.jpg",
+  "task": { "id": 10, "name": "demo-task" },
   "labels": [
-    {
-      "name": "cat",
-      "display_name": "Cat",
-      "color": "#ff0000",
-      "tool": "rectTool"
-    }
+    { "name": "car", "display_name": "Car", "color": "#ff0000", "tool": "rectTool" },
+    { "name": "person", "tool": "polygonTool" }
   ],
   "constraints": {
     "allowed_tools": ["rectTool", "polygonTool"],
-    "max_results_per_label": 100
+    "max_results_per_label": 100,
+    "filter_by_labels": true
   },
-  "prompt": "optional user prompt"
+  "prompt": null
 }
 ```
 
-### Response Format
+**Constraints fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `allowed_tools` | string[] | [] | Restrict returned tool types; empty means no restriction |
+| `max_results_per_label` | int | 100 | Maximum results per label |
+| `filter_by_labels` | bool | false | Whether to filter out results not matching the labels list |
+
+`filter_by_labels` explained:
+- `false`: Model returns everything it detects; label names serve as prompt hints only
+- `true`: Only returns results matching configured label names
+
+**Response:**
 
 ```json
 {
-  "model": "model-name",
-  "latency_ms": 1500,
-  "warning_message": null,
-  "results": {
-    "rectTool": [
-      {
-        "id": "uuid",
-        "x": 100,
-        "y": 200,
-        "width": 150,
-        "height": 80,
-        "label": "cat",
-        "score": 0.95,
-        "order": 0
-      }
-    ],
-    "polygonTool": [
-      {
-        "id": "uuid",
-        "points": [
-          {"x": 10, "y": 20},
-          {"x": 50, "y": 20},
-          {"x": 50, "y": 60}
-        ],
+  "model": "microsoft/Florence-2-base",
+  "latency_ms": 1840,
+  "results": [
+    {
+      "toolName": "rectTool",
+      "label": "car",
+      "result": { "x": 120, "y": 80, "width": 260, "height": 140 },
+      "score": 0.94
+    },
+    {
+      "toolName": "polygonTool",
+      "label": "person",
+      "result": {
         "type": "line",
-        "label": "road",
-        "score": 0.88,
-        "order": 1
-      }
-    ]
-  }
+        "points": [
+          { "x": 50, "y": 100 },
+          { "x": 80, "y": 200 },
+          { "x": 30, "y": 200 }
+        ]
+      },
+      "score": 0.87
+    }
+  ],
+  "warning_message": null
 }
 ```
 
+### GET /health
+
+Returns model loading status for health checking.
+
 ### Result Fields by Tool
 
-| Tool | Required Fields |
-|------|----------------|
-| rectTool | `x`, `y`, `width`, `height`, `label` |
-| polygonTool | `points` (coordinate array), `label` |
-| lineTool | `points` (coordinate array), `label` |
-| pointTool | `x`, `y`, `label` |
+| Tool | Result format |
+|------|--------------|
+| rectTool | `{ "x", "y", "width", "height" }` |
+| polygonTool | `{ "type": "line", "points": [{"x", "y"}, ...] }` |
 
-Optional common fields: `id`, `order`, `score`, `visible`, `attributes`
+Optional common fields: `score` (confidence score)
