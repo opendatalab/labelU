@@ -62,6 +62,7 @@ class LabelItem(BaseModel):
 class Constraints(BaseModel):
     allowed_tools: list[str] = []
     max_results_per_label: int = 100
+    filter_by_labels: bool = False
 
 
 class PredictRequest(BaseModel):
@@ -172,10 +173,12 @@ async def predict(req: PredictRequest) -> PredictResponse:
         raise HTTPException(status_code=400, detail=f"Failed to download image: {exc}")
 
     label_names = [lbl.name for lbl in req.labels]
+    label_name_set = {n.lower().strip() for n in label_names}
     label_tool_map = {lbl.name.lower().strip(): lbl.tool for lbl in req.labels}
     text_prompt = " . ".join(label_names) + " ."
     max_per = req.constraints.max_results_per_label
     allowed = set(req.constraints.allowed_tools) if req.constraints.allowed_tools else None
+    filter_labels = req.constraints.filter_by_labels
 
     boxes, det_labels, scores = _detect_objects(image, text_prompt)
 
@@ -184,6 +187,8 @@ async def predict(req: PredictRequest) -> PredictResponse:
 
     for box, det_label, score in zip(boxes, det_labels, scores):
         clean = det_label.strip().lower()
+        if filter_labels and clean not in label_name_set:
+            continue
         counts[clean] = counts.get(clean, 0) + 1
         if counts[clean] > max_per:
             continue

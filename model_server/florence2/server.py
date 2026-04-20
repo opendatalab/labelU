@@ -125,36 +125,74 @@ def _mask_to_polygon_points(mask: np.ndarray) -> list[dict[str, float]]:
     return [{"x": float(pt[0][0]), "y": float(pt[0][1])} for pt in approx]
 
 
+def _detect_with_od(
+    image: Image.Image,
+    default_tool: str,
+) -> list[ResultItem]:
+    """Use <OD> for general object detection (Florence2 built-in categories)."""
+    raw = _run_florence(image, "<OD>")
+    data = raw.get("<OD>", {})
+    bboxes = data.get("bboxes", [])
+    detected_labels = data.get("labels", [])
+
+    results: list[ResultItem] = []
+    for bbox, det_label in zip(bboxes, detected_labels):
+        det_clean = det_label.strip().lower()
+        results.append(ResultItem(
+            toolName=default_tool,
+            label=det_clean,
+            result=_bbox_to_rect(bbox),
+            score=None,
+        ))
+    return results
+
+
 def _detect_with_grounding(
     image: Image.Image,
     labels: list[LabelItem],
     max_per_label: int,
     filter_by_labels: bool = False,
 ) -> list[ResultItem]:
-    """Use <CAPTION_TO_PHRASE_GROUNDING> for open-vocabulary detection."""
-    caption = ". ".join(lbl.name for lbl in labels)
-    raw = _run_florence(image, "<CAPTION_TO_PHRASE_GROUNDING>", caption)
-    data = raw.get("<CAPTION_TO_PHRASE_GROUNDING>", {})
-    bboxes = data.get("bboxes", [])
-    detected_labels = data.get("labels", [])
-
-    label_name_set = {lbl.name.lower() for lbl in labels}
+    """Use <OD> as baseline, then <CAPTION_TO_PHRASE_GROUNDING> for custom labels."""
     label_tool_map = {lbl.name.lower(): lbl.tool for lbl in labels}
     default_tool = labels[0].tool if labels else "rectTool"
 
-    results: list[ResultItem] = []
-    for bbox, det_label in zip(bboxes, detected_labels):
-        det_clean = det_label.strip().lower()
-        if filter_by_labels and det_clean not in label_name_set:
-            continue
-        tool = label_tool_map.get(det_clean, default_tool)
-        results.append(ResultItem(
-            toolName=tool,
-            label=det_clean,
-            result=_bbox_to_rect(bbox),
-            score=None,
-        ))
-    return results
+    # Step 1: Run <OD> to get all standard detections
+    od_results = _detect_with_od(image, default_tool)
+    od_labels_found = {r.label for r in od_results}
+    logger.info("<OD> found %d objects: %s", len(od_results), od_labels_found)
+
+    # Step 2: Find configured labels not covered by <OD>, run grounding for those
+    uncovered = [lbl for lbl in labels if lbl.name.lower() not in od_labels_found]
+    grounding_results: list[ResultItem] = []
+    if uncovered:
+        caption = ". ".join(lbl.name for lbl in uncovered)
+        raw = _run_florence(image, "<CAPTION_TO_PHRASE_GROUNDING>", caption)
+        logger.info("<CAPTION_TO_PHRASE_GROUNDING> raw: %s", raw)
+        data = raw.get("<CAPTION_TO_PHRASE_GROUNDING>", {})
+        for bbox, det_label in zip(data.get("bboxes", []), data.get("labels", [])):
+            det_clean = det_label.strip().lower()
+            tool = label_tool_map.get(det_clean, default_tool)
+            grounding_results.append(ResultItem(
+                toolName=tool,
+                label=det_clean,
+                result=_bbox_to_rect(bbox),
+                score=None,
+            ))
+
+    # Merge: OD results + grounding results for uncovered labels
+    all_results = od_results + grounding_results
+
+    if filter_by_labels:
+        label_name_set = {lbl.name.lower() for lbl in labels}
+        all_results = [r for r in all_results if r.label in label_name_set]
+
+    # Apply tool mapping from configured labels
+    for r in all_results:
+        if r.label in label_tool_map:
+            r.toolName = label_tool_map[r.label]
+
+    return all_results
 
 
 def _segment_for_labels(
@@ -174,17 +212,23 @@ def _segment_for_labels(
         for i, polygon in enumerate(polygons_raw[:max_per_label]):
             if isinstance(polygon, list) and len(polygon) > 0:
                 if isinstance(polygon[0], list):
-                    points = [{"x": float(polygon[0][j]), "y": float(polygon[0][j + 1])}
-                              for j in range(0, len(polygon[0]), 2)]
+                    points = [
+                        {"x": float(polygon[0][j]), "y": float(polygon[0][j + 1])}
+                        for j in range(0, len(polygon[0]), 2)
+                    ]
                 else:
-                    points = [{"x": float(polygon[j]), "y": float(polygon[j + 1])}
-                              for j in range(0, len(polygon), 2)]
+                    points = [
+                        {"x": float(polygon[j]), "y": float(polygon[j + 1])}
+                        for j in range(0, len(polygon), 2)
+                    ]
                 if len(points) >= 3:
-                    results.append(ResultItem(
-                        toolName="polygonTool",
-                        label=lbl.name,
-                        result={"type": "line", "points": points},
-                    ))
+                    results.append(
+                        ResultItem(
+                            toolName="polygonTool",
+                            label=lbl.name,
+                            result={"type": "line", "points": points},
+                        )
+                    )
     return results
 
 
@@ -197,7 +241,9 @@ async def predict(req: PredictRequest) -> PredictResponse:
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Failed to download image: {exc}")
 
-    allowed = set(req.constraints.allowed_tools) if req.constraints.allowed_tools else None
+    allowed = (
+        set(req.constraints.allowed_tools) if req.constraints.allowed_tools else None
+    )
     max_per = req.constraints.max_results_per_label
     results: list[ResultItem] = []
 
@@ -205,9 +251,20 @@ async def predict(req: PredictRequest) -> PredictResponse:
     need_segment = allowed is None or "polygonTool" in (allowed or set())
 
     if need_detect:
-        detect_labels = [l for l in req.labels if l.tool != "polygonTool"] if need_segment else req.labels
+        detect_labels = (
+            [l for l in req.labels if l.tool != "polygonTool"]
+            if need_segment
+            else req.labels
+        )
+
+        logger.info("detect_labels: %s", detect_labels)
+
         if detect_labels:
-            results.extend(_detect_with_grounding(image, detect_labels, max_per, req.constraints.filter_by_labels))
+            results.extend(
+                _detect_with_grounding(
+                    image, detect_labels, max_per, req.constraints.filter_by_labels
+                )
+            )
 
     if need_segment:
         seg_labels = [l for l in req.labels if l.tool == "polygonTool"]
@@ -230,7 +287,9 @@ def main():
     parser = argparse.ArgumentParser(description="LabelU Florence-2 Model Server")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--host", type=str, default="0.0.0.0")
-    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--model", type=str, default=MODEL_NAME)
     args = parser.parse_args()
 
@@ -239,9 +298,15 @@ def main():
 
     logger.info("Loading %s on %s ...", MODEL_NAME, device)
     processor = AutoProcessor.from_pretrained(MODEL_NAME, trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME, trust_remote_code=True, torch_dtype=torch.float16 if "cuda" in device else torch.float32,
-    ).to(device).eval()
+    model = (
+        AutoModelForCausalLM.from_pretrained(
+            MODEL_NAME,
+            trust_remote_code=True,
+            torch_dtype=torch.float16 if "cuda" in device else torch.float32,
+        )
+        .to(device)
+        .eval()
+    )
     logger.info("Model loaded.")
 
     uvicorn.run(app, host=args.host, port=args.port)
