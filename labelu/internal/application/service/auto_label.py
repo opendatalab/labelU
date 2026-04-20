@@ -1,3 +1,4 @@
+import asyncio
 import json
 import time
 import uuid
@@ -9,12 +10,14 @@ from loguru import logger
 from sqlalchemy.orm import Session
 
 from labelu.internal.adapter.persistence import crud_pre_annotation, crud_sample, crud_task
-from labelu.internal.application.command.auto_label import AutoLabelCommand
-from labelu.internal.application.response.auto_label import AutoLabelResponse
+from labelu.internal.adapter.persistence import crud_auto_label_job
+from labelu.internal.application.command.auto_label import AutoLabelCommand, BatchAutoLabelCommand
+from labelu.internal.application.response.auto_label import AutoLabelResponse, AutoLabelJobResponse
 from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.error_code import ErrorCode, LabelUException
 from labelu.internal.common.storage import get_model_read_url
 from labelu.internal.common.config import settings
+from labelu.internal.domain.models.auto_label_job import AutoLabelStatus
 from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
 from labelu.internal.domain.models.task import MediaType
 from labelu.internal.domain.models.user import User
@@ -327,3 +330,208 @@ async def create(
         pre_annotation_id=created_pre_annotation.id,
         warning_message=meta.get("warning_message"),
     )
+
+
+# ── Batch auto-label ──────────────────────────────────────────────────────────
+
+
+async def create_batch_job(
+    db: Session,
+    task_id: int,
+    cmd: BatchAutoLabelCommand,
+    current_user: User,
+) -> AutoLabelJobResponse:
+    if not settings.AI_AUTO_LABEL_ENABLED:
+        raise LabelUException(
+            code=ErrorCode.CODE_56000_AUTO_LABEL_DISABLED,
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not settings.AI_MODEL_ENDPOINT:
+        raise LabelUException(
+            code=ErrorCode.CODE_56004_AUTO_LABEL_NOT_CONFIGURED,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    task = crud_task.get(db=db, task_id=task_id)
+    if not task:
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if task.media_type != MediaType.IMAGE.value:
+        raise LabelUException(
+            code=ErrorCode.CODE_56001_AUTO_LABEL_UNSUPPORTED_MEDIA,
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    task_config = _parse_task_config(task.config)
+    labels, _ = _extract_tool_configs(task_config)
+    if not labels:
+        raise LabelUException(
+            code=ErrorCode.CODE_56002_AUTO_LABEL_NO_LABELS_CONFIGURED,
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Get all NEW state samples
+    new_samples = crud_sample.list_new_samples(db=db, task_id=task_id)
+    if not new_samples:
+        raise LabelUException(
+            code=ErrorCode.CODE_56006_AUTO_LABEL_NO_SAMPLES,
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    sample_ids = [s.id for s in new_samples]
+
+    with begin_transaction(db):
+        job = crud_auto_label_job.create(
+            db=db,
+            task_id=task_id,
+            user_id=current_user.id,
+            sample_count=len(sample_ids),
+            filter_by_labels=cmd.filter_by_labels,
+        )
+        job_id = job.id
+
+    asyncio.get_event_loop().run_in_executor(
+        None, _run_batch_auto_label_sync, job_id, task_id, sample_ids, cmd.filter_by_labels
+    )
+
+    return AutoLabelJobResponse(
+        id=job_id,
+        task_id=task_id,
+        status=AutoLabelStatus.PENDING.value,
+        sample_count=len(sample_ids),
+        processed_count=0,
+        success_count=0,
+        failed_count=0,
+        created_at=job.created_at,
+    )
+
+
+def get_batch_job(db: Session, task_id: int, job_id: int) -> AutoLabelJobResponse:
+    job = crud_auto_label_job.get(db=db, job_id=job_id)
+    if not job or job.task_id != task_id:
+        raise LabelUException(
+            code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    return AutoLabelJobResponse(
+        id=job.id,
+        task_id=job.task_id,
+        status=job.status,
+        sample_count=job.sample_count or 0,
+        processed_count=job.processed_count or 0,
+        success_count=job.success_count or 0,
+        failed_count=job.failed_count or 0,
+        error_message=job.error_message,
+        created_at=job.created_at,
+    )
+
+
+def _run_batch_auto_label_sync(job_id: int, task_id: int, sample_ids: list[int], filter_by_labels: bool):
+    """Run batch auto-label in a thread. Processes samples sequentially."""
+    from labelu.internal.common.db import SessionLocal
+
+    db = SessionLocal()
+    try:
+        job = crud_auto_label_job.get(db=db, job_id=job_id)
+        with begin_transaction(db):
+            crud_auto_label_job.update_status(db, job, AutoLabelStatus.PROCESSING.value)
+
+        task = crud_task.get(db=db, task_id=task_id)
+        task_config = _parse_task_config(task.config)
+
+        for sample_id in sample_ids:
+            try:
+                _process_single_sample(db, task, task_config, sample_id, filter_by_labels, job)
+                with begin_transaction(db):
+                    crud_auto_label_job.increment_progress(db, job, success=True)
+            except Exception as exc:
+                logger.error("Batch auto-label failed for sample {}: {}", sample_id, str(exc))
+                with begin_transaction(db):
+                    crud_auto_label_job.increment_progress(db, job, success=False)
+
+        with begin_transaction(db):
+            crud_auto_label_job.update_status(db, job, AutoLabelStatus.COMPLETED.value)
+    except Exception as e:
+        logger.error("Batch auto-label job {} failed: {}", job_id, str(e))
+        try:
+            job = crud_auto_label_job.get(db=db, job_id=job_id)
+            with begin_transaction(db):
+                crud_auto_label_job.update_status(
+                    db, job, AutoLabelStatus.FAILED.value,
+                    error_message=str(e),
+                )
+        except Exception:
+            logger.error("Failed to update auto-label job status for job {}", job_id)
+    finally:
+        db.close()
+
+
+def _process_single_sample(
+    db: Session,
+    task,
+    task_config: dict[str, Any],
+    sample_id: int,
+    filter_by_labels: bool,
+    job,
+):
+    """Process a single sample: call model, normalize results, save pre-annotation."""
+    sample = crud_sample.get(db=db, sample_id=sample_id)
+    if not sample or not sample.file:
+        raise ValueError(f"Sample {sample_id} not found or has no file")
+
+    # Build payload
+    labels, config_by_tool = _extract_tool_configs(task_config)
+    payload = {
+        "request_id": str(uuid.uuid4()),
+        "image_url": _get_image_url(sample.file),
+        "task": {"id": task.id, "name": task.name},
+        "labels": labels,
+        "constraints": {
+            "allowed_tools": list(config_by_tool.keys()),
+            "max_results_per_label": 100,
+            "filter_by_labels": filter_by_labels,
+        },
+        "prompt": None,
+    }
+
+    # Synchronous HTTP call (we're in a thread)
+    with httpx.Client(timeout=settings.AI_MODEL_TIMEOUT_SECONDS) as client:
+        response = client.post(settings.AI_MODEL_ENDPOINT, json=payload)
+        if response.status_code >= 400:
+            logger.error("model service returned {}: {}", response.status_code, response.text)
+        response.raise_for_status()
+        model_data = response.json()
+
+    normalized_payload = _normalize_results(
+        model_data=model_data,
+        sample_name=sample.file.filename,
+        task_config=task_config,
+    )
+
+    # Delete existing AI-generated pre-annotations for this sample
+    existing_pre_annotations, _ = crud_pre_annotation.list_by(
+        db=db, task_id=task.id, sample_name=sample.file.filename, page=0, size=100,
+    )
+    existing_ai = [item for item in existing_pre_annotations if _is_ai_generated(item)]
+
+    with begin_transaction(db):
+        if existing_ai:
+            crud_pre_annotation.delete(db=db, pre_annotation_ids=[item.id for item in existing_ai])
+
+        crud_pre_annotation.batch(
+            db=db,
+            pre_annotations=[
+                TaskPreAnnotation(
+                    task_id=task.id,
+                    file_id=None,
+                    sample_name=sample.file.filename,
+                    data=json.dumps(normalized_payload, ensure_ascii=False),
+                    created_by=job.created_by,
+                    updated_by=job.created_by,
+                )
+            ],
+        )

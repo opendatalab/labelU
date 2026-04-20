@@ -14,7 +14,7 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.service import sample as service
 from labelu.internal.application.service import auto_label as auto_label_service
-from labelu.internal.application.command.auto_label import AutoLabelCommand
+from labelu.internal.application.command.auto_label import AutoLabelCommand, BatchAutoLabelCommand
 from labelu.internal.application.command.sample import ExportType
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
@@ -27,7 +27,7 @@ from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.sample import CreateSampleResponse
-from labelu.internal.application.response.auto_label import AutoLabelResponse
+from labelu.internal.application.response.auto_label import AutoLabelResponse, AutoLabelJobResponse
 from labelu.internal.application.response.export import ExportJobResponse
 from labelu.internal.adapter.persistence import crud_export_job
 from labelu.internal.common.storage import get_storage_backend
@@ -188,6 +188,43 @@ async def auto_label(
         current_user=current_user,
     )
     return OkResp[AutoLabelResponse](data=data)
+
+
+@router.post(
+    "/{task_id}/auto_label_job",
+    response_model=OkResp[AutoLabelJobResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def create_auto_label_job(
+    task_id: int,
+    cmd: BatchAutoLabelCommand,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    data = await auto_label_service.create_batch_job(
+        db=db,
+        task_id=task_id,
+        cmd=cmd,
+        current_user=current_user,
+    )
+    return OkResp[AutoLabelJobResponse](data=data)
+
+
+@router.get(
+    "/{task_id}/auto_label_job/{job_id}",
+    response_model=OkResp[AutoLabelJobResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_auto_label_job_status(
+    task_id: int,
+    job_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    data = auto_label_service.get_batch_job(db=db, task_id=task_id, job_id=job_id)
+    return OkResp[AutoLabelJobResponse](data=data)
 
 
 @router.post(

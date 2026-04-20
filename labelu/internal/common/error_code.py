@@ -130,6 +130,10 @@ class ErrorCode(Enum):
         TASK_INIT_CODE + 6005,
         "AI model returned an unsupported tool type in response",
     )
+    CODE_56006_AUTO_LABEL_NO_SAMPLES = (
+        TASK_INIT_CODE + 6006,
+        "No unannotated samples found for batch auto-label",
+    )
     CODE_61000_NO_DATA = (
         EXPORT_INIT_CODE + 1000,
         "No data",
