@@ -14,5 +14,10 @@
     "type": "file",
     "name": "audio",
     "label": "音频"
+  },
+  {
+    "type": "file",
+    "name": "ai-annotation",
+    "label": "AI 自动标注"
   }
 ]

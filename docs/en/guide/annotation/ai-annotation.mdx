@@ -1,0 +1,157 @@
+# AI Auto-Annotation
+
+LabelU supports integrating AI model services to automatically annotate image data. AI-generated pre-annotations can serve as a starting point for manual annotation, significantly improving annotation efficiency.
+
+## Overview
+
+- Currently only supports auto-annotation for **image tasks**
+- Supported annotation tools: Rectangle (rectTool), Polygon (polygonTool), Point (pointTool), Line (lineTool)
+- AI annotation results are presented as pre-annotations that annotators can modify and refine
+
+## Prerequisites
+
+AI auto-annotation requires the following configuration by an administrator:
+
+### Environment Variables
+
+Set the following environment variables when deploying LabelU:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `AI_AUTO_LABEL_ENABLED` | Enable AI auto-annotation | `false` |
+| `AI_MODEL_ENDPOINT` | AI model service URL | None |
+| `AI_MODEL_TIMEOUT_SECONDS` | Model request timeout (seconds) | `60` |
+| `AI_PROVIDER` | AI service provider identifier | None |
+| `AI_MODEL_NAME` | Model name identifier | None |
+
+Example configuration:
+
+```bash
+export AI_AUTO_LABEL_ENABLED=true
+export AI_MODEL_ENDPOINT=http://your-model-service:8080/predict
+export AI_MODEL_TIMEOUT_SECONDS=120
+export AI_PROVIDER=openai
+export AI_MODEL_NAME=gpt-4-vision
+```
+
+### Annotation Configuration Requirements
+
+The task's annotation configuration must include at least one supported annotation tool (Rectangle, Polygon, Point, or Line) with label attributes configured. The AI model generates annotation results based on these labels.
+
+## Usage
+
+### Trigger AI Annotation
+
+1. Enter the image annotation page
+2. Click the "AI Annotation" button in the top-right toolbar
+
+{/* TODO: Screenshot - AI Annotation button in the top-right corner of annotation page */}
+
+3. The system sends the current image and task configuration to the AI model for inference
+4. After the model returns results, annotations are automatically displayed on the image
+
+{/* TODO: Screenshot - Annotation results after AI annotation completes */}
+
+### Result Handling
+
+- AI annotation results are loaded as **pre-annotations** that annotators can adjust directly
+- Clicking "AI Annotation" again will overwrite previous AI annotation results
+- Manual annotations are not affected; AI annotation results are stored independently
+
+:::tip
+AI annotation results are provided as references. It is recommended that annotators review and correct the results to ensure annotation quality.
+:::
+
+## Error Handling
+
+You may encounter the following messages when using AI annotation:
+
+| Error Message | Description | Solution |
+|---------------|-------------|----------|
+| AI annotation is not enabled | AI annotation is disabled | Contact admin to set `AI_AUTO_LABEL_ENABLED=true` |
+| AI annotation only supports image tasks | Unsupported media type | AI annotation only works with image tasks |
+| No annotation tools with labels configured | No tools configured | Add supported tools with label attributes in annotation config |
+| AI model endpoint is not configured | Model URL not set | Contact admin to set `AI_MODEL_ENDPOINT` |
+| AI model service request failed | Model service error | Check if the model service is running properly |
+
+## Model Service API Specification
+
+To build your own AI model service, implement the following API:
+
+### Request Format
+
+```json
+POST /predict
+Content-Type: application/json
+
+{
+  "request_id": "uuid",
+  "image_url": "https://presigned-url-to-image",
+  "task": {
+    "id": 1,
+    "name": "Task Name"
+  },
+  "labels": [
+    {
+      "name": "cat",
+      "display_name": "Cat",
+      "color": "#ff0000",
+      "tool": "rectTool"
+    }
+  ],
+  "constraints": {
+    "allowed_tools": ["rectTool", "polygonTool"],
+    "max_results_per_label": 100
+  },
+  "prompt": "optional user prompt"
+}
+```
+
+### Response Format
+
+```json
+{
+  "model": "model-name",
+  "latency_ms": 1500,
+  "warning_message": null,
+  "results": {
+    "rectTool": [
+      {
+        "id": "uuid",
+        "x": 100,
+        "y": 200,
+        "width": 150,
+        "height": 80,
+        "label": "cat",
+        "score": 0.95,
+        "order": 0
+      }
+    ],
+    "polygonTool": [
+      {
+        "id": "uuid",
+        "points": [
+          {"x": 10, "y": 20},
+          {"x": 50, "y": 20},
+          {"x": 50, "y": 60}
+        ],
+        "type": "line",
+        "label": "road",
+        "score": 0.88,
+        "order": 1
+      }
+    ]
+  }
+}
+```
+
+### Result Fields by Tool
+
+| Tool | Required Fields |
+|------|----------------|
+| rectTool | `x`, `y`, `width`, `height`, `label` |
+| polygonTool | `points` (coordinate array), `label` |
+| lineTool | `points` (coordinate array), `label` |
+| pointTool | `x`, `y`, `label` |
+
+Optional common fields: `id`, `order`, `score`, `visible`, `attributes`

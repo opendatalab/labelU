@@ -12,6 +12,11 @@
   },
   {
     "type": "file",
+    "name": "datasource",
+    "label": "S3 Data Source Import"
+  },
+  {
+    "type": "file",
     "name": "config",
     "label": "Annotation Config"
   }

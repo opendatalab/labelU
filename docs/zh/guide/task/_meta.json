@@ -12,6 +12,11 @@
   },
   {
     "type": "file",
+    "name": "datasource",
+    "label": "S3 数据源导入"
+  },
+  {
+    "type": "file",
     "name": "config",
     "label": "标注配置"
   }
