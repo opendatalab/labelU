@@ -1,7 +1,7 @@
 import re
 import aiofiles
 import os
-from PIL import Image
+import tempfile
 from pathlib import Path
 
 from loguru import logger
@@ -12,6 +12,13 @@ from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
+from labelu.internal.common.storage import (
+    build_attachment_api_path,
+    build_partial_api_path,
+    build_thumbnail_key,
+    create_thumbnail_bytes,
+    get_storage_backend,
+)
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.attachment import TaskAttachment
 from labelu.internal.adapter.persistence import crud_task
@@ -22,9 +29,48 @@ from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.attachment import AttachmentResponse
 
 
+def build_attachment_response(attachment) -> AttachmentResponse | None:
+    if not attachment:
+        return None
+
+    # External data source attachment — use the data source's own credentials
+    if getattr(attachment, "data_source_id", None) and getattr(attachment, "data_source", None):
+        from labelu.internal.application.service.datasource import get_presigned_url
+        url = get_presigned_url(attachment.data_source, attachment.path)
+        return AttachmentResponse(
+            id=attachment.id,
+            filename=attachment.filename,
+            url=url,
+            thumbnail_url=None,
+            stream_url=url,
+            storage_backend="s3",
+        )
+
+    # Local or global S3 storage
+    storage = get_storage_backend()
+    if storage.is_remote:
+        url = storage.get_read_url(attachment.path)
+        thumbnail_key = build_thumbnail_key(attachment.path)
+        thumbnail_url = storage.get_read_url(thumbnail_key) if storage.exists(thumbnail_key) else None
+        stream_url = url
+    else:
+        url = attachment.url or build_attachment_api_path(attachment.path)
+        thumbnail_url = build_attachment_api_path(build_thumbnail_key(attachment.path))
+        stream_url = build_partial_api_path(attachment.path)
+    return AttachmentResponse(
+        id=attachment.id,
+        filename=attachment.filename,
+        url=url,
+        thumbnail_url=thumbnail_url,
+        stream_url=stream_url,
+        storage_backend=storage.backend_name,
+    )
+
+
 async def create(
     db: Session, task_id: int, cmd: AttachmentCommand, current_user: User
 ) -> AttachmentResponse:
+    storage = get_storage_backend()
 
     task = crud_task.get(db=db, task_id=task_id)
     if not task:
@@ -46,29 +92,25 @@ async def create(
     )
     attachment_relative_path = str(attachment_relative_base_dir.joinpath(sanitized))
 
-    # file full path
-    attachment_full_base_dir = Path(settings.MEDIA_ROOT).joinpath(
-        attachment_relative_base_dir
-    )
-    attachment_full_path = Path(settings.MEDIA_ROOT).joinpath(
-        attachment_relative_path
-    )
-
     # check file exist
-    if attachment_full_path.exists():
-        logger.error("file already exists:{}", attachment_full_path)
+    if storage.exists(attachment_relative_path):
+        logger.error("file already exists:{}", attachment_relative_path)
         raise LabelUException(
             code=ErrorCode.CODE_51002_TASK_ATTACHMENT_ALREADY_EXISTS,
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-        
-    # create dicreatory
-    attachment_full_base_dir.mkdir(parents=True, exist_ok=True)
-    
+
     CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
-    logger.info(attachment_full_path)
+    thumbnail_key = build_thumbnail_key(attachment_relative_path)
+    thumbnail_bytes = None
+    temp_file_path = None
+
     try:
-        async with aiofiles.open(attachment_full_path, "wb") as out_file:
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        temp_file_path = Path(temp_file.name)
+        temp_file.close()
+
+        async with aiofiles.open(temp_file_path, "wb") as out_file:
             total_size = 0
             while True:
                 chunk = await cmd.file.read(CHUNK_SIZE)
@@ -78,43 +120,50 @@ async def create(
                 total_size += len(chunk)
                 logger.debug(f"{total_size} bytes written")
 
-        logger.info(f"File saved: {attachment_full_path}, size: {total_size} bytes")
+        if cmd.file.content_type and cmd.file.content_type.startswith("image/"):
+            thumbnail_bytes = create_thumbnail_bytes(temp_file_path)
+
+        storage.save_file(
+            local_path=temp_file_path,
+            key=attachment_relative_path,
+            content_type=cmd.file.content_type,
+        )
+
+        if thumbnail_bytes:
+            storage.save_bytes(
+                content=thumbnail_bytes,
+                key=thumbnail_key,
+                content_type=cmd.file.content_type,
+            )
+
+        if temp_file_path and temp_file_path.exists():
+            os.remove(temp_file_path)
+
+        logger.info(f"File saved: {attachment_relative_path}, size: {total_size} bytes")
     except Exception as e:
-        if attachment_full_path.exists():
-            os.remove(attachment_full_path)
+        if temp_file_path and temp_file_path.exists():
+            os.remove(temp_file_path)
+        if storage.exists(attachment_relative_path):
+            storage.delete(attachment_relative_path)
+        if thumbnail_bytes and storage.exists(thumbnail_key):
+            storage.delete(thumbnail_key)
         logger.error(f"Upload failed: {str(e)}")
         raise LabelUException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Upload failed: {str(e)}"
         )
-
-    # create thumbnail for image
-    if cmd.file.content_type.startswith("image/"):
-        tumbnail_full_path = Path(
-            f"{attachment_full_path.parent}/{attachment_full_path.stem}-thumbnail{attachment_full_path.suffix}"
-        )
-        logger.info(tumbnail_full_path)
-        image = Image.open(attachment_full_path)
-        image.thumbnail(
-            (
-                round(image.width / image.height * settings.THUMBNAIL_HEIGH_PIXEL),
-                settings.THUMBNAIL_HEIGH_PIXEL,
-            ),
-        )
-        if image.mode != "RGB":
-            image = image.convert("RGB")
-        image.save(tumbnail_full_path)
 
     # check file already saved
-    if not attachment_full_path.exists() or (
-        cmd.file.content_type.startswith("image/") and not tumbnail_full_path.exists()
+    if not storage.exists(attachment_relative_path) or (
+        cmd.file.content_type
+        and cmd.file.content_type.startswith("image/")
+        and not storage.exists(thumbnail_key)
     ):
         logger.error(
             "cannot find saved images, path is:{}, image content-type is:{}, thumbnail path is:{}",
-            attachment_full_path,
+            attachment_relative_path,
             cmd.file.content_type,
-            tumbnail_full_path,
+            thumbnail_key,
         )
         raise LabelUException(
             code=ErrorCode.CODE_51000_CREATE_ATTACHMENT_ERROR,
@@ -122,7 +171,7 @@ async def create(
         )
 
     attachment_url_path = attachment_relative_path.replace("\\", "/")
-    attachment_api_url = f"{settings.API_V1_STR}/tasks/attachment/{attachment_url_path}"
+    attachment_api_url = build_attachment_api_path(attachment_url_path)
     # add a task file record
     with begin_transaction(db):
         attachment = crud_attachment.create(
@@ -138,31 +187,45 @@ async def create(
         )
 
     # response
+    if storage.is_remote:
+        url = storage.get_read_url(attachment_url_path)
+        thumb_url = storage.get_read_url(thumbnail_key) if thumbnail_bytes else None
+        stream = url
+    else:
+        url = attachment_api_url
+        thumb_url = build_attachment_api_path(thumbnail_key) if thumbnail_bytes else None
+        stream = build_partial_api_path(attachment_url_path)
     return AttachmentResponse(
         id=attachment.id,
-        url=attachment_api_url,
+        url=url,
+        thumbnail_url=thumb_url,
+        stream_url=stream,
+        storage_backend=storage.backend_name,
         filename=sanitized,
     )
 
 
-async def download_attachment(file_path: str) -> str:
+async def download_attachment(file_path: str) -> dict:
+    storage = get_storage_backend()
 
     # check file exist
-    file_full_path = settings.MEDIA_ROOT.joinpath(file_path.lstrip("/"))
-    if not file_full_path.is_file() or not file_full_path.exists():
-        logger.error("attachment not found:{}", file_full_path)
+    if not storage.exists(file_path):
+        logger.error("attachment not found:{}", file_path)
         raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    # response
-    return file_full_path
+    local_path = storage.get_local_path(file_path)
+    if local_path:
+        return {"local_path": str(local_path)}
+    return {"redirect_url": storage.get_read_url(file_path)}
 
 
 async def delete(
     db: Session, task_id: int, cmd: AttachmentDeleteCommand, current_user: User
 ) -> CommonDataResp:
+    storage = get_storage_backend()
 
     # get task
     task = crud_task.get(db=db, task_id=task_id)
@@ -190,8 +253,10 @@ async def delete(
             db=db, attachment_ids=cmd.attachment_ids
         )
         for attachment in attachments:
-            file_full_path = Path(settings.MEDIA_ROOT).joinpath(attachment.path)
-            os.remove(file_full_path)
+            storage.delete(attachment.path)
+            thumbnail_key = build_thumbnail_key(attachment.path)
+            if storage.exists(thumbnail_key):
+                storage.delete(thumbnail_key)
     except Exception as e:
         logger.error(e)
 
