@@ -1,0 +1,91 @@
+# S3 Data Source Import
+
+In addition to uploading local files, LabelU supports importing data from S3-compatible object storage services (such as AWS S3, MinIO, Alibaba Cloud OSS, etc.).
+
+## Create a Data Source
+
+Before importing data, you need to create a data source connection.
+
+### Access Data Source Management
+
+Click the "Data Sources" menu in the top navigation bar to access the data source management page.
+
+{/* TODO: Screenshot - Data source management page entry */}
+
+### Create a New Data Source
+
+Click the "New Data Source" button and fill in the following configuration:
+
+| Field | Description | Required |
+|-------|-------------|----------|
+| Name | Data source name for identification | Yes |
+| Endpoint | S3 service URL, e.g. `https://s3.amazonaws.com` | Yes |
+| Region | Region, e.g. `us-east-1` | No |
+| Bucket | Storage bucket name | Yes |
+| Prefix | Path prefix to limit the file browsing scope | No |
+| Access Key ID | Access key ID | Yes |
+| Secret Access Key | Secret access key | Yes |
+| Path Style | Whether to use path-style access (required for self-hosted storage like MinIO) | No |
+| Use SSL | Whether to use HTTPS connection | No |
+| Presign Expiry | Presigned URL expiry time in seconds (default: 3600) | No |
+
+{/* TODO: Screenshot - New data source form */}
+
+:::tip
+- For self-hosted storage services like MinIO, enable the "Path Style" option
+- Access Key and Secret Key are stored encrypted
+:::
+
+## Import Files from Data Source
+
+After creating a task, you can import files from an S3 data source in the "Data Import" step.
+
+### Open S3 Import Dialog
+
+On the data import page, click the "S3 Import" button to open the import dialog.
+
+{/* TODO: Screenshot - S3 Import button on data import page */}
+
+### Select Data Source
+
+Select a previously created data source in the dialog. The system will automatically list the files under that data source.
+
+{/* TODO: Screenshot - S3 import dialog showing data source selection and file list */}
+
+### Browse and Import
+
+Two import methods are supported:
+
+#### Method 1: Import Selected
+
+1. Check the files you want to import in the file list
+2. Click the "Import Selected" button at the bottom
+3. Only checked files will be imported
+
+#### Method 2: Import All
+
+1. After selecting a data source, no need to check individual files
+2. Click the "Import All" button at the bottom
+3. The system will automatically import all files matching the media type under the current path
+
+{/* TODO: Screenshot - S3 import dialog footer area (Import Selected + Import All buttons) */}
+
+:::info
+- The "Import All" feature automatically filters files by extension based on the task's media type (e.g., image tasks only import jpg, png, etc.)
+- Maximum of 10,000 files per import
+- Files with duplicate names that have already been imported will not be imported again
+:::
+
+### Import Results
+
+After successful import, files will appear in the upload list on the data import page with a "Success" status.
+
+{/* TODO: Screenshot - File list after successful import */}
+
+## File Preview
+
+Files imported from S3 can be previewed normally in both the sample list and annotation pages. The system automatically generates time-limited presigned URLs for file access.
+
+:::note
+The presigned URL expiry is determined by the "Presign Expiry" setting in the data source configuration. Refresh the page after expiry to obtain new URLs.
+:::

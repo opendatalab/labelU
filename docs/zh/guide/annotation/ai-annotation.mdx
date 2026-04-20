@@ -1,0 +1,157 @@
+# AI 自动标注
+
+LabelU 支持接入 AI 模型服务，对图片数据进行自动标注。AI 自动标注生成的预标注结果可作为人工标注的起点，显著提升标注效率。
+
+## 功能说明
+
+- 目前仅支持**图片任务**的自动标注
+- 支持的标注工具：拉框（rectTool）、多边形（polygonTool）、标点（pointTool）、标线（lineTool）
+- AI 标注结果以预标注形式呈现，标注人员可在此基础上修改和完善
+
+## 前置配置
+
+AI 自动标注需要管理员进行以下配置后方可使用：
+
+### 环境变量
+
+在部署 LabelU 时设置以下环境变量：
+
+| 环境变量 | 说明 | 默认值 |
+|---------|------|--------|
+| `AI_AUTO_LABEL_ENABLED` | 是否启用 AI 自动标注 | `false` |
+| `AI_MODEL_ENDPOINT` | AI 模型服务地址 | 无 |
+| `AI_MODEL_TIMEOUT_SECONDS` | 模型请求超时时间（秒） | `60` |
+| `AI_PROVIDER` | AI 服务提供商标识 | 无 |
+| `AI_MODEL_NAME` | 模型名称标识 | 无 |
+
+示例配置：
+
+```bash
+export AI_AUTO_LABEL_ENABLED=true
+export AI_MODEL_ENDPOINT=http://your-model-service:8080/predict
+export AI_MODEL_TIMEOUT_SECONDS=120
+export AI_PROVIDER=openai
+export AI_MODEL_NAME=gpt-4-vision
+```
+
+### 标注配置要求
+
+任务的标注配置中至少需要一个支持的标注工具（拉框、多边形、标点、标线），且工具下需配置标签属性（attributes），AI 模型会根据这些标签生成对应的标注结果。
+
+## 使用方式
+
+### 触发 AI 标注
+
+1. 进入图片标注页面
+2. 在右上角工具栏中，点击「AI 标注」按钮
+
+{/* TODO: 截图 - 标注页面右上角的 AI 标注按钮 */}
+
+3. 系统会将当前图片和任务配置发送给 AI 模型进行推理
+4. 等待模型返回结果后，标注会自动展示在图片上
+
+{/* TODO: 截图 - AI 标注完成后的标注结果展示 */}
+
+### 结果处理
+
+- AI 标注结果会以**预标注**形式加载，标注人员可以直接在此基础上进行调整
+- 再次点击「AI 标注」会覆盖之前的 AI 标注结果
+- 手动标注的结果不受影响，AI 标注结果独立存储
+
+:::tip
+AI 标注结果仅作为参考，建议标注人员对结果进行人工审核和必要的修正，以确保标注质量。
+:::
+
+## 错误处理
+
+使用 AI 标注时可能遇到以下提示：
+
+| 错误提示 | 说明 | 解决方案 |
+|---------|------|---------|
+| AI annotation is not enabled | AI 标注未启用 | 联系管理员设置 `AI_AUTO_LABEL_ENABLED=true` |
+| AI annotation only supports image tasks | 不支持的媒体类型 | AI 标注仅支持图片任务 |
+| No annotation tools with labels configured | 未配置标注工具 | 在标注配置中添加支持的工具并配置标签 |
+| AI model endpoint is not configured | 模型地址未配置 | 联系管理员设置 `AI_MODEL_ENDPOINT` |
+| AI model service request failed | 模型服务请求失败 | 检查模型服务是否正常运行 |
+
+## 模型服务接口规范
+
+如需自行搭建 AI 模型服务，需实现以下接口：
+
+### 请求格式
+
+```json
+POST /predict
+Content-Type: application/json
+
+{
+  "request_id": "uuid",
+  "image_url": "https://presigned-url-to-image",
+  "task": {
+    "id": 1,
+    "name": "任务名称"
+  },
+  "labels": [
+    {
+      "name": "cat",
+      "display_name": "猫",
+      "color": "#ff0000",
+      "tool": "rectTool"
+    }
+  ],
+  "constraints": {
+    "allowed_tools": ["rectTool", "polygonTool"],
+    "max_results_per_label": 100
+  },
+  "prompt": "optional user prompt"
+}
+```
+
+### 响应格式
+
+```json
+{
+  "model": "model-name",
+  "latency_ms": 1500,
+  "warning_message": null,
+  "results": {
+    "rectTool": [
+      {
+        "id": "uuid",
+        "x": 100,
+        "y": 200,
+        "width": 150,
+        "height": 80,
+        "label": "cat",
+        "score": 0.95,
+        "order": 0
+      }
+    ],
+    "polygonTool": [
+      {
+        "id": "uuid",
+        "points": [
+          {"x": 10, "y": 20},
+          {"x": 50, "y": 20},
+          {"x": 50, "y": 60}
+        ],
+        "type": "line",
+        "label": "road",
+        "score": 0.88,
+        "order": 1
+      }
+    ]
+  }
+}
+```
+
+### 各工具的结果字段
+
+| 工具 | 必要字段 |
+|------|---------|
+| rectTool | `x`, `y`, `width`, `height`, `label` |
+| polygonTool | `points` (坐标数组), `label` |
+| lineTool | `points` (坐标数组), `label` |
+| pointTool | `x`, `y`, `label` |
+
+可选公共字段：`id`, `order`, `score`, `visible`, `attributes`

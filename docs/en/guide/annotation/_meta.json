@@ -14,5 +14,10 @@
     "type": "file",
     "name": "audio",
     "label": "Audio"
+  },
+  {
+    "type": "file",
+    "name": "ai-annotation",
+    "label": "AI Auto-Annotation"
   }
 ]
