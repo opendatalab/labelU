@@ -86,6 +86,7 @@ def _build_model_payload(sample, task, task_config: dict[str, Any], cmd: AutoLab
         "constraints": {
             "allowed_tools": list(config_by_tool.keys()),
             "max_results_per_label": 100,
+            "filter_by_labels": cmd.filter_by_labels,
         },
         "prompt": cmd.prompt,
     }
