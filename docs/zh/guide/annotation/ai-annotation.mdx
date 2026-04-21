@@ -12,20 +12,7 @@ LabelU 支持接入 AI 模型服务，对图片数据进行自动标注。AI 自
 
 ## 整体架构
 
-```
-┌──────────────────┐         HTTP POST /         ┌──────────────────────┐
-│                  │  ──────────────────────────► │                      │
-│   LabelU 后端    │   image_url + labels +       │   模型服务 (Model    │
-│   (FastAPI)      │   constraints                │   Server)            │
-│                  │  ◄────────────────────────── │                      │
-└──────────────────┘      results[]               └──────────────────────┘
-        │                                                   │
-        │  读写数据库                                         │  下载图片 & 推理
-        ▼                                                   ▼
-┌──────────────────┐                              ┌──────────────────────┐
-│  SQLite / MySQL  │                              │  GPU / CPU           │
-└──────────────────┘                              └──────────────────────┘
-```
+![](/assets/arch.png)
 
 工作流程：
 1. 用户在前端触发 AI 标注（单张或批量）
@@ -183,12 +170,16 @@ AI_MODEL_NAME=florence-2-base     # 或 grounding-dino-tiny+efficient-sam / sam3
 1. 进入图片标注页面
 2. 在右上角工具栏中，点击「AI 标注」按钮
 
-{/* TODO: 截图 - 标注页面右上角的 AI 标注按钮 */}
+![florence2](/assets/ai-annotation.jpeg)
 
 3. 系统会将当前图片和任务配置发送给 AI 模型进行推理
 4. 等待模型返回结果后，标注会自动展示在图片上
 
-{/* TODO: 截图 - AI 标注完成后的标注结果展示 */}
+![](/assets/ai-annotation-result.jpeg)
+> 目标检测，使用 florence2 模型标注
+
+![](/assets/ai-annotation-segment.jpeg)
+> 目标分割，使用 florence2 模型标注
 
 ### 批量 AI 标注
 
