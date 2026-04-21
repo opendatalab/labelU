@@ -199,36 +199,65 @@ def _segment_for_labels(
     image: Image.Image,
     labels: list[LabelItem],
     max_per_label: int,
+    filter_by_labels: bool = False,
 ) -> list[ResultItem]:
-    """Use <REFERRING_EXPRESSION_SEGMENTATION> per label for polygon output."""
-    results: list[ResultItem] = []
-    for lbl in labels:
-        if lbl.tool != "polygonTool":
-            continue
-        raw = _run_florence(image, "<REFERRING_EXPRESSION_SEGMENTATION>", lbl.name)
-        seg_data = raw.get("<REFERRING_EXPRESSION_SEGMENTATION>", {})
-        polygons_raw = seg_data.get("polygons", [])
+    """Detect all instances first, then segment each via <REGION_TO_SEGMENTATION>.
 
-        for i, polygon in enumerate(polygons_raw[:max_per_label]):
-            if isinstance(polygon, list) and len(polygon) > 0:
-                if isinstance(polygon[0], list):
+    <REFERRING_EXPRESSION_SEGMENTATION> only returns ONE object per query.
+    To get all instances we: 1) detect bboxes, 2) segment each bbox region.
+    """
+    results: list[ResultItem] = []
+    seg_labels = [lbl for lbl in labels if lbl.tool == "polygonTool"]
+    if not seg_labels:
+        return results
+
+    # Step 1: detect all objects to get bounding boxes
+    det_results = _detect_with_grounding(image, seg_labels, max_per_label, filter_by_labels)
+    logger.info("Segment pipeline: detected %d bboxes for polygon labels", len(det_results))
+
+    # Step 2: for each detected bbox, run region-based segmentation
+    for det in det_results:
+        bbox = det.result  # {x, y, width, height}
+        x1 = bbox["x"]
+        y1 = bbox["y"]
+        x2 = x1 + bbox["width"]
+        y2 = y1 + bbox["height"]
+
+        # Florence-2 <REGION_TO_SEGMENTATION> expects "<loc_x1><loc_y1><loc_x2><loc_y2>"
+        # where coordinates are normalized to 0-999 range
+        w, h = image.size
+        loc_x1 = int(x1 / w * 999)
+        loc_y1 = int(y1 / h * 999)
+        loc_x2 = int(x2 / w * 999)
+        loc_y2 = int(y2 / h * 999)
+        region_text = f"<loc_{loc_x1}><loc_{loc_y1}><loc_{loc_x2}><loc_{loc_y2}>"
+
+        try:
+            raw = _run_florence(image, "<REGION_TO_SEGMENTATION>", region_text)
+            seg_data = raw.get("<REGION_TO_SEGMENTATION>", {})
+            polygons_raw = seg_data.get("polygons", [])
+
+            for polygon in polygons_raw[:1]:  # one polygon per bbox
+                if isinstance(polygon, list) and len(polygon) > 0:
+                    coords = polygon[0] if isinstance(polygon[0], list) else polygon
                     points = [
-                        {"x": float(polygon[0][j]), "y": float(polygon[0][j + 1])}
-                        for j in range(0, len(polygon[0]), 2)
+                        {"x": float(coords[j]), "y": float(coords[j + 1])}
+                        for j in range(0, len(coords), 2)
                     ]
-                else:
-                    points = [
-                        {"x": float(polygon[j]), "y": float(polygon[j + 1])}
-                        for j in range(0, len(polygon), 2)
-                    ]
-                if len(points) >= 3:
-                    results.append(
-                        ResultItem(
-                            toolName="polygonTool",
-                            label=lbl.name,
-                            result={"type": "line", "points": points},
+                    if len(points) >= 3:
+                        results.append(
+                            ResultItem(
+                                toolName="polygonTool",
+                                label=det.label,
+                                result={"type": "line", "points": points},
+                                score=det.score,
+                            )
                         )
-                    )
+        except Exception as exc:
+            logger.warning("Region segmentation failed for bbox %s: %s", bbox, exc)
+            # Fallback: skip this object's polygon
+            continue
+
     return results
 
 
@@ -269,7 +298,7 @@ async def predict(req: PredictRequest) -> PredictResponse:
     if need_segment:
         seg_labels = [l for l in req.labels if l.tool == "polygonTool"]
         if seg_labels:
-            results.extend(_segment_for_labels(image, seg_labels, max_per))
+            results.extend(_segment_for_labels(image, seg_labels, max_per, req.constraints.filter_by_labels))
 
     latency = int((time.perf_counter() - start) * 1000)
     return PredictResponse(model=MODEL_NAME, latency_ms=latency, results=results)

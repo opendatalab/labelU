@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     AI_AUTO_LABEL_ENABLED: bool = False
     AI_PROVIDER: str = "local_http"
     AI_MODEL_ENDPOINT: str = ""
-    AI_MODEL_TIMEOUT_SECONDS: int = 60
+    AI_MODEL_TIMEOUT_SECONDS: int = 300
     AI_MODEL_NAME: str = ""
     AI_IMAGE_URL_EXPIRE_SECONDS: int = 300
 

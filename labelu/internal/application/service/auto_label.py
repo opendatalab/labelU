@@ -283,9 +283,10 @@ async def create(
             model_data = response.json()
     except Exception as exc:
         logger.opt(exception=exc).error("auto label model request failed")
+        detail = response.text if 'response' in dir() and hasattr(response, 'text') else str(exc)
         raise LabelUException(
             code=ErrorCode.CODE_56003_AUTO_LABEL_MODEL_ERROR,
-            message=response.text,
+            message=detail,
             status_code=status.HTTP_502_BAD_GATEWAY,
         )
 
