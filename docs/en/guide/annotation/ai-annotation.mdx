@@ -12,20 +12,7 @@ LabelU supports integrating AI model services to automatically annotate image da
 
 ## Architecture
 
-```
-┌──────────────────┐         HTTP POST /         ┌──────────────────────┐
-│                  │  ──────────────────────────► │                      │
-│   LabelU Backend │   image_url + labels +       │   Model Server       │
-│   (FastAPI)      │   constraints                │                      │
-│                  │  ◄────────────────────────── │                      │
-└──────────────────┘      results[]               └──────────────────────┘
-        │                                                   │
-        │  Read/Write DB                                    │  Download image & inference
-        ▼                                                   ▼
-┌──────────────────┐                              ┌──────────────────────┐
-│  SQLite / MySQL  │                              │  GPU / CPU           │
-└──────────────────┘                              └──────────────────────┘
-```
+![](/assets/arch.png)
 
 Workflow:
 1. User triggers AI annotation from the frontend (single or batch)
