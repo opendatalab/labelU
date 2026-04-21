@@ -4,7 +4,7 @@ import aiofiles
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
 from fastapi import File, Header, UploadFile
-from fastapi.responses import FileResponse, StreamingResponse, Response
+from fastapi.responses import FileResponse, StreamingResponse, Response, RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials
 import mimetypes
 
@@ -60,8 +60,9 @@ async def download_attachment(file_path: str):
 
     # business logic
     data = await service.download_attachment(file_path=file_path)
-    
-    return data
+    if data.get("redirect_url"):
+        return RedirectResponse(url=data["redirect_url"], status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    return FileResponse(path=data["local_path"])
 
 @router.get(
     "/partial/{file_path:path}",
@@ -75,7 +76,9 @@ async def get_content(file_path: str, range: str = Header(None)):
     
     try:
         full_path = await service.download_attachment(file_path=file_path)
-        full_path = Path(full_path) 
+        if full_path.get("redirect_url"):
+            return RedirectResponse(url=full_path["redirect_url"], status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+        full_path = Path(full_path["local_path"])
     except (FileNotFoundError, OSError, LabelUException):
         raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,

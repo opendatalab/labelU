@@ -12,6 +12,8 @@ dependencies = [
     "fastapi>=0.100.0",
     "loguru>=0.6.0",
     "sqlalchemy>=2.0.0",
+    "boto3",
+    "cryptography>=41.0.0",
     "python-jose[cryptography]>=3.3.0",
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",

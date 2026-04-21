@@ -106,9 +106,49 @@ class ErrorCode(Enum):
         TASK_INIT_CODE + 5003,
         "Sample name exists",
     )
+    CODE_56000_AUTO_LABEL_DISABLED = (
+        TASK_INIT_CODE + 6000,
+        "AI annotation is not enabled. Set AI_AUTO_LABEL_ENABLED=true to activate",
+    )
+    CODE_56001_AUTO_LABEL_UNSUPPORTED_MEDIA = (
+        TASK_INIT_CODE + 6001,
+        "AI annotation only supports image tasks",
+    )
+    CODE_56002_AUTO_LABEL_NO_LABELS_CONFIGURED = (
+        TASK_INIT_CODE + 6002,
+        "No annotation tools with labels configured for AI annotation",
+    )
+    CODE_56003_AUTO_LABEL_MODEL_ERROR = (
+        TASK_INIT_CODE + 6003,
+        "AI model service request failed",
+    )
+    CODE_56004_AUTO_LABEL_NOT_CONFIGURED = (
+        TASK_INIT_CODE + 6004,
+        "AI model endpoint is not configured. Set AI_MODEL_ENDPOINT in settings",
+    )
+    CODE_56005_AUTO_LABEL_INVALID_RESPONSE = (
+        TASK_INIT_CODE + 6005,
+        "AI model returned an unsupported tool type in response",
+    )
+    CODE_56006_AUTO_LABEL_NO_SAMPLES = (
+        TASK_INIT_CODE + 6006,
+        "No unannotated samples found for batch auto-label",
+    )
     CODE_61000_NO_DATA = (
         EXPORT_INIT_CODE + 1000,
         "No data",
+    )
+    CODE_62000_S3_IMPORT_TOO_MANY = (
+        EXPORT_INIT_CODE + 2000,
+        "Too many files to import (max 10000)",
+    )
+    CODE_62001_S3_IMPORT_NO_MATCH = (
+        EXPORT_INIT_CODE + 2001,
+        "No matching files found under the specified prefix",
+    )
+    CODE_62002_S3_REQUEST_FAILED = (
+        EXPORT_INIT_CODE + 2002,
+        "Failed to connect to S3 storage service",
     )
 
 
@@ -128,9 +168,9 @@ def _request_context(request: Request) -> str:
 
 class LabelUException(HTTPException):
     def __init__(
-        self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        self, code: ErrorCode, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, message: str = None
     ):
-        self.msg = code.value[1]
+        self.msg = message or code.value[1]
         self.code = code.value[0]
         super().__init__(status_code=status_code, detail=self.msg)
 

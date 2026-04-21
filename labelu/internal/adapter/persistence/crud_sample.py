@@ -81,6 +81,18 @@ def get_by_ids(db: Session, sample_ids: List[int], task_id: Union[int, None] = N
     return db.query(TaskSample).filter(*query_filter).all()
 
 
+def list_new_samples(db: Session, task_id: int) -> List[TaskSample]:
+    return (
+        db.query(TaskSample)
+        .filter(
+            TaskSample.task_id == task_id,
+            TaskSample.state == SampleState.NEW.value,
+            TaskSample.deleted_at == None,
+        )
+        .all()
+    )
+
+
 def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSample:
     obj_data = jsonable_encoder(obj_in)
     for field in obj_data:

@@ -15,9 +15,14 @@ from labelu.internal.common.config import settings
 from labelu.internal.common.converter import converter
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
+from labelu.internal.common.storage import (
+    build_thumbnail_key,
+    get_storage_backend,
+)
 from labelu.internal.adapter.persistence import crud_attachment, crud_pre_annotation, crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.adapter.persistence import crud_export_job
+from labelu.internal.adapter.persistence import crud_datasource
 from labelu.internal.domain.models.pre_annotation import TaskPreAnnotation
 from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
@@ -28,26 +33,28 @@ from labelu.internal.domain.models.export_job import ExportStatus
 from labelu.internal.application.command.sample import ExportType
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
+from labelu.internal.application.command.datasource import ImportS3SamplesCommand
 from labelu.internal.application.response.base import UserResp
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.sample import SampleResponse
-from labelu.internal.application.response.attachment import AttachmentResponse
+from labelu.internal.application.service.attachment import build_attachment_response
 from labelu.internal.clients.ws import sampleConnectionManager
 from labelu.internal.common.websocket import Message, MessageType
 from labelu.internal.adapter.ws.sample import TaskSampleWsPayload
 
-def is_sample_pre_annotated(db: Session, task_id: int, sample_name: str | None = None) -> Tuple[List[TaskPreAnnotation], int]:
+
+def is_sample_pre_annotated(db: Session, task_id: int, sample_name: str | None = None) -> bool:
     if sample_name is None:
         return False
-    
+
     _, total = crud_pre_annotation.list_by(
         db=db,
         task_id=task_id,
         sample_name=sample_name,
         size=1,
     )
-    
+
     return total > 0
 
 async def create(
@@ -86,6 +93,134 @@ async def create(
     return CreateSampleResponse(ids=ids)
 
 
+MAX_IMPORT_KEYS = 10000
+
+
+def _collect_s3_keys(ds, prefix: str, extension: str | None) -> list[str]:
+    """List all matching S3 object keys under *prefix*, paginating internally."""
+    from labelu.internal.application.service.datasource import _build_s3_client
+
+    client = _build_s3_client(ds)
+    full_prefix = prefix if prefix else (ds.prefix or "")
+
+    allowed_exts = None
+    if extension:
+        allowed_exts = {
+            ("." + e.strip().lower().lstrip("."))
+            for e in extension.split(",")
+            if e.strip()
+        }
+
+    keys: list[str] = []
+    continuation_token = None
+
+    while True:
+        kwargs = {"Bucket": ds.bucket, "Prefix": full_prefix, "MaxKeys": 1000}
+        if continuation_token:
+            kwargs["ContinuationToken"] = continuation_token
+
+        try:
+            resp = client.list_objects_v2(**kwargs)
+        except Exception as exc:
+            logger.opt(exception=exc).error(
+                "S3 list_objects_v2 failed for datasource {}", ds.id
+            )
+            raise LabelUException(
+                code=ErrorCode.CODE_62002_S3_REQUEST_FAILED,
+                status_code=status.HTTP_502_BAD_GATEWAY,
+            )
+
+        for obj in resp.get("Contents", []):
+            key: str = obj["Key"]
+            if key.endswith("/"):
+                continue
+            if allowed_exts:
+                ext = ("." + key.rsplit(".", 1)[-1].lower()) if "." in key else ""
+                if ext not in allowed_exts:
+                    continue
+            keys.append(key)
+            if len(keys) > MAX_IMPORT_KEYS:
+                raise LabelUException(
+                    code=ErrorCode.CODE_62000_S3_IMPORT_TOO_MANY,
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
+
+        if not resp.get("IsTruncated"):
+            break
+        continuation_token = resp.get("NextContinuationToken")
+
+    return keys
+
+
+async def import_from_s3(
+    db: Session, task_id: int, cmd: ImportS3SamplesCommand, current_user: User,
+) -> CreateSampleResponse:
+    """Import S3 objects as task samples (no file copy — stores reference only)."""
+    from labelu.internal.domain.models.attachment import TaskAttachment
+    from labelu.internal.application.service.datasource import _build_s3_client
+
+    with begin_transaction(db):
+        task = crud_task.get(db=db, task_id=task_id, lock=True)
+        if not task:
+            raise LabelUException(
+                code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        ds = crud_datasource.get(db=db, ds_id=cmd.data_source_id)
+        if not ds:
+            raise LabelUException(
+                code=ErrorCode.CODE_61000_NO_DATA,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Resolve object keys: either from explicit list or by listing S3 prefix
+        object_keys = cmd.object_keys
+        if not object_keys and cmd.prefix is not None:
+            object_keys = _collect_s3_keys(ds, cmd.prefix, cmd.extension)
+
+        if not object_keys:
+            raise LabelUException(
+                code=ErrorCode.CODE_62001_S3_IMPORT_NO_MATCH,
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        attachments = []
+        for key in object_keys:
+            filename = key.rsplit("/", 1)[-1] if "/" in key else key
+            att = TaskAttachment(
+                path=key,
+                url="",
+                filename=filename,
+                task_id=task_id,
+                data_source_id=ds.id,
+                created_by=current_user.id,
+                updated_by=current_user.id,
+            )
+            db.add(att)
+            attachments.append(att)
+        db.flush()
+
+        samples = [
+            TaskSample(
+                inner_id=task.last_sample_inner_id + i + 1,
+                task_id=task_id,
+                file_id=att.id,
+                created_by=current_user.id,
+                updated_by=current_user.id,
+                data=json.dumps({}),
+            )
+            for i, att in enumerate(attachments)
+        ]
+        obj_in = {Task.last_sample_inner_id.key: task.last_sample_inner_id + len(samples)}
+        if task.status == TaskStatus.DRAFT.value:
+            obj_in[Task.status.key] = TaskStatus.IMPORTED
+        crud_task.update(db=db, db_obj=task, obj_in=obj_in)
+        new_samples = crud_sample.batch(db=db, samples=samples)
+
+    return CreateSampleResponse(ids=[s.id for s in new_samples])
+
+
 async def list_by(
     db: Session,
     task_id: Union[int, None],
@@ -116,7 +251,7 @@ async def list_by(
             data=json.loads(sample.data),
             annotated_count=sample.annotated_count,
             is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, sample_name=sample.file.filename if sample.file else None),
-            file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
+            file=build_attachment_response(sample.file),
             created_at=sample.created_at,
             created_by=UserResp(
                 id=sample.owner.id,
@@ -154,7 +289,7 @@ async def get(
         state=sample.state,
         data=json.loads(sample.data),
         is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, sample_name=sample.file.filename if sample.file else None),
-        file=AttachmentResponse(id=sample.file.id, filename=sample.file.filename, url=sample.file.url) if sample.file else None,
+        file=build_attachment_response(sample.file),
         annotated_count=sample.annotated_count,
         created_at=sample.created_at,
         created_by=UserResp(
@@ -249,6 +384,7 @@ async def patch(
         state=updated_sample.state,
         data=json.loads(updated_sample.data),
         is_pre_annotated=is_sample_pre_annotated(db=db, task_id=task_id, sample_name=sample.file.filename if sample.file else None),
+        file=build_attachment_response(updated_sample.file),
         annotated_count=updated_sample.annotated_count,
         created_at=updated_sample.created_at,
         created_by=UserResp(
@@ -266,6 +402,7 @@ async def patch(
 async def delete(
     db: Session, sample_ids: List[int], current_user: User
 ) -> CommonDataResp:
+    storage = get_storage_backend()
 
     with begin_transaction(db):
         # delete media
@@ -277,8 +414,10 @@ async def delete(
             db=db, attachment_ids=attachment_ids
         )
         for attachment in attachments:
-            file_full_path = Path(settings.MEDIA_ROOT).joinpath(attachment.path)
-            os.remove(file_full_path)
+            storage.delete(attachment.path)
+            thumbnail_key = build_thumbnail_key(attachment.path)
+            if storage.exists(thumbnail_key):
+                storage.delete(thumbnail_key)
         
         crud_sample.delete(db=db, sample_ids=sample_ids)
     # response
@@ -363,10 +502,20 @@ def _run_export_sync(job_id: int, task_id: int, export_type: ExportType, sample_
             format=export_type.value,
         )
 
+        storage = get_storage_backend()
+        if storage.is_remote:
+            local_export_path = Path(file_full_path)
+            export_key = f"{settings.EXPORT_DIR}/{local_export_path.name}"
+            storage.save_file(local_export_path, export_key)
+            local_export_path.unlink(missing_ok=True)
+            stored_path = export_key
+        else:
+            stored_path = str(file_full_path)
+
         with begin_transaction(db):
             crud_export_job.update_status(
                 db, job, ExportStatus.COMPLETED.value,
-                file_path=str(file_full_path),
+                file_path=stored_path,
                 processed_count=len(data),
             )
     except Exception as e:

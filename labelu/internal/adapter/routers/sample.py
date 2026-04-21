@@ -3,7 +3,7 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status, Security
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials
 
 from labelu.internal.common import db as db_module
@@ -13,19 +13,24 @@ from labelu.internal.common.error_code import LabelUException
 from labelu.internal.domain.models.user import User
 from labelu.internal.dependencies.user import get_current_user
 from labelu.internal.application.service import sample as service
+from labelu.internal.application.service import auto_label as auto_label_service
+from labelu.internal.application.command.auto_label import AutoLabelCommand, BatchAutoLabelCommand
 from labelu.internal.application.command.sample import ExportType
 from labelu.internal.application.command.sample import PatchSampleCommand
 from labelu.internal.application.command.sample import CreateSampleCommand
 from labelu.internal.application.command.sample import DeleteSampleCommand
 from labelu.internal.application.command.sample import ExportSampleCommand
+from labelu.internal.application.command.datasource import ImportS3SamplesCommand
 from labelu.internal.application.response.base import OkResp
 from labelu.internal.application.response.base import MetaData
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.base import OkRespWithMeta
 from labelu.internal.application.response.sample import SampleResponse
 from labelu.internal.application.response.sample import CreateSampleResponse
+from labelu.internal.application.response.auto_label import AutoLabelResponse, AutoLabelJobResponse
 from labelu.internal.application.response.export import ExportJobResponse
 from labelu.internal.adapter.persistence import crud_export_job
+from labelu.internal.common.storage import get_storage_backend
 
 
 router = APIRouter(prefix="/tasks", tags=["samples"])
@@ -162,6 +167,84 @@ async def update(
     return OkResp[SampleResponse](data=data)
 
 
+@router.post(
+    "/{task_id}/samples/{sample_id}/auto_label",
+    response_model=OkResp[AutoLabelResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def auto_label(
+    task_id: int,
+    sample_id: int,
+    cmd: AutoLabelCommand,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    data = await auto_label_service.create(
+        db=db,
+        task_id=task_id,
+        sample_id=sample_id,
+        cmd=cmd,
+        current_user=current_user,
+    )
+    return OkResp[AutoLabelResponse](data=data)
+
+
+@router.post(
+    "/{task_id}/auto_label_job",
+    response_model=OkResp[AutoLabelJobResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def create_auto_label_job(
+    task_id: int,
+    cmd: BatchAutoLabelCommand,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    data = await auto_label_service.create_batch_job(
+        db=db,
+        task_id=task_id,
+        cmd=cmd,
+        current_user=current_user,
+    )
+    return OkResp[AutoLabelJobResponse](data=data)
+
+
+@router.get(
+    "/{task_id}/auto_label_job/{job_id}",
+    response_model=OkResp[AutoLabelJobResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_auto_label_job_status(
+    task_id: int,
+    job_id: int,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    data = auto_label_service.get_batch_job(db=db, task_id=task_id, job_id=job_id)
+    return OkResp[AutoLabelJobResponse](data=data)
+
+
+@router.post(
+    "/{task_id}/samples/import_s3",
+    response_model=OkResp[CreateSampleResponse],
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_s3(
+    task_id: int,
+    cmd: ImportS3SamplesCommand,
+    authorization: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(db_module.get_db),
+    current_user: User = Depends(get_current_user),
+):
+    data = await service.import_from_s3(
+        db=db, task_id=task_id, cmd=cmd, current_user=current_user,
+    )
+    return OkResp[CreateSampleResponse](data=data)
+
+
 @router.delete(
     "/{task_id}/samples",
     response_model=OkResp[CommonDataResp],
@@ -289,6 +372,11 @@ async def download_export(
             code=ErrorCode.CODE_61000_NO_DATA,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+
+    storage = get_storage_backend()
+    if storage.is_remote:
+        download_url = storage.get_read_url(job.file_path)
+        return RedirectResponse(url=download_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
     file_path = Path(job.file_path)
     media_type = ".json" if file_path.suffix == ".json" else file_path.suffix.strip(".")

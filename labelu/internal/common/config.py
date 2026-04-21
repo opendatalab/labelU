@@ -27,6 +27,24 @@ class Settings(BaseSettings):
     EXPORT_DIR: str = "export"
     UPLOAD_FILE_MAX_SIZE: int = 200_000_000  # ~200MB
     THUMBNAIL_HEIGH_PIXEL: int = 120
+    STORAGE_BACKEND: str = "local"
+
+    S3_ENDPOINT: str = ""
+    S3_REGION: str = ""
+    S3_BUCKET: str = ""
+    S3_ACCESS_KEY_ID: str = ""
+    S3_SECRET_ACCESS_KEY: str = ""
+    S3_PUBLIC_BASE_URL: str = ""
+    S3_PRESIGN_EXPIRE_SECONDS: int = 3600
+    S3_PATH_STYLE: bool = False
+    S3_USE_SSL: bool = True
+
+    AI_AUTO_LABEL_ENABLED: bool = False
+    AI_PROVIDER: str = "local_http"
+    AI_MODEL_ENDPOINT: str = ""
+    AI_MODEL_TIMEOUT_SECONDS: int = 60
+    AI_MODEL_NAME: str = ""
+    AI_IMAGE_URL_EXPIRE_SECONDS: int = 300
 
     DATABASE_URL: str = Field(
         # default="mysql://labelu:labelupass@localhost/labeludb",

@@ -1,4 +1,5 @@
 from .attachment import TaskAttachment
+from .data_source import DataSource
 from .sample import TaskSample
 from .task import Task
 from .user import User
