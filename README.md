@@ -28,6 +28,18 @@ Audio annotation tools are another key feature of LabelU. These tools possess ef
 ### Artificial Intelligence Assisted Labelling
 LabelU supports one-click loading of pre-annotated data, which can be refined and adjusted according to actual needs. This feature improves the efficiency and accuracy of annotation.
 
+### AI Auto-Annotation
+LabelU integrates AI model services for automatic annotation of image data. Click the "AI Annotate" button on the annotation page to have the model automatically detect and segment objects. Supports batch annotation for entire tasks with real-time progress tracking. Three reference model servers are provided out of the box:
+
+- **Florence-2** — lightweight, CPU-friendly (~4GB VRAM)
+- **GroundingDINO + EfficientSAM** — high-quality detection + segmentation (~4GB VRAM)
+- **SAM 3** — state-of-the-art unified model (~8GB VRAM, requires high-end GPU)
+
+See [`model_server/README.md`](./model_server/README.md) for setup instructions.
+
+### S3 Data Source Import
+LabelU supports importing annotation data directly from S3-compatible object storage (AWS S3, MinIO, etc.). Configure data source connections in the task settings, browse and preview files, then import selected files or all files under a path with one click.
+
 
 https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
 

@@ -28,7 +28,23 @@ LabelU为图像标注提供了全面的工具集，包括2D框、语义分割、
 ### 人工智能辅助标注
 LabelU 支持预标注数据的一键载入，用户可以根据实际需要对其进行细化和调整。这一特性提高了标注的效率和准确性。
 
+### AI 自动标注
+LabelU 集成了 AI 模型服务，支持图像数据的自动标注。在标注页面点击「AI 标注」按钮即可让模型自动检测和分割目标，也支持对整个任务的所有未标注样本进行批量标注，并可实时查看进度。项目内置提供了三个参考模型服务：
+
+- **Florence-2** — 轻量级，CPU 友好（约 4GB 显存）
+- **GroundingDINO + EfficientSAM** — 高质量检测 + 分割（约 4GB 显存）
+- **SAM 3** — 最新一代统一模型（约 8GB 显存，需要高端 GPU）
+
+详见 [`model_server/README.md`](./model_server/README.md) 了解部署方式。
+
+### S3 数据源导入
+LabelU 支持从 S3 兼容对象存储（AWS S3、MinIO 等）直接导入标注数据。在任务设置中配置数据源连接，浏览和预览文件，然后一键导入选定文件或路径下的所有文件。
+
+
 https://github.com/user-attachments/assets/f90e5a66-ab4d-456e-af4d-e6408a623812
+
+
+https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
 
 
 ## 特性
