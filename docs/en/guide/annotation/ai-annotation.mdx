@@ -156,7 +156,7 @@ Once the model server is ready, configure the connection in LabelU's `.env` file
 ```bash
 AI_AUTO_LABEL_ENABLED=true
 AI_MODEL_ENDPOINT=http://localhost:5000/
-AI_MODEL_TIMEOUT_SECONDS=60
+AI_MODEL_TIMEOUT_SECONDS=300
 AI_PROVIDER=labelu
 AI_MODEL_NAME=florence-2-base     # or grounding-dino-tiny+efficient-sam / sam3
 ```
@@ -170,12 +170,16 @@ After restarting LabelU, the AI annotation button will appear on image task anno
 1. Enter the image annotation page
 2. Click the "AI Annotate" button in the top-right toolbar
 
-{/* TODO: Screenshot - AI Annotation button in the top-right corner of annotation page */}
+![florence2](/assets/ai-annotation.jpeg)
 
 3. The system sends the current image and task configuration to the AI model for inference
 4. After the model returns results, annotations are automatically displayed on the image
 
-{/* TODO: Screenshot - Annotation results after AI annotation completes */}
+![](/assets/ai-annotation-result.jpeg)
+> 目标检测，使用 florence2 模型标注
+
+![](/assets/ai-annotation-segment.jpeg)
+> 目标分割，使用 florence2 模型标注
 
 ### Batch AI Annotation
 
