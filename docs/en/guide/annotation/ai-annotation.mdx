@@ -8,6 +8,34 @@ LabelU supports integrating AI model services to automatically annotate image da
 - Supported annotation tools: Rectangle (rectTool), Polygon (polygonTool)
 - AI annotation results are presented as pre-annotations that annotators can modify and refine
 - Supports "Only keep configured labels" option — when enabled, only results matching task labels are returned; when disabled, the model detects all objects freely
+- Supports **single-image annotation** (per-image on annotation page) and **batch annotation** (one-click annotation for all unannotated samples on the sample list page)
+
+## Architecture
+
+```
+┌──────────────────┐         HTTP POST /         ┌──────────────────────┐
+│                  │  ──────────────────────────► │                      │
+│   LabelU Backend │   image_url + labels +       │   Model Server       │
+│   (FastAPI)      │   constraints                │                      │
+│                  │  ◄────────────────────────── │                      │
+└──────────────────┘      results[]               └──────────────────────┘
+        │                                                   │
+        │  Read/Write DB                                    │  Download image & inference
+        ▼                                                   ▼
+┌──────────────────┐                              ┌──────────────────────┐
+│  SQLite / MySQL  │                              │  GPU / CPU           │
+└──────────────────┘                              └──────────────────────┘
+```
+
+Workflow:
+1. User triggers AI annotation from the frontend (single or batch)
+2. LabelU backend assembles the request (image URL, label list, constraints) and sends it to the model server via HTTP POST
+3. Model server downloads the image and runs inference, returning detection/segmentation results
+4. LabelU backend converts results into pre-annotation format and saves to database
+
+:::warning Network Requirements
+The model server must be able to access image URLs provided by LabelU. If LabelU and the model server are deployed on different machines, ensure the model server can reach the `MEDIA_HOST` address over the network.
+:::
 
 ## Prerequisites
 
@@ -25,23 +53,26 @@ Set the following environment variables when deploying LabelU:
 | `AI_PROVIDER` | AI service provider identifier | None |
 | `AI_MODEL_NAME` | Model name identifier | None |
 
-Example configuration:
-
-```bash
-export AI_AUTO_LABEL_ENABLED=true
-export AI_MODEL_ENDPOINT=http://localhost:5000/
-export AI_MODEL_TIMEOUT_SECONDS=60
-export AI_PROVIDER=labelu
-export AI_MODEL_NAME=florence-2-base
-```
-
 ### Annotation Configuration Requirements
 
 The task's annotation configuration must include at least one supported annotation tool (Rectangle or Polygon) with label attributes configured. The AI model generates annotation results based on these labels.
 
-## Reference Model Servers
+## Model Deployment
 
 LabelU provides three open-source reference model server implementations, all following the same unified API protocol.
+
+### System Requirements
+
+| Resource | Florence-2 | GroundingDINO + EfficientSAM | SAM 3 |
+|----------|-----------|------------------------------|-------|
+| Python | 3.8+ | 3.8+ | **3.12+** |
+| PyTorch | 2.1+ | 2.1+ | **2.7+** |
+| CUDA | Optional | Recommended | **12.6+ (required)** |
+| GPU Compute | Any | Any | **SM 80+ (Ampere/Ada)** |
+| Min VRAM | ~4GB | ~4GB | ~8GB |
+| Model Size | ~500MB | ~900MB | ~1.7GB |
+| RAM | ≥8GB | ≥8GB | ≥16GB |
+| Disk | ≥2GB (incl. model cache) | ≥3GB (incl. model cache) | ≥5GB (incl. model cache) |
 
 ### Comparison
 
@@ -63,7 +94,7 @@ LabelU provides three open-source reference model server implementations, all fo
 - Mid-range GPU (1660/2060) → **GroundingDINO + EfficientSAM**
 - CPU only or low VRAM → **Florence-2**
 
-### Quick Start
+### Installation & Startup
 
 #### Florence-2
 
@@ -115,9 +146,39 @@ docker build -t labelu-sam3 .
 docker run --gpus all -p 5000:5000 labelu-sam3
 ```
 
+:::tip First-Time Startup
+The first time you start a model server, it will automatically download model weights from HuggingFace. Download time depends on your network speed. Model weights are cached locally (usually at `~/.cache/huggingface/`) and won't need to be downloaded again on subsequent starts.
+
+If your network is restricted, you can manually download the models in advance and set the `HF_HOME` environment variable to specify the cache directory.
+:::
+
+### Verify Deployment
+
+After the model server starts successfully, verify with the health check endpoint:
+
+```bash
+curl http://localhost:5000/health
+```
+
+A `200` status code indicates the model is loaded and ready.
+
+### Configure LabelU Connection
+
+Once the model server is ready, configure the connection in LabelU's `.env` file or environment variables:
+
+```bash
+AI_AUTO_LABEL_ENABLED=true
+AI_MODEL_ENDPOINT=http://localhost:5000/
+AI_MODEL_TIMEOUT_SECONDS=60
+AI_PROVIDER=labelu
+AI_MODEL_NAME=florence-2-base     # or grounding-dino-tiny+efficient-sam / sam3
+```
+
+After restarting LabelU, the AI annotation button will appear on image task annotation pages and sample list pages.
+
 ## Usage
 
-### Trigger AI Annotation
+### Single-Image AI Annotation
 
 1. Enter the image annotation page
 2. Click the "AI Annotate" button in the top-right toolbar
@@ -129,6 +190,19 @@ docker run --gpus all -p 5000:5000 labelu-sam3
 
 {/* TODO: Screenshot - Annotation results after AI annotation completes */}
 
+### Batch AI Annotation
+
+For tasks with many samples, you can annotate all unannotated samples with one click:
+
+1. On the **sample list page**, click the "Batch AI Annotate" button in the bottom toolbar
+2. The system creates a background job that calls the AI model for each sample
+3. A real-time progress bar shows success count, failure count, and total
+4. After completion, the sample list refreshes automatically; annotators can enter the annotation page to review and correct AI-generated pre-annotations
+
+:::info
+Batch annotation only processes **unannotated** (NEW state) samples. Already annotated or skipped samples will not be overwritten.
+:::
+
 ### "Only Keep Configured Labels" Option
 
 Click the dropdown arrow on the right side of the AI Annotate button to toggle this option:
@@ -136,7 +210,7 @@ Click the dropdown arrow on the right side of the AI Annotate button to toggle t
 - **Enabled** (default): Only keeps detection results matching the label names in the task configuration
 - **Disabled**: The model freely detects all objects; label names are auto-generated by the model
 
-This setting is automatically persisted and retained after page refresh.
+This setting is automatically persisted and retained after page refresh. Batch annotation also follows this setting.
 
 ### Result Handling
 
@@ -159,6 +233,7 @@ You may encounter the following messages when using AI annotation:
 | No annotation tools with labels configured | No tools configured | Add supported tools with label attributes in annotation config |
 | AI model endpoint is not configured | Model URL not set | Contact admin to set `AI_MODEL_ENDPOINT` |
 | AI model service request failed | Model service error | Check if the model service is running properly |
+| No unannotated samples | No samples to annotate | All samples are already annotated (batch mode) |
 
 ## Model Service API Protocol
 
