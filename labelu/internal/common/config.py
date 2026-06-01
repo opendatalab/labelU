@@ -60,6 +60,11 @@ class Settings(BaseSettings):
 
     TOKEN_GENERATE_ALGORITHM: str = "HS256"
     TOKEN_ACCESS_EXPIRE_MINUTES: int = 30
+    # Sliding refresh: when an authenticated request arrives with a token whose
+    # remaining lifetime is below this many minutes, a freshly issued token is
+    # returned via the `X-New-Token` response header so active users never get
+    # logged out. Should be smaller than TOKEN_ACCESS_EXPIRE_MINUTES.
+    TOKEN_REFRESH_THRESHOLD_MINUTES: int = 15
     TOKEN_TYPE: str = "Bearer"
     EXPOSE_INTERNAL_ERRORS: bool = False
 
