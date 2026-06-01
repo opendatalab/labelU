@@ -50,3 +50,19 @@ def create_access_token(
     )
 
     return encoded_jwt
+
+
+def should_refresh_token(exp_timestamp: Union[int, float, None]) -> bool:
+    """Decide whether a still-valid token is close enough to expiry that it
+    should be transparently re-issued (sliding refresh).
+
+    ``exp_timestamp`` is the raw ``exp`` claim (seconds since epoch) taken
+    straight from the decoded JWT payload, which avoids any timezone ambiguity
+    from re-parsing into datetime objects.
+    """
+    if not exp_timestamp:
+        return False
+    now = datetime.now(timezone.utc).timestamp()
+    remaining_seconds = exp_timestamp - now
+    threshold_seconds = settings.TOKEN_REFRESH_THRESHOLD_MINUTES * 60
+    return 0 < remaining_seconds <= threshold_seconds

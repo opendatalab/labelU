@@ -1,15 +1,18 @@
 from typing import Optional
+from datetime import timedelta
 
 from jose import jwt
 from loguru import logger
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
-from fastapi import HTTPException, WebSocket, status, Depends, Request
+from fastapi import HTTPException, WebSocket, status, Depends, Request, Response
 
 from labelu.internal.domain.models.user import User
 from labelu.internal.common import db as db_module
 from labelu.internal.common.config import settings
 from labelu.internal.common.security import AccessToken
+from labelu.internal.common.security import create_access_token
+from labelu.internal.common.security import should_refresh_token
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
 from labelu.internal.adapter.persistence import crud_user
@@ -31,7 +34,9 @@ reusable_oauth2 = SpecialOAuth2PasswordBearer()
 
 
 def get_current_user(
-    db: Session = Depends(db_module.get_db), token: str = Depends(reusable_oauth2)
+    response: Response,
+    db: Session = Depends(db_module.get_db),
+    token: str = Depends(reusable_oauth2),
 ) -> User:
     try:
         payload = jwt.decode(
@@ -49,6 +54,17 @@ def get_current_user(
     user = crud_user.get(db, id=token_data.id)
     if not user:
         raise LabelUException(code=ErrorCode.CODE_40002_USER_NOT_FOUND, status_code=401)
+
+    # Sliding refresh: hand back a freshly issued token (same `Bearer xxx`
+    # format the login endpoint returns) when the current one is close to
+    # expiry, so active users are never logged out mid-session.
+    if should_refresh_token(payload.get("exp")):
+        new_token = create_access_token(
+            token=AccessToken(id=user.id, username=user.username),
+            expires_delta=timedelta(minutes=settings.TOKEN_ACCESS_EXPIRE_MINUTES),
+        )
+        response.headers["X-New-Token"] = f"{settings.TOKEN_TYPE} {new_token}"
+
     return user
 
 
