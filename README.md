@@ -32,7 +32,7 @@ LabelU supports one-click loading of pre-annotated data, which can be refined an
 LabelU integrates AI model services for automatic annotation of image data. Click the "AI Annotate" button on the annotation page to have the model automatically detect and segment objects. Supports batch annotation for entire tasks with real-time progress tracking. Three reference model servers are provided out of the box:
 
 - **Florence-2** — lightweight, CPU-friendly (~4GB VRAM)
-- **GroundingDINO + EfficientSAM** — high-quality detection + segmentation (~4GB VRAM)
+- **GroundingDINO + SAM ViT-B** — high-quality detection + segmentation (~4GB VRAM)
 - **SAM 3** — state-of-the-art unified model (~8GB VRAM, requires high-end GPU)
 
 See [`model_server/README.md`](./model_server/README.md) for setup instructions.

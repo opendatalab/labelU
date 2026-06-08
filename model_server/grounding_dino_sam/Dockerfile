@@ -13,9 +13,9 @@ RUN python -c "\
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection; \
 AutoProcessor.from_pretrained('IDEA-Research/grounding-dino-tiny'); \
 AutoModelForZeroShotObjectDetection.from_pretrained('IDEA-Research/grounding-dino-tiny'); \
-from transformers import EfficientSamModel, SamImageProcessor; \
-SamImageProcessor.from_pretrained('ybelkada/efficient-sam-vitt'); \
-EfficientSamModel.from_pretrained('ybelkada/efficient-sam-vitt')"
+from transformers import SamModel, SamProcessor; \
+SamProcessor.from_pretrained('facebook/sam-vit-base'); \
+SamModel.from_pretrained('facebook/sam-vit-base')"
 
 EXPOSE 5000
 CMD ["python", "server.py", "--device", "cpu"]

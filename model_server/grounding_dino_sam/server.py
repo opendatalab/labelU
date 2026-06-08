@@ -1,8 +1,8 @@
 """
-LabelU Model Server — GroundingDINO + EfficientSAM
+LabelU Model Server — GroundingDINO + SAM
 
 High-quality reference implementation for open-vocabulary detection
-(GroundingDINO) paired with segmentation (EfficientSAM).
+(GroundingDINO) paired with segmentation (Segment Anything).
 
 Implements the LabelU auto-label model API protocol:
   POST /  →  { request_id, image_url, labels, constraints, prompt }
@@ -34,7 +34,7 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("dino-sam-server")
 
-app = FastAPI(title="LabelU GroundingDINO + EfficientSAM Model Server")
+app = FastAPI(title="LabelU GroundingDINO + SAM Model Server")
 
 # ── globals ───────────────────────────────────────────────────────────
 dino_model = None
@@ -44,8 +44,8 @@ sam_processor = None
 device = "cpu"
 
 DINO_MODEL_ID = "IDEA-Research/grounding-dino-tiny"
-SAM_MODEL_ID = "ybelkada/efficient-sam-vitt"
-MODEL_LABEL = "grounding-dino-tiny+efficient-sam"
+SAM_MODEL_ID = "facebook/sam-vit-base"
+MODEL_LABEL = "grounding-dino-tiny+sam-vit-base"
 
 BOX_THRESHOLD = 0.25
 TEXT_THRESHOLD = 0.25
@@ -122,20 +122,14 @@ def _detect_objects(
 
 
 def _segment_box(image: Image.Image, box_xyxy: list[float]) -> np.ndarray | None:
-    """Run EfficientSAM on a single bounding box prompt. Returns binary mask."""
+    """Run SAM on a single bounding box prompt. Returns binary mask."""
     if sam_model is None:
         return None
 
-    w, h = image.size
-    input_points = torch.tensor([[[
-        [box_xyxy[0] / w, box_xyxy[1] / h],
-        [box_xyxy[2] / w, box_xyxy[3] / h],
-    ]]]).to(device)
-    input_labels = torch.tensor([[[2, 3]]]).to(device)  # box prompt: top-left=2, bottom-right=3
-
-    inputs = sam_processor(image, input_points=input_points, input_labels=input_labels, return_tensors="pt").to(device)
+    input_boxes = [[box_xyxy]]
+    inputs = sam_processor(image, input_boxes=input_boxes, return_tensors="pt").to(device)
     with torch.inference_mode():
-        outputs = sam_model(**inputs)
+        outputs = sam_model(**inputs, multimask_output=False)
 
     mask = sam_processor.image_processor.post_process_masks(
         outputs.pred_masks.cpu(),
@@ -143,7 +137,7 @@ def _segment_box(image: Image.Image, box_xyxy: list[float]) -> np.ndarray | None
         inputs["reshaped_input_sizes"].cpu(),
     )[0]
 
-    mask_np = mask[0, 0].numpy().astype(np.uint8)
+    mask_np = (mask[0, 0].numpy() > 0).astype(np.uint8)
     return mask_np
 
 
@@ -218,7 +212,7 @@ async def predict(req: PredictRequest) -> PredictResponse:
         ))
 
     latency = int((time.perf_counter() - start) * 1000)
-    warning = None if sam_model else "EfficientSAM not loaded; polygon results use bounding boxes"
+    warning = None if sam_model else "SAM not loaded; polygon results use bounding boxes"
     return PredictResponse(model=MODEL_LABEL, latency_ms=latency, results=results, warning_message=warning)
 
 
@@ -230,18 +224,18 @@ async def health():
 # ── entrypoint ────────────────────────────────────────────────────────
 def main():
     global dino_model, dino_processor, sam_model, sam_processor, device
+    global BOX_THRESHOLD, TEXT_THRESHOLD
 
-    parser = argparse.ArgumentParser(description="LabelU GroundingDINO + EfficientSAM Model Server")
+    parser = argparse.ArgumentParser(description="LabelU GroundingDINO + SAM Model Server")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument("--no-sam", action="store_true", help="Disable EfficientSAM (detection only)")
+    parser.add_argument("--no-sam", action="store_true", help="Disable SAM (detection only)")
     parser.add_argument("--box-threshold", type=float, default=BOX_THRESHOLD)
     parser.add_argument("--text-threshold", type=float, default=TEXT_THRESHOLD)
     args = parser.parse_args()
 
     device = args.device
-    global BOX_THRESHOLD, TEXT_THRESHOLD
     BOX_THRESHOLD = args.box_threshold
     TEXT_THRESHOLD = args.text_threshold
 
@@ -253,13 +247,13 @@ def main():
     logger.info("GroundingDINO loaded.")
 
     if not args.no_sam:
-        from transformers import EfficientSamModel, SamImageProcessor
-        logger.info("Loading EfficientSAM (%s) on %s ...", SAM_MODEL_ID, device)
-        sam_processor = SamImageProcessor.from_pretrained(SAM_MODEL_ID)
-        sam_model = EfficientSamModel.from_pretrained(SAM_MODEL_ID).to(device).eval()
-        logger.info("EfficientSAM loaded.")
+        from transformers import SamModel, SamProcessor
+        logger.info("Loading SAM (%s) on %s ...", SAM_MODEL_ID, device)
+        sam_processor = SamProcessor.from_pretrained(SAM_MODEL_ID)
+        sam_model = SamModel.from_pretrained(SAM_MODEL_ID).to(device).eval()
+        logger.info("SAM loaded.")
     else:
-        logger.info("EfficientSAM disabled (--no-sam).")
+        logger.info("SAM disabled (--no-sam).")
 
     uvicorn.run(app, host=args.host, port=args.port)
 
