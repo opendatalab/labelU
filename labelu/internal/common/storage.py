@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from functools import lru_cache
+import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -60,7 +61,7 @@ class LocalStorageBackend(StorageBackend):
     def save_file(self, local_path: Path, key: str, content_type: Optional[str] = None) -> None:
         target_path = self._resolve(key)
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        local_path.replace(target_path)
+        shutil.move(str(local_path), str(target_path))
 
     def save_bytes(self, content: bytes, key: str, content_type: Optional[str] = None) -> None:
         target_path = self._resolve(key)
