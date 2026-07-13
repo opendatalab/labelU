@@ -28,6 +28,18 @@ Audio annotation tools are another key feature of LabelU. These tools possess ef
 ### Artificial Intelligence Assisted Labelling
 LabelU supports one-click loading of pre-annotated data, which can be refined and adjusted according to actual needs. This feature improves the efficiency and accuracy of annotation.
 
+### AI Auto-Annotation
+LabelU integrates AI model services for automatic annotation of image data. Click the "AI Annotate" button on the annotation page to have the model automatically detect and segment objects. Supports batch annotation for entire tasks with real-time progress tracking. Three reference model servers are provided out of the box:
+
+- **Florence-2** — lightweight, CPU-friendly (~4GB VRAM)
+- **GroundingDINO + SAM ViT-B** — high-quality detection + segmentation (~4GB VRAM)
+- **SAM 3** — state-of-the-art unified model (~8GB VRAM, requires high-end GPU)
+
+See [`model_server/README.md`](./model_server/README.md) for setup instructions.
+
+### S3 Data Source Import
+LabelU supports importing annotation data directly from S3-compatible object storage (AWS S3, MinIO, etc.). Configure data source connections in the task settings, browse and preview files, then import selected files or all files under a path with one click.
+
 
 https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
 
@@ -99,31 +111,33 @@ labelu
 DATABASE_URL=mysql://<username>:<password>@<host>/<your dbname> labelu migrate_to_mysql
 ```
 
-1. Visit [http://localhost:8000/](http://localhost:8000/) and ready to go.
+6. Visit [http://localhost:8000/](http://localhost:8000/) and ready to go.
 
 ### Local development
 
 ```bash
-# Download and Install miniconda
-# https://docs.conda.io/en/latest/miniconda.html
+# Install uv
+# https://docs.astral.sh/uv/getting-started/installation/
 
-# Create virtual environment(python = 3.11)
-conda create -n labelu python=3.11
+# Clone the repository
+git clone https://github.com/opendatalab/labelU.git
+cd labelU
 
-# Activate virtual environment
-conda activate labelu
+# Create virtual environment and install all dependencies (Python >= 3.11)
+uv sync
 
-# Install peotry
-# https://python-poetry.org/docs/#installing-with-the-official-installer
-
-# Install all package dependencies
-poetry install
+# Copy the example environment file and configure it
+cp .env.example .env
+# Edit .env and set your values:
+#   PASSWORD_SECRET_KEY  - JWT secret key, generate with: openssl rand -hex 32
+#   MEDIA_HOST           - Media server URL (default: http://localhost:8000)
+#   DATABASE_URL         - Database connection URL (default: sqlite:///data/labelu.sqlite)
 
 # Download the frontend statics from labelu-kit repo
 sh ./scripts/resolve_frontend.sh true
 
 # Start labelu, server: http://localhost:8000
-uvicorn labelu.main:app --reload
+uv run uvicorn labelu.main:app --reload
 ```
 
 
@@ -151,7 +165,7 @@ uvicorn labelu.main:app --reload
 Welcome to the OpenDataLab official WeChat group！
 
 <p align="center">
-<img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
+    <img width="400" height="400" alt="20260228-175257" src="https://github.com/user-attachments/assets/8c2a5c23-1a09-4548-b2be-23e75cbc9530" />
 </p>
 
 

@@ -4,11 +4,11 @@ import aiofiles
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
 from fastapi import File, Header, UploadFile
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, Response, RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials
 import mimetypes
 
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.common.error_code import ErrorCode, LabelUException
 from labelu.internal.common.security import security
 from labelu.internal.domain.models.user import User
@@ -33,7 +33,7 @@ async def create(
     task_id: int,
     file: UploadFile = File(...),
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -60,8 +60,9 @@ async def download_attachment(file_path: str):
 
     # business logic
     data = await service.download_attachment(file_path=file_path)
-    
-    return data
+    if data.get("redirect_url"):
+        return RedirectResponse(url=data["redirect_url"], status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    return FileResponse(path=data["local_path"])
 
 @router.get(
     "/partial/{file_path:path}",
@@ -75,8 +76,10 @@ async def get_content(file_path: str, range: str = Header(None)):
     
     try:
         full_path = await service.download_attachment(file_path=file_path)
-        full_path = Path(full_path) 
-    except Exception:
+        if full_path.get("redirect_url"):
+            return RedirectResponse(url=full_path["redirect_url"], status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+        full_path = Path(full_path["local_path"])
+    except (FileNotFoundError, OSError, LabelUException):
         raise LabelUException(
             code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
@@ -118,8 +121,8 @@ async def get_content(file_path: str, range: str = Header(None)):
         content_length = end - start + 1
         
     except ValueError:
-        return FileResponse(
-            path=str(full_path),
+        return Response(
+            content=full_path.read_bytes(),
             media_type=media_type,
             headers={"Accept-Ranges": "bytes"}
         )
@@ -161,7 +164,7 @@ async def delete(
     task_id: int,
     cmd: AttachmentDeleteCommand,
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """

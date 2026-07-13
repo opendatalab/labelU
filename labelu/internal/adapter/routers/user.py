@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, Security
 from fastapi.security import HTTPAuthorizationCredentials
 
-from labelu.internal.common import db
+from labelu.internal.common import db as db_module
 from labelu.internal.domain.models.user import User
 from labelu.internal.common.security import security
 from labelu.internal.dependencies.user import get_current_user
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def list_users(
     authorization: HTTPAuthorizationCredentials = Security(security),
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     page: int | None = 0,
     size: int | None = 10,
     username: str | None = None,
@@ -58,7 +58,7 @@ async def get_me(
     response_model=OkResp[UserResponse],
     status_code=status.HTTP_201_CREATED,
 )
-async def signup(cmd: SignupCommand, db: Session = Depends(db.get_db)):
+async def signup(cmd: SignupCommand, db: Session = Depends(db_module.get_db)):
     """
     User signup a account
     """
@@ -75,7 +75,7 @@ async def signup(cmd: SignupCommand, db: Session = Depends(db.get_db)):
     response_model=OkResp[LoginResponse],
     status_code=status.HTTP_200_OK,
 )
-async def login(cmd: LoginCommand, db: Session = Depends(db.get_db)):
+async def login(cmd: LoginCommand, db: Session = Depends(db_module.get_db)):
     """
     User login, get an access token for future requests
     """
@@ -94,16 +94,19 @@ async def login(cmd: LoginCommand, db: Session = Depends(db.get_db)):
 )
 async def logout(
     authorization: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
-    User logout
-    """
+    User logout.
 
-    # business logic
-    pass
+    Note: With JWT token expiration enabled (30min TTL), server-side
+    token invalidation is not strictly necessary. The client should
+    discard the token on logout. For stricter security, implement
+    a token blacklist with Redis.
+    """
 
     # response
     data = LogoutResponse(msg="succeeded")
     return OkResp[LogoutResponse](data=data)
+

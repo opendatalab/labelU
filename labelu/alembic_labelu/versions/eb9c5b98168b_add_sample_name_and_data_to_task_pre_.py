@@ -78,7 +78,7 @@ def upgrade() -> None:
                 
             # create task_pre_annotation
             exist_task_pre_annotations = session.execute(
-                select([Base.classes.task_pre_annotation])
+                select(Base.classes.task_pre_annotation)
             ).scalars().all()
             
             for task_pre_annotation in exist_task_pre_annotations:

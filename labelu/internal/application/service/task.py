@@ -6,6 +6,7 @@ from loguru import logger
 from fastapi import status
 from sqlalchemy.orm import Session
 
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -13,11 +14,13 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import SampleState
+from labelu.internal.application.service.access import assert_task_access
 from labelu.internal.adapter.persistence import crud_task, crud_user
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.application.command.task import BasicConfigCommand
 from labelu.internal.application.command.task import UpdateCommand
 from labelu.internal.application.response.base import UserResp
+from labelu.internal.application.response.user import UserResponse
 from labelu.internal.application.response.base import CommonDataResp
 from labelu.internal.application.response.task import TaskStatics
 from labelu.internal.application.response.task import TaskResponse
@@ -29,7 +32,7 @@ async def create(
 ) -> TaskResponse:
     # new a task
 
-    with db.begin():
+    with begin_transaction(db):
         new_task = crud_task.create(
             db=db,
             task=Task(
@@ -158,7 +161,7 @@ async def get_collaborators(db: Session, task_id: int, current_user: User):
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    return [UserResp(id=user.id, username=user.username) for user in task.collaborators]
+    return [UserResponse(id=user.id, username=user.username) for user in task.collaborators]
 
 async def add_collaborator(db: Session, task_id: int, user_id: int, current_user: User):
     task = crud_task.get(db=db, task_id=task_id)
@@ -196,10 +199,10 @@ async def add_collaborator(db: Session, task_id: int, user_id: int, current_user
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         task.collaborators.append(user)
 
-    return UserResp(id=user.id, username=user.username)
+    return UserResponse(id=user.id, username=user.username)
 
 async def batch_add_collaborators(db: Session, task_id: int, user_ids: List[int], current_user: User):
     task = crud_task.get(db=db, task_id=task_id)
@@ -230,10 +233,10 @@ async def batch_add_collaborators(db: Session, task_id: int, user_ids: List[int]
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         task.collaborators.extend(users)
 
-    return [UserResp(id=user.id, username=user.username) for user in users]
+    return [UserResponse(id=user.id, username=user.username) for user in users]
 
 async def remove_collaborator(db: Session, task_id: int, user_id: int, current_user: User):
     task = crud_task.get(db=db, task_id=task_id)
@@ -270,7 +273,7 @@ async def remove_collaborator(db: Session, task_id: int, user_id: int, current_u
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         task.collaborators.remove(user)
 
     return CommonDataResp(ok=True)
@@ -303,14 +306,14 @@ async def batch_remove_collaborators(db: Session, task_id: int, user_ids: List[i
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with db.begin():
+    with begin_transaction(db):
         for user in users:
             if user in task.collaborators:
                 task.collaborators.remove(user)
 
     return CommonDataResp(ok=True)
 
-async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
+async def update(db: Session, task_id: int, cmd: UpdateCommand, current_user: User) -> TaskResponse:
 
     # get task
     task = crud_task.get(db=db, task_id=task_id)
@@ -321,13 +324,15 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    assert_task_access(task, current_user)
+
     # update
     obj_in = cmd.dict(exclude_unset=True)
     if cmd.config and cmd.media_type:
         obj_in[Task.status.key] = TaskStatus.CONFIGURED
     else:
         obj_in[Task.config.key] = None
-    with db.begin():
+    with begin_transaction(db):
         updated_task = crud_task.update(db=db, db_obj=task, obj_in=obj_in)
 
     # response
@@ -370,7 +375,7 @@ async def delete(db: Session, task_id: int, current_user: User) -> CommonDataRes
         )
 
     # delete
-    with db.begin():
+    with begin_transaction(db):
         crud_task.delete(db=db, db_obj=task)
 
     # delete media

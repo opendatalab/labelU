@@ -3,7 +3,7 @@ FROM python:3.11-slim
 WORKDIR /labelu
 
 RUN pip3 install -i https://test.pypi.org/pypi/ --extra-index-url https://pypi.org/simple -U labelu
-ENV MEDIA_HOST http://labelu.shlab.tech
+ENV MEDIA_HOST=http://localhost:8000
 
 EXPOSE 8000
 

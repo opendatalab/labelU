@@ -9,7 +9,7 @@ import json
 
 from alembic import op
 from alembic import context
-from sqlalchemy import update
+from sqlalchemy import update, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.automap import automap_base
 
@@ -71,7 +71,7 @@ def upgrade() -> None:
     # replace the key with value in a transaction
     with context.begin_transaction():
         task_items = session.execute(
-            'SELECT id, config FROM task WHERE config IS NOT NULL AND config != ""'
+            text('SELECT id, config FROM task WHERE config IS NOT NULL AND config != ""')
         )
         for task_item in task_items:
             task_id = task_item[0]
@@ -80,7 +80,8 @@ def upgrade() -> None:
             # replace key with value in the sample of current task
             # get the sample data items of the task id
             sample_items = session.execute(
-                f"SELECT id, data, annotated_count FROM task_sample WHERE task_id={task_id}"
+                text("SELECT id, data, annotated_count FROM task_sample WHERE task_id=:tid"),
+                {"tid": task_id},
             )
             # if task have several annotated sample, continute to replace key with value
             for sample_item in sample_items:

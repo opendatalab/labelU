@@ -9,6 +9,15 @@ class AttachmentResponse(BaseModel):
     url: Union[str, None] = Field(
         default=None, description="description: upload file url"
     )
+    thumbnail_url: Union[str, None] = Field(
+        default=None, description="description: upload file thumbnail url"
+    )
+    stream_url: Union[str, None] = Field(
+        default=None, description="description: upload file stream url"
+    )
+    storage_backend: Union[str, None] = Field(
+        default=None, description="description: upload file storage backend"
+    )
     filename: Union[str, None] = Field(
         default=None, description="description: upload file name"
     )

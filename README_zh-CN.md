@@ -28,7 +28,23 @@ LabelU为图像标注提供了全面的工具集，包括2D框、语义分割、
 ### 人工智能辅助标注
 LabelU 支持预标注数据的一键载入，用户可以根据实际需要对其进行细化和调整。这一特性提高了标注的效率和准确性。
 
+### AI 自动标注
+LabelU 集成了 AI 模型服务，支持图像数据的自动标注。在标注页面点击「AI 标注」按钮即可让模型自动检测和分割目标，也支持对整个任务的所有未标注样本进行批量标注，并可实时查看进度。项目内置提供了三个参考模型服务：
+
+- **Florence-2** — 轻量级，CPU 友好（约 4GB 显存）
+- **GroundingDINO + SAM ViT-B** — 高质量检测 + 分割（约 4GB 显存）
+- **SAM 3** — 最新一代统一模型（约 8GB 显存，需要高端 GPU）
+
+详见 [`model_server/README.md`](./model_server/README.md) 了解部署方式。
+
+### S3 数据源导入
+LabelU 支持从 S3 兼容对象存储（AWS S3、MinIO 等）直接导入标注数据。在任务设置中配置数据源连接，浏览和预览文件，然后一键导入选定文件或路径下的所有文件。
+
+
 https://github.com/user-attachments/assets/f90e5a66-ab4d-456e-af4d-e6408a623812
+
+
+https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
 
 
 ## 特性
@@ -102,26 +118,28 @@ DATABASE_URL=mysql://<username>:<password>@<host>/<your dbname> labelu migrate_t
 ### 本地开发
 
 ```bash
-# 安装miniconda
-# https://docs.conda.io/en/latest/miniconda.html
+# 安装 uv
+# https://docs.astral.sh/uv/getting-started/installation/
 
-# 创建虚拟环境(python = 3.11)
-conda create -n labelu python=3.11
+# 克隆项目
+git clone https://github.com/opendatalab/labelU.git
+cd labelU
 
-# 激活虚拟环境
-conda activate labelu
+# 创建虚拟环境并安装所有依赖包 (Python >= 3.11)
+uv sync
 
-# 安装 peotry
-# https://python-poetry.org/docs/#installing-with-the-official-installer
-
-# 安装所有依赖包
-poetry install
+# 复制环境变量示例文件并根据实际情况修改
+cp .env.example .env
+# 编辑 .env 并设置以下变量：
+#   PASSWORD_SECRET_KEY  - JWT 密钥，可通过以下命令生成：openssl rand -hex 32
+#   MEDIA_HOST           - 媒体服务器地址（默认：http://localhost:8000）
+#   DATABASE_URL         - 数据库连接地址（默认：sqlite:///data/labelu.sqlite）
 
 # 从 LabelU-kit 下载前端资源
 sh ./scripts/resolve_frontend.sh true
 
 # 启动labelu, 默认访问地址: http://localhost:8000
-uvicorn labelu.main:app --reload
+uv run uvicorn labelu.main:app --reload
 ```
 
 ## 快速上手
@@ -137,7 +155,7 @@ uvicorn labelu.main:app --reload
 欢迎加入 Opendatalab 官方微信群！
 
 <p align="center">
-<img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
+  <img width="400" height="400" alt="20260228-175257" src="https://github.com/user-attachments/assets/8c2a5c23-1a09-4548-b2be-23e75cbc9530" />
 </p>
 
 ## 友情链接

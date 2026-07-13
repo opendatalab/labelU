@@ -9,7 +9,9 @@ from labelu.internal.common.config import settings
 from labelu.internal.common.security import AccessToken
 from labelu.internal.common.security import get_password_hash
 from labelu.internal.common.security import create_access_token
+from labelu.internal.common.db import begin_transaction
 
+from labelu.tests.conftest import TEST_USERNAME
 from labelu.tests.utils.utils import random_username
 from labelu.tests.utils.utils import random_lower_string
 
@@ -37,10 +39,11 @@ class TestClassUserRouter:
         username = random_username()
         password = random_lower_string()
         data = {"username": username, "password": password}
-        crud_user.create(
-            db=db,
-            user=User(username=username, hashed_password=get_password_hash(password)),
-        )
+        with begin_transaction(db):
+            crud_user.create(
+                db=db,
+                user=User(username=username, hashed_password=get_password_hash(password)),
+            )
 
         # run
         r = client.post(f"{settings.API_V1_STR}/users/signup", json=data)
@@ -55,10 +58,11 @@ class TestClassUserRouter:
         username = random_username()
         password = random_lower_string()
         data = {"username": username, "password": password}
-        crud_user.create(
-            db=db,
-            user=User(username=username, hashed_password=get_password_hash(password)),
-        )
+        with begin_transaction(db):
+            crud_user.create(
+                db=db,
+                user=User(username=username, hashed_password=get_password_hash(password)),
+            )
 
         # run
         r = client.post(f"{settings.API_V1_STR}/users/login", json=data)
@@ -101,7 +105,7 @@ class TestClassUserRouter:
         r = client.post(f"{settings.API_V1_STR}/users/logout", headers=headers)
 
         # check
-        assert r.status_code == 403
+        assert r.status_code == 401
         assert r.json()["err_code"] == 40003
 
     def test_cannot_not_found_token(self, client: TestClient, db: Session) -> None:
@@ -110,7 +114,7 @@ class TestClassUserRouter:
         r = client.post(f"{settings.API_V1_STR}/users/logout")
 
         # check
-        assert r.status_code == 403
+        assert r.status_code == 401
         assert r.json()["err_code"] == 30003
 
     def test_user_not_found(self, client: TestClient, db: Session) -> None:
@@ -129,3 +133,44 @@ class TestClassUserRouter:
         # check
         assert r.status_code == 401
         assert r.json()["err_code"] == 40002
+
+    def test_token_sliding_refresh_when_near_expiry(
+        self, client: TestClient, db: Session
+    ) -> None:
+        # prepare: a still-valid token whose remaining lifetime is below the
+        # refresh threshold, so the request should trigger a sliding refresh.
+        user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
+        remaining = settings.TOKEN_REFRESH_THRESHOLD_MINUTES - 1
+        access_token = create_access_token(
+            token=AccessToken(id=user.id, username=user.username),
+            expires_delta=timedelta(minutes=remaining),
+        )
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+        # run
+        r = client.get(f"{settings.API_V1_STR}/users/me", headers=headers)
+
+        # check: a brand-new token is handed back via the response header
+        assert r.status_code == 200
+        assert "X-New-Token" in r.headers
+        assert r.headers["X-New-Token"].startswith(settings.TOKEN_TYPE)
+        assert r.headers["X-New-Token"] != f"Bearer {access_token}"
+
+    def test_token_not_refreshed_when_fresh(
+        self, client: TestClient, db: Session
+    ) -> None:
+        # prepare: a token whose remaining lifetime is above the threshold
+        user = crud_user.get_user_by_username(db, username=TEST_USERNAME)
+        remaining = settings.TOKEN_REFRESH_THRESHOLD_MINUTES + 5
+        access_token = create_access_token(
+            token=AccessToken(id=user.id, username=user.username),
+            expires_delta=timedelta(minutes=remaining),
+        )
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+        # run
+        r = client.get(f"{settings.API_V1_STR}/users/me", headers=headers)
+
+        # check: no refresh header on a fresh token
+        assert r.status_code == 200
+        assert "X-New-Token" not in r.headers

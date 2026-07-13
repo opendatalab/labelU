@@ -1,8 +1,9 @@
 from typing import Any
+from contextlib import asynccontextmanager
+
 from loguru import logger
-import typer
+import click
 import uvicorn
-from typer import Typer
 from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 
@@ -74,7 +75,16 @@ tags_metadata = [
     },
 ]
 
+@asynccontextmanager
+async def lifespan(app):
+    if settings.need_migration_to_mysql:
+        logger.info("Migrating database to MySQL")
+        migrate_to_mysql()
+    yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="labelU",
     description=description,
     version=labelu_version,
@@ -91,6 +101,11 @@ app = FastAPI(
     openapi_tags=tags_metadata,
 )
 
+if not settings.PASSWORD_SECRET_KEY:
+    import secrets
+    settings.PASSWORD_SECRET_KEY = secrets.token_hex(32)
+    logger.warning("PASSWORD_SECRET_KEY not set, using auto-generated key. Set it in .env for production.")
+
 init_logging()
 init_tables()
 run_db_migrations()
@@ -98,13 +113,6 @@ add_exception_handler(app=app)
 add_router(app=app)
 add_ws_router(app=app)
 add_middleware(app=app)
-
-def startup():
-    if settings.need_migration_to_mysql:
-        logger.info("Migrating database to MySQL")
-        migrate_to_mysql()
-
-app.add_event_handler("startup", startup)
 
 class NoCacheStaticFiles(StaticFiles):
     def __init__(self, *args: Any, **kwargs: Any):
@@ -126,28 +134,23 @@ class NoCacheStaticFiles(StaticFiles):
 
 app.mount("", NoCacheStaticFiles(packages=["labelu.internal"], html=True))
 
-cli = Typer()
+@click.group(invoke_without_command=True)
+@click.option('--host', default='localhost', help='Server host')
+@click.option('--port', default=8000, help='Server port')
+@click.option('--media-host', default='http://localhost:8000', help='Media Host')
+@click.pass_context
+def cli(ctx: click.Context, host: str, port: int, media_host: str):
+    if ctx.invoked_subcommand is None:
+        settings.PORT = port
+        settings.HOST = host
+        settings.MEDIA_HOST = media_host
+        
+        uvicorn.run(app=app, host=settings.HOST, port=settings.PORT, ws="websockets")
 
 @cli.command('migrate_to_mysql')
 def to_mysql():
     """Migrate database to MySQL"""
     migrate_to_mysql()
-
-@cli.callback(invoke_without_command=True)
-def main(
-    host: str = typer.Option("localhost", "--host", help="Server host"),
-    port: int = typer.Option(8000, "--port", help="Server port"),
-    media_host: str = typer.Option("http://localhost:8000", "--media-host", help="Media URL")
-):
-    if port:
-        settings.PORT = port
-    if host:
-        settings.HOST = host
-    if media_host:
-        settings.MEDIA_HOST = media_host
-        
-    uvicorn.run(app=app, host=settings.HOST, port=settings.PORT, ws="websockets")
-        
 
 if __name__ == "__main__":
     cli()

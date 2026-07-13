@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.domain.models.task import Task
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
@@ -91,17 +92,18 @@ class TestClassTaskAttachmentRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                config="config",
-                media_type="IMAGE",
-                status="FINISHED",
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    config="config",
+                    media_type="IMAGE",
+                    status="FINISHED",
+                ),
+            )
 
         empty_task_upload(task.id, "test.png")
         # run
@@ -235,16 +237,17 @@ class TestClassTaskAttachmentRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=current_user.id,
-                updated_by=current_user.id,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         empty_task_upload(task.id, "test.png")
         
@@ -296,16 +299,17 @@ class TestClassTaskAttachmentRouter:
     ) -> None:
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=0,
+                    updated_by=0,
+                ),
+            )
 
         # run
         data = {"attachment_ids": [1]}
@@ -401,6 +405,48 @@ class TestClassTaskAttachmentRouter:
         # 检查
         assert r.status_code == 404
         assert r.json()["err_code"] == 30003
+
+    def test_upload_rejects_path_traversal_filename(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # prepare data
+        data = {
+            "name": "traversal test",
+            "description": "test",
+            "tips": "test",
+        }
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
+        )
+        task_id = task.json()["data"]["id"]
+
+        # clean the location where a sanitized upload would actually land
+        empty_task_upload(task_id, "tmp/pwned_traversal_marker.txt")
+
+        marker = "pwned_traversal_marker.txt"
+        escape_target = Path("/tmp").joinpath(marker)
+        if escape_target.exists():
+            escape_target.unlink()
+
+        # craft a filename whose directory part tries to escape the upload dir
+        malicious_name = "../../../../../../../../tmp/" + marker
+        with Path("labelu/tests/data/test.txt").open(mode="rb") as f:
+            res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": (malicious_name, f, "text/plain")},
+            )
+
+        # the crafted file must NOT be written outside the media root
+        assert not escape_target.exists()
+        # the upload is handled safely and stored inside the task upload dir
+        assert res.status_code == 201
+        assert f"upload/{task_id}/" in res.json()["data"]["url"]
+        # the stored key stays within the media root
+        parts = res.json()["data"]["url"].split("/attachment/")[-1]
+        assert Path(settings.MEDIA_ROOT).joinpath(parts).resolve().is_relative_to(
+            Path(settings.MEDIA_ROOT).resolve()
+        )
 
     def test_upload_file_with_hash_symbol(
         self, client: TestClient, testuser_token_headers: dict, db: Session

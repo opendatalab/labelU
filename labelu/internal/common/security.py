@@ -1,20 +1,17 @@
 from typing import Union
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from jose import jwt
 from pydantic import BaseModel
-from passlib.context import CryptContext
+import bcrypt
 from fastapi.security import HTTPBearer
 
 from labelu.internal.common.config import settings
 
 security = HTTPBearer()
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__truncate_error=False,
-)
+
+
 
 class AccessToken(BaseModel):
     id: int
@@ -23,11 +20,15 @@ class AccessToken(BaseModel):
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
+    )
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(
+        password.encode("utf-8"), bcrypt.gensalt()
+    ).decode("utf-8")
 
 
 # create access token for user login
@@ -36,9 +37,9 @@ def create_access_token(
 ):
     # update token expire
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     token.exp = expire
 
     # generate jwt token
@@ -49,3 +50,19 @@ def create_access_token(
     )
 
     return encoded_jwt
+
+
+def should_refresh_token(exp_timestamp: Union[int, float, None]) -> bool:
+    """Decide whether a still-valid token is close enough to expiry that it
+    should be transparently re-issued (sliding refresh).
+
+    ``exp_timestamp`` is the raw ``exp`` claim (seconds since epoch) taken
+    straight from the decoded JWT payload, which avoids any timezone ambiguity
+    from re-parsing into datetime objects.
+    """
+    if not exp_timestamp:
+        return False
+    now = datetime.now(timezone.utc).timestamp()
+    remaining_seconds = exp_timestamp - now
+    threshold_seconds = settings.TOKEN_REFRESH_THRESHOLD_MINUTES * 60
+    return 0 < remaining_seconds <= threshold_seconds

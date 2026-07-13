@@ -30,16 +30,21 @@ def test_create_access_token_successful():
 
 
 def test_access_token_no_exp_time():
-    # prepare data
-
-    # run
-    access_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjpudWxsfQ.ZSN0TVuafP6h0xnI7SpCz6NIyC8UxMYTk37ySfzSfBU"
+    # prepare data - create a token with no expiration set initially
+    token = AccessToken(id=1, username="user@example.com")
+    encoded = jwt.encode(
+        token.dict(),
+        settings.PASSWORD_SECRET_KEY,
+        algorithm=settings.TOKEN_GENERATE_ALGORITHM,
+    )
 
     # check
     payload = jwt.decode(
-        access_token,
+        encoded,
         settings.PASSWORD_SECRET_KEY,
         algorithms=[settings.TOKEN_GENERATE_ALGORITHM],
         options={"verify_exp": False},
     )
     assert payload
+    assert payload["id"] == 1
+    assert payload["username"] == "user@example.com"

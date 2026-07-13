@@ -10,6 +10,6 @@ class CreatePreAnnotationCommand(BaseModel):
 
 class DeletePreAnnotationCommand(BaseModel):
     pre_annotation_ids: List[int] = Field(
-        min_items=1,
+        min_length=1,
         description="description: pre annotation ids",
     )

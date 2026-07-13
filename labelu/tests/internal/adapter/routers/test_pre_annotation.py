@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_pre_annotation
@@ -19,17 +20,21 @@ class TestClassTaskPreAnnotationRouter:
     def test_create_pre_annotation_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
-            
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
         )
+            
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         # prepare data
         empty_task_upload(task.id, "test.jsonl")
@@ -53,20 +58,69 @@ class TestClassTaskPreAnnotationRouter:
         assert r.status_code == 201
         assert len(json["data"]["ids"]) == 1
         
+    def test_pre_annotation_access_forbidden_for_non_member(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # task + pre-annotation owned by another user
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="other", description="d", tips="t",
+                    created_by=999, updated_by=999,
+                ),
+            )
+        with begin_transaction(db):
+            pre = crud_pre_annotation.batch(
+                db=db,
+                pre_annotations=[
+                    TaskPreAnnotation(
+                        task_id=task.id, file_id=1, sample_name="x",
+                        data="{}", created_by=999, updated_by=999,
+                    )
+                ],
+            )
+        pid = pre[0].id
+
+        # list
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
+            headers=testuser_token_headers, params={"page": 0, "size": 10},
+        )
+        assert r.status_code == 403
+        # get
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/{pid}",
+            headers=testuser_token_headers,
+        )
+        assert r.status_code == 403
+        # delete
+        r = client.request(
+            "delete",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
+            headers=testuser_token_headers,
+            json={"pre_annotation_ids": [pid]},
+        )
+        assert r.status_code == 403
+
     def test_create_pre_annotation_sample_exists(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
-            
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
         )
+            
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         empty_task_upload(task.id, "test.jsonl")
         
@@ -134,16 +188,17 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         empty_task_upload(task.id, "test.jsonl")
         
@@ -164,10 +219,11 @@ class TestClassTaskPreAnnotationRouter:
             for i in range(14)
         ]
         
-        crud_pre_annotation.batch(
-            db=db,
-            pre_annotations=pre_annotations,
-        )
+        with begin_transaction(db):
+            crud_pre_annotation.batch(
+                db=db,
+                pre_annotations=pre_annotations,
+            )
 
         # run
         r = client.get(
@@ -191,16 +247,17 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         empty_task_upload(task.id, "test.png")
         empty_task_upload(task.id, "test.jsonl")
@@ -228,10 +285,11 @@ class TestClassTaskPreAnnotationRouter:
                 data="{}",
             )
         ]
-        crud_sample.batch(
-            db=db,
-            samples=samples,
-        )
+        with begin_transaction(db):
+            crud_sample.batch(
+                db=db,
+                samples=samples,
+            )
         
         pre_annotations = [
             TaskPreAnnotation(
@@ -242,16 +300,17 @@ class TestClassTaskPreAnnotationRouter:
                 updated_by=current_user.id,
             )
         ]
-        crud_pre_annotation.batch(
-            db=db,
-            pre_annotations=pre_annotations,
-        )
+        with begin_transaction(db):
+            crud_pre_annotation.batch(
+                db=db,
+                pre_annotations=pre_annotations,
+            )
 
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations?sample_name={img.json()['data']['filename']}",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
-            params={"page": 0},
+            params={"sample_name": img.json()['data']['filename'], "page": 0},
         )
 
         # check
@@ -268,16 +327,17 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         empty_task_upload(task.id, "test.png")
         # upload sample file
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
@@ -304,10 +364,11 @@ class TestClassTaskPreAnnotationRouter:
                 data="{}",
             )
         ]
-        crud_sample.batch(
-            db=db,
-            samples=samples,
-        )
+        with begin_transaction(db):
+            crud_sample.batch(
+                db=db,
+                samples=samples,
+            )
         
         pre_annotations = [
             TaskPreAnnotation(
@@ -317,16 +378,17 @@ class TestClassTaskPreAnnotationRouter:
                 updated_by=current_user.id,
             )
         ]
-        crud_pre_annotation.batch(
-            db=db,
-            pre_annotations=pre_annotations,
-        )
+        with begin_transaction(db):
+            crud_pre_annotation.batch(
+                db=db,
+                pre_annotations=pre_annotations,
+            )
 
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations?sample_name=asdasd.png",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
-            params={"page": 0},
+            params={"sample_name": "asdasd.png", "page": 0},
         )
 
         # check
@@ -358,21 +420,22 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         # run
         r = client.get(
-            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations?sample_name=",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
             headers=testuser_token_headers,
-            params={"page": 0, "size": 10},
+            params={"sample_name": "", "page": 0, "size": 10},
         )
 
         # check
@@ -386,27 +449,29 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
-        pre_annotations = crud_pre_annotation.batch(
-            db=db,
-            pre_annotations=[
-                TaskPreAnnotation(
-                    task_id=task.id,
-                    file_id=1,
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
                     created_by=current_user.id,
                     updated_by=current_user.id,
-                )
-            ],
-        )
+                ),
+            )
+        with begin_transaction(db):
+            pre_annotations = crud_pre_annotation.batch(
+                db=db,
+                pre_annotations=[
+                    TaskPreAnnotation(
+                        task_id=task.id,
+                        file_id=1,
+                        created_by=current_user.id,
+                        updated_by=current_user.id,
+                    )
+                ],
+            )
         
         assert pre_annotations[0] is not None
 
@@ -427,28 +492,30 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
-        pre_annotations = crud_pre_annotation.batch(
-            db=db,
-            pre_annotations=[
-                TaskPreAnnotation(
-                    task_id=1,
-                    file_id=1,
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
                     created_by=current_user.id,
                     updated_by=current_user.id,
-                    data="{}",
-                )
-            ],
-        )
+                ),
+            )
+        with begin_transaction(db):
+            pre_annotations = crud_pre_annotation.batch(
+                db=db,
+                pre_annotations=[
+                    TaskPreAnnotation(
+                        task_id=1,
+                        file_id=1,
+                        created_by=current_user.id,
+                        updated_by=current_user.id,
+                        data="{}",
+                    )
+                ],
+            )
 
         # run
         data = {"pre_annotation_ids": [pre_annotations[0].id]}
@@ -464,18 +531,22 @@ class TestClassTaskPreAnnotationRouter:
     def test_pre_annotations_delete_not_found(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
 
         # prepare data
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="name",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="name",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
 
         # run
         data = {"pre_annotation_ids": [1, 2]}
@@ -495,16 +566,17 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="list files task",
-                description="description",
-                tips="tips",
-                created_by=current_user.id,
-                updated_by=current_user.id,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="list files task",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         # 上传预注释文件
         empty_task_upload(task.id, "test.jsonl")
@@ -577,6 +649,9 @@ class TestClassTaskPreAnnotationRouter:
     def test_pre_annotation_files_list_with_errors(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         # 测试不存在的任务
         r = client.get(
             f"{settings.API_V1_STR}/tasks/9999/pre_annotations/files",
@@ -588,16 +663,17 @@ class TestClassTaskPreAnnotationRouter:
         assert r.status_code == 200
         
         # 测试无效的排序规则
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="invalid sort task",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="invalid sort task",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         r2 = client.get(
             f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files",
@@ -615,16 +691,17 @@ class TestClassTaskPreAnnotationRouter:
         current_user = crud_user.get_user_by_username(
             db=db, username="test@example.com"
         )
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="delete file task",
-                description="description",
-                tips="tips",
-                created_by=current_user.id,
-                updated_by=current_user.id,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="delete file task",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         # 上传预注释文件
         empty_task_upload(task.id, "test.jsonl")
@@ -667,6 +744,9 @@ class TestClassTaskPreAnnotationRouter:
     def test_delete_pre_annotation_file_errors(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         # 测试不存在的任务
         r1 = client.delete(
             f"{settings.API_V1_STR}/tasks/9999/pre_annotations/files/1",
@@ -677,16 +757,17 @@ class TestClassTaskPreAnnotationRouter:
         assert r1.status_code == 404
         
         # 测试不存在的文件
-        task = crud_task.create(
-            db=db,
-            task=Task(
-                name="not found file task",
-                description="description",
-                tips="tips",
-                created_by=0,
-                updated_by=0,
-            ),
-        )
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="not found file task",
+                    description="description",
+                    tips="tips",
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
+                ),
+            )
         
         r2 = client.delete(
             f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/files/9999",

@@ -10,6 +10,7 @@ import os
 
 from alembic import context, op
 import sqlalchemy as sa
+from sqlalchemy import text
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 from labelu.internal.common.config import settings
@@ -101,12 +102,12 @@ def upgrade() -> None:
                             
             # Update existing data in the task_sample table
             task_items = session.execute(
-                'SELECT id, config FROM task'
+                text('SELECT id, config FROM task')
             )
             
             # Update the task_attachment table
             attachments = session.execute(
-                'SELECT id, path FROM task_attachment'
+                text('SELECT id, path FROM task_attachment')
             )
             
             for attachment in attachments:
@@ -117,14 +118,16 @@ def upgrade() -> None:
                 
                 if filename:
                     session.execute(
-                        f"UPDATE task_attachment SET filename='{filename}', url='{url}' WHERE id={attachment_id}"
+                        text("UPDATE task_attachment SET filename=:fname, url=:url WHERE id=:aid"),
+                        {"fname": filename, "url": url, "aid": attachment_id},
                     )
             
             if column_exist_in_table("task_sample", "task_attachment_ids"):
                 for task_item in task_items:
                     task_id = task_item[0]
                     task_samples = session.execute(
-                        f"SELECT id, task_attachment_ids FROM task_sample WHERE task_id={task_id}"
+                        text("SELECT id, task_attachment_ids FROM task_sample WHERE task_id=:tid"),
+                        {"tid": task_id},
                     )
 
                     for task_sample in task_samples:
@@ -137,14 +140,16 @@ def upgrade() -> None:
                             continue
                         
                         attachment = session.execute(
-                            f"SELECT id, path FROM task_attachment WHERE id={file_id}"
+                            text("SELECT id, path FROM task_attachment WHERE id=:fid"),
+                            {"fid": file_id},
                         )
                         attachment_path = list(attachment)[0][1]
                         
                         if attachment_path:
                             # Update the task_sample table
                             session.execute(
-                                f"UPDATE task_sample SET file_id={file_id} WHERE id={task_sample_id}"
+                                text("UPDATE task_sample SET file_id=:fid WHERE id=:sid"),
+                                {"fid": file_id, "sid": task_sample_id},
                             )
                 
             session.commit()

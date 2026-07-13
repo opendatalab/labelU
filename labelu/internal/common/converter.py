@@ -218,7 +218,6 @@ class Converter:
         for sample in input_data:
             annotation_data = json.loads(sample.get("data"))
             file = sample.get("file", {})
-            logger.info("data is: {}", sample)
 
             # annotation result
             annotation_result = json.loads(annotation_data.get("result", {}))
@@ -317,10 +316,7 @@ class Converter:
         color_list = []
         for sample in input_data:
             file = sample.get("file", {})
-            if sample.get("state") != "DONE":
-                continue
             annotation_data = json.loads(sample.get("data"))
-            logger.info("data is: {}", sample)
             filename = file.get("filename")
             if filename and filename.split("/")[-1]:
                 file_relative_path_base_name = filename.split("/")[-1].split(".")[0]
@@ -445,9 +441,7 @@ class Converter:
             
             # skip invalid data
             annotated_result = json.loads(data.get("result"))
-            if sample.get("state") == "SKIPPED":
-                continue
-            
+
             labelme_item["imagePath"] = file.get("filename", "")
             labelme_item["imageData"] = image_to_base64(file.get("path"))
             
@@ -567,9 +561,9 @@ class Converter:
             
             # skip invalid data
             annotated_result = json.loads(data.get("result"))
-            if sample.get("state") == "SKIPPED" or not annotated_result:
+            if not annotated_result:
                 continue
-            
+
             image_path = settings.MEDIA_ROOT.joinpath(file.get("path").lstrip("/"))
             file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.txt")
@@ -669,9 +663,9 @@ class Converter:
             
             # skip invalid data
             annotated_result = json.loads(data.get("result"))
-            if sample.get("state") == "SKIPPED" or not annotated_result:
+            if not annotated_result:
                 continue
-            
+
             for tool in annotated_result.copy().keys():
                 if tool == 'rectTool':
                     tool_results = annotated_result.pop(tool)
@@ -843,9 +837,9 @@ class Converter:
             
             # skip invalid data
             annotated_result = json.loads(data.get("result"))
-            if sample.get("state") == "SKIPPED" or not annotated_result:
+            if not annotated_result:
                 continue
-            
+
             voc_xml = xml_converter.create_pascal_voc_xml(config, file, annotated_result)
             file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.xml")

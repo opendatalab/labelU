@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from labelu.internal.domain.models.user import User
 from labelu.internal.adapter.persistence import crud_user
+from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.config import settings
 from labelu.internal.common.error_code import ErrorCode
 from labelu.internal.common.error_code import LabelUException
@@ -31,7 +32,7 @@ async def signup(db: Session, cmd: SignupCommand) -> UserResponse:
         )
 
     # new a user
-    with db.begin():
+    with begin_transaction(db):
         user = crud_user.create(
             db,
             User(
