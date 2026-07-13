@@ -39,6 +39,14 @@ class Settings(BaseSettings):
     S3_PATH_STYLE: bool = False
     S3_USE_SSL: bool = True
 
+    # Allow user-configured data-source S3 endpoints to point at private
+    # networks (RFC1918 / ULA / loopback). Enabled by default for on-prem
+    # deployments that use an internal MinIO/S3-compatible store. Even when
+    # enabled, link-local (cloud metadata 169.254.0.0/16), multicast,
+    # reserved and unspecified addresses are always rejected. Set to false to
+    # restrict data-source endpoints to public hosts only (strict SSRF mode).
+    ALLOW_PRIVATE_S3_ENDPOINT: bool = True
+
     AI_AUTO_LABEL_ENABLED: bool = False
     AI_PROVIDER: str = "local_http"
     AI_MODEL_ENDPOINT: str = ""

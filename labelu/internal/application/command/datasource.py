@@ -5,13 +5,20 @@ from urllib.parse import urlparse
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from labelu.internal.common.config import settings
+
 
 def validate_s3_endpoint(endpoint: Union[str, None]) -> Union[str, None]:
     """Reject S3 endpoints that could be abused for SSRF.
 
-    Only http(s) URLs are allowed, and the host must not resolve to a
-    loopback/private/link-local/reserved address (e.g. the cloud metadata
-    endpoint 169.254.169.254 or internal services).
+    Only http(s) URLs are allowed. Link-local (cloud metadata
+    169.254.0.0/16, fe80::/10), multicast, reserved and unspecified
+    addresses are always rejected — they are never valid S3 endpoints.
+
+    Private (RFC1918 / ULA) and loopback addresses are allowed when
+    ``settings.ALLOW_PRIVATE_S3_ENDPOINT`` is true (the default, for on-prem
+    deployments backed by an internal MinIO/S3-compatible store) and
+    rejected otherwise (strict mode).
     """
     if endpoint is None or endpoint == "":
         return endpoint
@@ -28,17 +35,25 @@ def validate_s3_endpoint(endpoint: Union[str, None]) -> Union[str, None]:
     except socket.gaierror:
         raise ValueError("endpoint host cannot be resolved")
 
+    allow_private = settings.ALLOW_PRIVATE_S3_ENDPOINT
     for info in infos:
         addr = ipaddress.ip_address(info[4][0])
+        # Never a legitimate S3 endpoint; always rejected regardless of config.
+        # Note: the metadata IP (169.254.x) is also flagged is_private on newer
+        # Python, so link-local is checked here and must win over the private
+        # carve-out below. Loopback is exempt from the reserved check because
+        # ::1 is also flagged is_reserved.
         if (
-            addr.is_private
-            or addr.is_loopback
-            or addr.is_link_local
-            or addr.is_reserved
+            addr.is_link_local
             or addr.is_multicast
             or addr.is_unspecified
+            or (addr.is_reserved and not addr.is_loopback)
         ):
             raise ValueError("endpoint host resolves to a disallowed address")
+        # Internal networks (RFC1918 / ULA / loopback): allowed only when
+        # explicitly permitted via ALLOW_PRIVATE_S3_ENDPOINT.
+        if (addr.is_private or addr.is_loopback) and not allow_private:
+            raise ValueError("endpoint host resolves to a private address")
     return endpoint
 
 
