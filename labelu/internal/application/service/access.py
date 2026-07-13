@@ -16,3 +16,16 @@ def assert_task_access(task, current_user) -> None:
             code=ErrorCode.CODE_30001_NO_PERMISSION,
             status_code=status.HTTP_403_FORBIDDEN,
         )
+
+
+def assert_owner(resource, current_user) -> None:
+    """Ensure current_user owns the resource (created_by).
+
+    Used for user-private resources without a collaborator concept
+    (e.g. data sources).
+    """
+    if resource.created_by != current_user.id:
+        raise LabelUException(
+            code=ErrorCode.CODE_30001_NO_PERMISSION,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )

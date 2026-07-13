@@ -72,7 +72,7 @@ async def get(
     db: Session = Depends(db_module.get_db),
     current_user: User = Depends(get_current_user),
 ):
-    data = await service.get(db=db, ds_id=ds_id)
+    data = await service.get(db=db, ds_id=ds_id, current_user=current_user)
     return OkResp[DataSourceResponse](data=data)
 
 
@@ -123,7 +123,7 @@ async def list_objects(
     current_user: User = Depends(get_current_user),
 ):
     data = await service.list_objects(
-        db=db, ds_id=ds_id, prefix=prefix, extension=extension,
+        db=db, ds_id=ds_id, current_user=current_user, prefix=prefix, extension=extension,
         page_token=page_token, size=size,
     )
     return OkResp[S3ObjectListResponse](data=data)

@@ -19,7 +19,7 @@ from labelu.internal.common.storage import (
     build_thumbnail_key,
     get_storage_backend,
 )
-from labelu.internal.application.service.access import assert_task_access
+from labelu.internal.application.service.access import assert_task_access, assert_owner
 from labelu.internal.adapter.persistence import crud_attachment, crud_pre_annotation, crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.adapter.persistence import crud_export_job
@@ -178,6 +178,7 @@ async def import_from_s3(
                 code=ErrorCode.CODE_61000_NO_DATA,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
+        assert_owner(ds, current_user)
 
         # Resolve object keys: either from explicit list or by listing S3 prefix
         object_keys = cmd.object_keys
