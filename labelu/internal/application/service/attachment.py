@@ -82,11 +82,21 @@ async def create(
 
         # file relative path
     path_filename = cmd.file.filename.split("/")
-    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1] NOTE: If you want keep filename safe, you can use uuid as filename 
+    #  filename = str(uuid.uuid4())[0:8] + "-" + path_filename[-1] NOTE: If you want keep filename safe, you can use uuid as filename
     filename = path_filename[-1]
     sanitized = re.sub(r'%', '_pct_', filename)
     sanitized = re.sub(r'[\\/*?:"<>|#]', '_', sanitized)
-    path = "/".join(path_filename[:-1])
+    # Sanitize the directory portion of the filename too: drop traversal
+    # components ("..", ".", empty) and apply the same character sanitization,
+    # so a crafted filename can never escape the task's upload directory.
+    safe_parts = []
+    for part in path_filename[:-1]:
+        part = re.sub(r'%', '_pct_', part)
+        part = re.sub(r'[\\/*?:"<>|#]', '_', part)
+        if part in ("", ".", ".."):
+            continue
+        safe_parts.append(part)
+    path = "/".join(safe_parts)
     attachment_relative_base_dir = Path(settings.UPLOAD_DIR).joinpath(
         str(task_id), path
     )
