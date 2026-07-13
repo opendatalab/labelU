@@ -16,6 +16,7 @@ from labelu.internal.common.storage import (
     build_thumbnail_key,
     get_storage_backend,
 )
+from labelu.internal.application.service.access import assert_task_access
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_pre_annotation
 from labelu.internal.adapter.persistence import crud_attachment
@@ -63,7 +64,9 @@ async def create(
                 code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
-        
+
+        assert_task_access(task, current_user)
+
         pre_annotations = []
         for pre_annotation in cmd:
             pre_annotation_file = crud_attachment.get(db, pre_annotation.file_id)
@@ -108,7 +111,12 @@ async def list_by(
     sorting: Optional[str],
     current_user: User,
 ) -> Tuple[List[PreAnnotationResponse], int]:
-    
+
+    if task_id is not None:
+        task = crud_task.get(db=db, task_id=task_id)
+        if task is not None:
+            assert_task_access(task, current_user)
+
     pre_annotations, total = crud_pre_annotation.list_by(
         db=db,
         task_id=task_id,
@@ -198,13 +206,17 @@ async def get(
         pre_annotation_id=pre_annotation_id,
     )
 
-    if not pre_annotation:
+    if not pre_annotation or pre_annotation.task_id != task_id:
         logger.error("cannot find pre_annotation: {}", pre_annotation_id)
         raise LabelUException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
-        
+
+    task = crud_task.get(db=db, task_id=pre_annotation.task_id)
+    if task is not None:
+        assert_task_access(task, current_user)
+
     # response
     return PreAnnotationResponse(
         id=pre_annotation.id,
@@ -233,7 +245,9 @@ async def delete_pre_annotation_file(
                 code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
-        
+
+        assert_task_access(task, current_user)
+
         attachments = crud_attachment.get_by_ids(
             db=db, attachment_ids=[file_id]
         )
@@ -264,6 +278,16 @@ async def delete(
 ) -> CommonDataResp:
 
     with begin_transaction(db):
+        # authorize: caller must have access to every pre-annotation's task
+        pre_annotations = [
+            crud_pre_annotation.get(db=db, pre_annotation_id=pid)
+            for pid in pre_annotation_ids
+        ]
+        for task_id in {pa.task_id for pa in pre_annotations if pa}:
+            task = crud_task.get(db=db, task_id=task_id)
+            if task is not None:
+                assert_task_access(task, current_user)
+
         crud_pre_annotation.delete(db=db, pre_annotation_ids=pre_annotation_ids)
     # response
     return CommonDataResp(ok=True)
