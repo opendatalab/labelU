@@ -24,8 +24,10 @@ class TestDataSourceEndpointSSRF:
     @pytest.mark.parametrize(
         "endpoint",
         [
-            "http://169.254.169.254",          # cloud metadata (IMDS) - always blocked
+            "http://169.254.169.254",          # AWS/GCP/Azure metadata (IMDS) - link-local
             "http://169.254.169.254/latest/",  # IMDS with path
+            "http://100.100.100.200/latest/",  # Alibaba/Tencent cloud metadata (100.64.0.0/10)
+            "http://100.64.0.1:9000",          # RFC6598 shared address space
             "http://0.0.0.0",                  # unspecified - always blocked
             "file:///etc/passwd",              # non-http scheme
             "ftp://example.com",               # non-http scheme

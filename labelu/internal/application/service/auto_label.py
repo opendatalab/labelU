@@ -9,6 +9,7 @@ from fastapi import status
 from loguru import logger
 from sqlalchemy.orm import Session
 
+from labelu.internal.application.service.access import assert_task_access
 from labelu.internal.adapter.persistence import crud_pre_annotation, crud_sample, crud_task
 from labelu.internal.adapter.persistence import crud_auto_label_job
 from labelu.internal.application.command.auto_label import AutoLabelCommand, BatchAutoLabelCommand
@@ -360,6 +361,8 @@ async def create_batch_job(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+
+    assert_task_access(task, current_user)
 
     if task.media_type != MediaType.IMAGE.value:
         raise LabelUException(

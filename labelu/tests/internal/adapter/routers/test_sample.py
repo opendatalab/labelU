@@ -353,6 +353,91 @@ class TestClassTaskSampleRouter:
         # check
         assert r.status_code == 422
 
+    def test_batch_auto_label_forbidden_for_non_owner(
+        self, client: TestClient, testuser_token_headers: dict, db: Session, monkeypatch
+    ) -> None:
+        # enable the AI feature so the request reaches the access check
+        monkeypatch.setattr(settings, "AI_AUTO_LABEL_ENABLED", True)
+        monkeypatch.setattr(settings, "AI_MODEL_ENDPOINT", "http://model.local")
+        # task owned by another user
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="other", description="d", tips="t", media_type="IMAGE",
+                    created_by=999, updated_by=999,
+                ),
+            )
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task.id}/auto_label_job",
+            headers=testuser_token_headers,
+            json={"filter_by_labels": True},
+        )
+        assert r.status_code == 403
+
+    def test_collaborator_can_annotate_shared_task(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # owner = the default test user
+        owner = crud_user.get_user_by_username(db=db, username="test@example.com")
+
+        # a second user, added as collaborator, with a real login token
+        collab_username = "collab_annotator@example.com"
+        client.post(
+            f"{settings.API_V1_STR}/users/signup",
+            json={"username": collab_username, "password": "collab@123"},
+        )
+        login = client.post(
+            f"{settings.API_V1_STR}/users/login",
+            json={"username": collab_username, "password": "collab@123"},
+        )
+        collab_headers = {"Authorization": login.json()["data"]["token"]}
+        collab_user = crud_user.get_user_by_username(db=db, username=collab_username)
+
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="shared", description="d", tips="t",
+                    created_by=owner.id, updated_by=owner.id,
+                ),
+            )
+        with begin_transaction(db):
+            samples = crud_sample.batch(
+                db=db,
+                samples=[TaskSample(
+                    task_id=task.id, file_id=1,
+                    created_by=owner.id, updated_by=owner.id, data="{}",
+                )],
+            )
+        sid = samples[0].id
+
+        # owner adds the collaborator
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task.id}/collaborators",
+            headers=testuser_token_headers,
+            json={"user_id": collab_user.id},
+        )
+        assert r.status_code == 201
+
+        # the collaborator can list, read and annotate samples in the shared task
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
+            headers=collab_headers, params={"page": 0, "size": 10},
+        )
+        assert r.status_code == 200
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/{sid}",
+            headers=collab_headers,
+        )
+        assert r.status_code == 200
+        r = client.patch(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/{sid}",
+            headers=collab_headers,
+            json={"data": {"k": "v"}, "annotated_count": 1},
+        )
+        assert r.status_code == 200
+
     def test_sample_access_forbidden_for_non_member(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
