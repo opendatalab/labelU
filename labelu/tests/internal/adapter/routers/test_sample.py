@@ -353,6 +353,28 @@ class TestClassTaskSampleRouter:
         # check
         assert r.status_code == 422
 
+    def test_batch_auto_label_forbidden_for_non_owner(
+        self, client: TestClient, testuser_token_headers: dict, db: Session, monkeypatch
+    ) -> None:
+        # enable the AI feature so the request reaches the access check
+        monkeypatch.setattr(settings, "AI_AUTO_LABEL_ENABLED", True)
+        monkeypatch.setattr(settings, "AI_MODEL_ENDPOINT", "http://model.local")
+        # task owned by another user
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="other", description="d", tips="t", media_type="IMAGE",
+                    created_by=999, updated_by=999,
+                ),
+            )
+        r = client.post(
+            f"{settings.API_V1_STR}/tasks/{task.id}/auto_label_job",
+            headers=testuser_token_headers,
+            json={"filter_by_labels": True},
+        )
+        assert r.status_code == 403
+
     def test_sample_access_forbidden_for_non_member(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
