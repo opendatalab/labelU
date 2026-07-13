@@ -1,13 +1,40 @@
-import pytest
+import os
+import shutil
+import tempfile
+from pathlib import Path
 from typing import Dict, Generator
 
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
-from labelu.main import app
+# Make the test suite hermetic: every run gets its own throwaway directory that
+# holds BOTH the sqlite test DB and all uploaded media. Without this, tests
+# wrote uploads into the developer's real appdirs data directory
+# (~/Library/Application Support/labelu/media) and kept ``test.db`` in the cwd,
+# so ``sqlite_sequence`` accumulated across runs and freshly minted task_ids
+# collided with leftover ``upload/<task_id>/...`` files, intermittently failing
+# uploads with a 400 "file already exists". The directory must be chosen at
+# import time because the engine below is created at module import, before any
+# pytest ``tmp_path``/``monkeypatch`` fixture could run. It is removed at the end
+# of the session by the ``_hermetic_storage`` fixture.
+_TEST_DATA_DIR = Path(tempfile.mkdtemp(prefix="labelu-test-"))
+
 from labelu.internal.common.config import settings
+
+# Redirect media storage into the isolated directory and drop the memoized
+# storage backend so it resolves paths against the new MEDIA_ROOT.
+settings.STORAGE_BACKEND = "local"
+settings.MEDIA_ROOT = _TEST_DATA_DIR / "media"
+os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+
+from labelu.internal.common.storage import get_storage_backend
+
+get_storage_backend.cache_clear()
+
+from labelu.main import app
 from labelu.internal.common.db import Base
 from labelu.internal.common.db import begin_transaction
 from labelu.internal.common.db import get_db
@@ -19,13 +46,30 @@ TEST_USERNAME = "test@example.com"
 TEST_USER_PASSWORD = "test@123"
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{_TEST_DATA_DIR / 'test.db'}"
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False, "timeout": 30},
 )
 TestingSessionLocal = sessionmaker(autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _hermetic_storage() -> Generator:
+    """Guarantee the isolated media root is active and clean it up afterwards.
+
+    The redirect itself happens at import time (above); this fixture re-clears
+    the storage-backend cache in case anything memoized it during collection and
+    removes the throwaway directory (test DB + media) once the session ends.
+    """
+    get_storage_backend.cache_clear()
+    try:
+        yield
+    finally:
+        engine.dispose()
+        get_storage_backend.cache_clear()
+        shutil.rmtree(_TEST_DATA_DIR, ignore_errors=True)
 
 
 def override_get_db():
@@ -46,6 +90,12 @@ def db() -> Generator:
     db = None
     try:
         db = TestingSessionLocal()
+        # Seed the test user at session scope so it exists before the
+        # module-scoped ``testuser_token_headers`` fixture logs in. The
+        # per-test ``run_around_tests`` cleanup preserves the ``user`` table, so
+        # this single seed lasts the whole session. (Previously the user
+        # survived only because ``test.db`` persisted in the cwd across runs.)
+        init_db()
         yield db
     finally:
         if db is not None:
