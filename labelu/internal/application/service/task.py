@@ -14,6 +14,7 @@ from labelu.internal.domain.models.user import User
 from labelu.internal.domain.models.task import Task
 from labelu.internal.domain.models.task import TaskStatus
 from labelu.internal.domain.models.sample import SampleState
+from labelu.internal.application.service.access import assert_task_access
 from labelu.internal.adapter.persistence import crud_task, crud_user
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.application.command.task import BasicConfigCommand
@@ -312,7 +313,7 @@ async def batch_remove_collaborators(db: Session, task_id: int, user_ids: List[i
 
     return CommonDataResp(ok=True)
 
-async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
+async def update(db: Session, task_id: int, cmd: UpdateCommand, current_user: User) -> TaskResponse:
 
     # get task
     task = crud_task.get(db=db, task_id=task_id)
@@ -322,6 +323,8 @@ async def update(db: Session, task_id: int, cmd: UpdateCommand) -> TaskResponse:
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+
+    assert_task_access(task, current_user)
 
     # update
     obj_in = cmd.dict(exclude_unset=True)

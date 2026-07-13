@@ -176,6 +176,27 @@ class TestClassTaskRouter:
         assert json["data"]["config"] == "new config"
         assert json["data"]["media_type"] == "IMAGE"
 
+    def test_task_update_forbidden_for_non_owner(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # task owned by another user
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="other", description="d", tips="t",
+                    created_by=999, updated_by=999,
+                ),
+            )
+
+        r = client.patch(
+            f"{settings.API_V1_STR}/tasks/{task.id}",
+            headers=testuser_token_headers,
+            json={"name": "hijacked", "description": "x", "tips": "y",
+                  "config": "c", "media_type": "IMAGE"},
+        )
+        assert r.status_code == 403
+
     def test_task_update_no_found_task(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:

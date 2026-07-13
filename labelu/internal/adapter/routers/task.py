@@ -220,7 +220,7 @@ async def update(
     """
 
     # business logic
-    data = await service.update(db=db, task_id=task_id, cmd=cmd)
+    data = await service.update(db=db, task_id=task_id, cmd=cmd, current_user=current_user)
 
     # response
     return OkResp[TaskResponse](data=data)
