@@ -19,6 +19,7 @@ from labelu.internal.common.storage import (
     build_thumbnail_key,
     get_storage_backend,
 )
+from labelu.internal.application.service.access import assert_task_access, assert_owner
 from labelu.internal.adapter.persistence import crud_attachment, crud_pre_annotation, crud_task
 from labelu.internal.adapter.persistence import crud_sample
 from labelu.internal.adapter.persistence import crud_export_job
@@ -70,6 +71,8 @@ async def create(
                 code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
+
+        assert_task_access(task, current_user)
 
         samples = [
             TaskSample(
@@ -167,12 +170,15 @@ async def import_from_s3(
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
+        assert_task_access(task, current_user)
+
         ds = crud_datasource.get(db=db, ds_id=cmd.data_source_id)
         if not ds:
             raise LabelUException(
                 code=ErrorCode.CODE_61000_NO_DATA,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
+        assert_owner(ds, current_user)
 
         # Resolve object keys: either from explicit list or by listing S3 prefix
         object_keys = cmd.object_keys
@@ -229,7 +235,12 @@ async def list_by(
     page: Union[int, None],
     size: int,
     sorting: Union[str, None],
+    current_user: User,
 ) -> Tuple[List[SampleResponse], int]:
+    if task_id is not None:
+        task = crud_task.get(db=db, task_id=task_id)
+        if task is not None:
+            assert_task_access(task, current_user)
     samples = crud_sample.list_by(
         db=db,
         task_id=task_id,
@@ -268,19 +279,23 @@ async def list_by(
 
 
 async def get(
-    db: Session, task_id: int, sample_id: int
+    db: Session, task_id: int, sample_id: int, current_user: User
 ) -> SampleResponse:
     sample = crud_sample.get(
         db=db,
         sample_id=sample_id,
     )
 
-    if not sample:
+    if not sample or sample.task_id != task_id:
         logger.error("cannot find sample:{}", sample_id)
         raise LabelUException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+
+    task = crud_task.get(db=db, task_id=sample.task_id)
+    if task is not None:
+        assert_task_access(task, current_user)
 
     # response
     return SampleResponse(
@@ -321,9 +336,11 @@ async def patch(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    assert_task_access(task, current_user)
+
     # get sample
     sample = crud_sample.get(db=db, sample_id=sample_id)
-    if not sample:
+    if not sample or sample.task_id != task_id:
         logger.error("cannot find sample:{}", sample_id)
         raise LabelUException(
             code=ErrorCode.CODE_55001_SAMPLE_NOT_FOUND,
@@ -407,6 +424,11 @@ async def delete(
     with begin_transaction(db):
         # delete media
         samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
+        # authorize: caller must have access to every sample's task
+        for task_id in {sample.task_id for sample in samples}:
+            task = crud_task.get(db=db, task_id=task_id)
+            if task is not None:
+                assert_task_access(task, current_user)
         attachment_ids = [sample.file_id for sample in samples if sample.file_id]
         attachments = crud_attachment.get_by_ids(db=db, attachment_ids=attachment_ids)
         
@@ -439,6 +461,8 @@ async def create_export_job(
             code=ErrorCode.CODE_50002_TASK_NOT_FOUND,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+
+    assert_task_access(task, current_user)
 
     with begin_transaction(db):
         job = crud_export_job.create(

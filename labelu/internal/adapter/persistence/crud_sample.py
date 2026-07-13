@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Union
 
 
-from sqlalchemy import case, func, text
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
@@ -39,17 +39,32 @@ def list_by(
     whens = {state.value: index for index, state in enumerate(SampleState)}
     sort_logic = case(whens, value=TaskSample.state).label(TaskSample.state.key)
 
+    # Allowlist of sortable columns mapped to real ORM columns. Only these
+    # identifiers may reach ORDER BY; anything else is rejected so request
+    # input can never be interpolated into raw SQL.
+    sortable_columns = {
+        "inner_id": TaskSample.inner_id,
+        "updated_at": TaskSample.updated_at,
+        "annotated_count": TaskSample.annotated_count,
+    }
+
     if sorting:
         sort_strings = sorting.split(",")
         for item in sort_strings:
             sort_key = item.split(":")
-            if sort_key[0] == TaskSample.state.key:
-                if sort_key[1] == "asc":
-                    query = query.order_by(sort_logic.asc())
-                else:
-                    query = query.order_by(sort_logic.desc())
+            column = sort_key[0]
+            direction = sort_key[1] if len(sort_key) > 1 else "asc"
+            if direction not in ("asc", "desc"):
+                continue
+            if column == TaskSample.state.key:
+                order_target = sort_logic
+            elif column in sortable_columns:
+                order_target = sortable_columns[column]
             else:
-                query = query.order_by(text(f"{sort_key[0]} {sort_key[1]}"))
+                continue
+            query = query.order_by(
+                order_target.asc() if direction == "asc" else order_target.desc()
+            )
 
     # default order by id, before need select last items
     if before:

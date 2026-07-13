@@ -85,6 +85,7 @@ conda activate labelu
 
 4. 安装 LabelU：
 
+安装基础版本（使用SQLite）
 ```bash
 pip install labelu
 ```
@@ -100,7 +101,7 @@ pip install labelu[mysql]
 # pip install labelu mysqlclient
 ```
 
-5. 运行：
+1. 运行：
 
 ```bash
 labelu

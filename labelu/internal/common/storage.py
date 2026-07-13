@@ -6,9 +6,12 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
+from fastapi import status
+from loguru import logger
 from PIL import Image
 
 from labelu.internal.common.config import settings
+from labelu.internal.common.error_code import ErrorCode, LabelUException
 
 
 class StorageBackend(ABC):
@@ -56,7 +59,16 @@ class LocalStorageBackend(StorageBackend):
         return "local"
 
     def _resolve(self, key: str) -> Path:
-        return settings.MEDIA_ROOT.joinpath(key.lstrip("/"))
+        root = settings.MEDIA_ROOT.resolve()
+        target = root.joinpath(key.lstrip("/")).resolve()
+        # Reject any key that escapes the media root via "../" traversal.
+        if target != root and root not in target.parents:
+            logger.error("rejected path traversal outside media root: {}", key)
+            raise LabelUException(
+                code=ErrorCode.CODE_51001_TASK_ATTACHMENT_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        return target
 
     def save_file(self, local_path: Path, key: str, content_type: Optional[str] = None) -> None:
         target_path = self._resolve(key)

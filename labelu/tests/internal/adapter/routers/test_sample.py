@@ -17,6 +17,9 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         with begin_transaction(db):
             task = crud_task.create(
                 db=db,
@@ -24,8 +27,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         data = [{"file_id": 1, "data": {}}]
@@ -50,6 +53,9 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         with begin_transaction(db):
             task = crud_task.create(
                 db=db,
@@ -57,8 +63,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                     status="CONFIGURED",
                 ),
             )
@@ -113,8 +119,8 @@ class TestClassTaskSampleRouter:
                 name="name",
                 description="description",
                 tips="tips",
-                created_by=0,
-                updated_by=0,
+                created_by=current_user.id,
+                updated_by=current_user.id,
             ),
         )
         samples = [
@@ -162,8 +168,8 @@ class TestClassTaskSampleRouter:
                 name="name",
                 description="description",
                 tips="tips",
-                created_by=0,
-                updated_by=0,
+                created_by=current_user.id,
+                updated_by=current_user.id,
             ),
         )
         samples = [
@@ -212,8 +218,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         samples = [
@@ -262,8 +268,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         samples = [
@@ -333,8 +339,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         # run
@@ -346,6 +352,58 @@ class TestClassTaskSampleRouter:
 
         # check
         assert r.status_code == 422
+
+    def test_sample_access_forbidden_for_non_member(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # a task owned by someone else; the test user is neither owner nor collaborator
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="other", description="d", tips="t",
+                    created_by=999, updated_by=999,
+                ),
+            )
+        with begin_transaction(db):
+            samples = crud_sample.batch(
+                db=db,
+                samples=[
+                    TaskSample(
+                        task_id=task.id, file_id=1,
+                        created_by=999, updated_by=999, data="{}",
+                    )
+                ],
+            )
+        sid = samples[0].id
+
+        # list
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
+            headers=testuser_token_headers, params={"page": 0, "size": 10},
+        )
+        assert r.status_code == 403
+        # get
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/{sid}",
+            headers=testuser_token_headers,
+        )
+        assert r.status_code == 403
+        # patch
+        r = client.patch(
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples/{sid}",
+            headers=testuser_token_headers,
+            json={"data": {}, "annotated_count": 0},
+        )
+        assert r.status_code == 403
+        # delete
+        r = client.request(
+            "delete",
+            f"{settings.API_V1_STR}/tasks/{task.id}/samples",
+            headers=testuser_token_headers,
+            json={"sample_ids": [sid]},
+        )
+        assert r.status_code == 403
 
     def test_sample_get(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -362,8 +420,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         with begin_transaction(db):
@@ -407,8 +465,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
 
@@ -438,8 +496,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         with begin_transaction(db):
@@ -487,8 +545,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         with begin_transaction(db):
@@ -541,6 +599,9 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         with begin_transaction(db):
             task = crud_task.create(
                 db=db,
@@ -548,8 +609,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
 
@@ -580,8 +641,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         with begin_transaction(db):
@@ -614,6 +675,9 @@ class TestClassTaskSampleRouter:
     ) -> None:
 
         # prepare data
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         with begin_transaction(db):
             task = crud_task.create(
                 db=db,
@@ -621,8 +685,8 @@ class TestClassTaskSampleRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
 
@@ -653,8 +717,8 @@ class TestClassTaskSampleRouter:
                     description="description",
                     tips="tips",
                     config='{"tools":[{"tool":"rectTool","config":{"isShowCursor":false,"showConfirm":false,"skipWhileNoDependencies":false,"drawOutsideTarget":false,"copyBackwardResult":false,"minWidth":1,"attributeConfigurable":true,"textConfigurable":true,"textCheckType":4,"customFormat":"","attributes":[{"key":"rectTool","value":"rectTool"}]}},{"tool":"pointTool","config":{"upperLimit":10,"isShowCursor":false,"attributeConfigurable":true,"copyBackwardResult":false,"textConfigurable":true,"textCheckType":0,"customFormat":"","attributes":[{"key":"pointTool","value":"pointTool"}]}},{"tool":"polygonTool","config":{"isShowCursor":false,"lineType":0,"lineColor":0,"drawOutsideTarget":false,"edgeAdsorption":true,"copyBackwardResult":false,"attributeConfigurable":true,"textConfigurable":true,"textCheckType":0,"customFormat":"","attributes":[{"key":"polygonTool","value":"polygonTool"}],"lowerLimitPointNum":"4","upperLimitPointNum":100}},{"tool":"lineTool","config":{"isShowCursor":false,"lineType":0,"lineColor":1,"edgeAdsorption":true,"outOfTarget":true,"copyBackwardResult":false,"attributeConfigurable":true,"textConfigurable":true,"textCheckType":4,"customFormat":"^[\s\S]{1,3}$","lowerLimitPointNum":4,"upperLimitPointNum":"","attributes":[{"key":"lineTool","value":"lineTool"}]}},{"tool":"tagTool"},{"tool":"textTool"}],"tagList":[{"key":"类别1","value":"class1","isMulti":true,"subSelected":[{"key":"选项1","value":"option1","isDefault":true},{"key":"选项2","value":"option2","isDefault":false}]},{"key":"类别2","value":"class2","isMulti":true,"subSelected":[{"key":"a选项1","value":"aoption1","isDefault":true},{"key":"a选项2","value":"aoption2","isDefault":false}]}],"attributes":[{"key":"RT","value":"RT"}],"textConfig":[{"label":"我的描述","key":"描述的关键","required":true,"default":"","maxLength":200},{"label":"我的描述1","key":"描述的关键1","required":true,"default":"","maxLength":200}],"fileInfo":{"type":"img","list":[{"id":1,"url":"/src/img/example/bear6.webp","result":"[]"}]},"commonAttributeConfigurable":true}',
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
             samples = crud_sample.batch(
@@ -704,8 +768,8 @@ class TestClassTaskSampleRouter:
                     description="description",
                     tips="tips",
                     config='{"tools":[{"tool":"rectTool","config":{"attributes":[{"key":"RT","value":"RT"}]}}],"tagList":[],"attributes":[],"textConfig":[],"fileInfo":{"type":"img","list":[]},"commonAttributeConfigurable":true}',
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
             result_data = '{"result": "{\"width\":100,\"height\":100,\"valid\":true,\"rotate\":0,\"rectTool\":{\"toolName\":\"rectTool\",\"result\":[{\"x\":10,\"y\":10,\"width\":50,\"height\":50,\"label\":\"RT\",\"valid\":true,\"isVisible\":true,\"id\":\"test1\",\"order\":1}]}}"}'
@@ -771,8 +835,8 @@ class TestClassTaskSampleRouter:
                     description="description",
                     tips="tips",
                     config='{"tools":[{"tool":"rectTool","config":{"attributes":[{"key":"RT","value":"RT"}]}}],"tagList":[],"attributes":[],"textConfig":[],"fileInfo":{"type":"img","list":[]},"commonAttributeConfigurable":true}',
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
             job = crud_export_job.create(

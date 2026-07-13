@@ -20,6 +20,9 @@ class TestClassTaskPreAnnotationRouter:
     def test_create_pre_annotation_successful(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
             
         with begin_transaction(db):
             task = crud_task.create(
@@ -28,8 +31,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         
@@ -55,9 +58,57 @@ class TestClassTaskPreAnnotationRouter:
         assert r.status_code == 201
         assert len(json["data"]["ids"]) == 1
         
+    def test_pre_annotation_access_forbidden_for_non_member(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+        # task + pre-annotation owned by another user
+        with begin_transaction(db):
+            task = crud_task.create(
+                db=db,
+                task=Task(
+                    name="other", description="d", tips="t",
+                    created_by=999, updated_by=999,
+                ),
+            )
+        with begin_transaction(db):
+            pre = crud_pre_annotation.batch(
+                db=db,
+                pre_annotations=[
+                    TaskPreAnnotation(
+                        task_id=task.id, file_id=1, sample_name="x",
+                        data="{}", created_by=999, updated_by=999,
+                    )
+                ],
+            )
+        pid = pre[0].id
+
+        # list
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
+            headers=testuser_token_headers, params={"page": 0, "size": 10},
+        )
+        assert r.status_code == 403
+        # get
+        r = client.get(
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations/{pid}",
+            headers=testuser_token_headers,
+        )
+        assert r.status_code == 403
+        # delete
+        r = client.request(
+            "delete",
+            f"{settings.API_V1_STR}/tasks/{task.id}/pre_annotations",
+            headers=testuser_token_headers,
+            json={"pre_annotation_ids": [pid]},
+        )
+        assert r.status_code == 403
+
     def test_create_pre_annotation_sample_exists(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
             
         with begin_transaction(db):
             task = crud_task.create(
@@ -66,8 +117,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         
@@ -144,8 +195,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         
@@ -203,8 +254,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         
@@ -283,8 +334,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         empty_task_upload(task.id, "test.png")
@@ -376,8 +427,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         # run
@@ -405,8 +456,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         with begin_transaction(db):
@@ -448,8 +499,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         with begin_transaction(db):
@@ -480,6 +531,9 @@ class TestClassTaskPreAnnotationRouter:
     def test_pre_annotations_delete_not_found(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
 
         # prepare data
         with begin_transaction(db):
@@ -489,8 +543,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="name",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
 
@@ -595,6 +649,9 @@ class TestClassTaskPreAnnotationRouter:
     def test_pre_annotation_files_list_with_errors(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         # 测试不存在的任务
         r = client.get(
             f"{settings.API_V1_STR}/tasks/9999/pre_annotations/files",
@@ -613,8 +670,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="invalid sort task",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         
@@ -687,6 +744,9 @@ class TestClassTaskPreAnnotationRouter:
     def test_delete_pre_annotation_file_errors(
         self, client: TestClient, testuser_token_headers: dict, db: Session
     ) -> None:
+        current_user = crud_user.get_user_by_username(
+            db=db, username="test@example.com"
+        )
         # 测试不存在的任务
         r1 = client.delete(
             f"{settings.API_V1_STR}/tasks/9999/pre_annotations/files/1",
@@ -704,8 +764,8 @@ class TestClassTaskPreAnnotationRouter:
                     name="not found file task",
                     description="description",
                     tips="tips",
-                    created_by=0,
-                    updated_by=0,
+                    created_by=current_user.id,
+                    updated_by=current_user.id,
                 ),
             )
         

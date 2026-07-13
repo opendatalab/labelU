@@ -30,6 +30,8 @@ from labelu.internal.application.response.sample import CreateSampleResponse
 from labelu.internal.application.response.auto_label import AutoLabelResponse, AutoLabelJobResponse
 from labelu.internal.application.response.export import ExportJobResponse
 from labelu.internal.adapter.persistence import crud_export_job
+from labelu.internal.adapter.persistence import crud_task
+from labelu.internal.application.service.access import assert_task_access
 from labelu.internal.common.storage import get_storage_backend
 
 
@@ -84,7 +86,9 @@ async def list_by(
     page: Union[int, None] = Query(default=None, ge=0),
     size: Union[int, None] = 100,
     sort: Union[str, None] = Query(
-        default=None, pattern="(annotated_count|state|inner_id|updated_at):(desc|asc)"
+        default=None,
+        pattern=r"^(annotated_count|state|inner_id|updated_at):(desc|asc)"
+        r"(,(annotated_count|state|inner_id|updated_at):(desc|asc))*$",
     ),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db_module.get_db),
@@ -109,6 +113,7 @@ async def list_by(
         page=page,
         size=size,
         sorting=sort,
+        current_user=current_user,
     )
 
     # response
@@ -134,7 +139,7 @@ async def get(
 
     # business logic
     data = await service.get(
-        db=db, task_id=task_id, sample_id=sample_id
+        db=db, task_id=task_id, sample_id=sample_id, current_user=current_user
     )
 
     # response
@@ -329,6 +334,10 @@ async def get_export_status(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    task = crud_task.get(db=db, task_id=job.task_id)
+    if task is not None:
+        assert_task_access(task, current_user)
+
     skipped_count, warning_message = _export_progress(
         sample_count=job.sample_count,
         processed_count=job.processed_count,
@@ -372,6 +381,10 @@ async def download_export(
             code=ErrorCode.CODE_61000_NO_DATA,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+
+    task = crud_task.get(db=db, task_id=job.task_id)
+    if task is not None:
+        assert_task_access(task, current_user)
 
     storage = get_storage_backend()
     if storage.is_remote:

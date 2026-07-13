@@ -9,6 +9,7 @@ from loguru import logger
 from sqlalchemy.orm import Session
 
 from labelu.internal.adapter.persistence import crud_datasource
+from labelu.internal.application.service.access import assert_owner
 from labelu.internal.application.command.datasource import (
     CreateDataSourceCommand,
     UpdateDataSourceCommand,
@@ -110,13 +111,14 @@ async def list_by(
     return [_to_response(ds) for ds in items], total
 
 
-async def get(db: Session, ds_id: int) -> DataSourceResponse:
+async def get(db: Session, ds_id: int, current_user: User) -> DataSourceResponse:
     ds = crud_datasource.get(db=db, ds_id=ds_id)
     if not ds:
         raise LabelUException(
             code=ErrorCode.CODE_61000_NO_DATA,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+    assert_owner(ds, current_user)
     return _to_response(ds)
 
 
@@ -129,6 +131,7 @@ async def update(
             code=ErrorCode.CODE_61000_NO_DATA,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+    assert_owner(ds, current_user)
     obj_in = cmd.model_dump(exclude_unset=True)
     if "access_key_id" in obj_in and obj_in["access_key_id"] is not None:
         obj_in["access_key_id"] = encrypt_value(obj_in["access_key_id"])
@@ -147,6 +150,7 @@ async def delete(db: Session, ds_id: int, current_user: User) -> None:
             code=ErrorCode.CODE_61000_NO_DATA,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+    assert_owner(ds, current_user)
     with begin_transaction(db):
         crud_datasource.soft_delete(db=db, db_obj=ds)
 
@@ -156,6 +160,7 @@ async def delete(db: Session, ds_id: int, current_user: User) -> None:
 async def list_objects(
     db: Session,
     ds_id: int,
+    current_user: User,
     prefix: Optional[str] = None,
     extension: Optional[str] = None,
     page_token: Optional[str] = None,
@@ -167,6 +172,7 @@ async def list_objects(
             code=ErrorCode.CODE_61000_NO_DATA,
             status_code=status.HTTP_404_NOT_FOUND,
         )
+    assert_owner(ds, current_user)
 
     client = _build_s3_client(ds)
     full_prefix = prefix if prefix is not None else (ds.prefix or "")
