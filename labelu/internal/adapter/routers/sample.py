@@ -84,7 +84,9 @@ async def list_by(
     page: Union[int, None] = Query(default=None, ge=0),
     size: Union[int, None] = 100,
     sort: Union[str, None] = Query(
-        default=None, pattern="(annotated_count|state|inner_id|updated_at):(desc|asc)"
+        default=None,
+        pattern=r"^(annotated_count|state|inner_id|updated_at):(desc|asc)"
+        r"(,(annotated_count|state|inner_id|updated_at):(desc|asc))*$",
     ),
     authorization: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(db_module.get_db),
