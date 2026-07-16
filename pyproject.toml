@@ -1,6 +1,6 @@
 [project]
 name = "labelu"
-version = '1.5.4'
+version = '1.5.5'
 description = ""
 readme = "README.md"
 license = { text = "Apache-2.0" }
