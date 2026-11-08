@@ -40,8 +40,9 @@ class TF_record_converter:
             file = sample.get("file", {})
             
             # skip invalid data
-            annotated_result = json.loads(data.get("result"))
+            annotated_result = json.loads(data.get("result") or "{}")
             if sample.get("state") == "SKIPPED" or not annotated_result:
+                examples.append(None)
                 continue
             
             image_width = annotated_result.get("width", 0)
