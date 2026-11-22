@@ -475,7 +475,7 @@ async def create_export_job(
         job_id = job.id
 
     # Run blocking export work in a thread pool to avoid blocking the event loop
-    asyncio.get_event_loop().run_in_executor(
+    asyncio.get_running_loop().run_in_executor(
         None, _run_export_sync, job_id, task_id, export_type, sample_ids
     )
     return job_id
@@ -492,7 +492,7 @@ def _run_export_sync(job_id: int, task_id: int, export_type: ExportType, sample_
             crud_export_job.update_status(db, job, ExportStatus.PROCESSING.value)
 
         task = crud_task.get(db=db, task_id=task_id)
-        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
+        samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
 
         data = []
         for sample in samples:
@@ -567,7 +567,7 @@ async def export(
     """Legacy synchronous export. Kept for backward compatibility."""
 
     task = crud_task.get(db=db, task_id=task_id)
-    samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids)
+    samples = crud_sample.get_by_ids(db=db, sample_ids=sample_ids, task_id=task_id)
     data = []
     for sample in samples:
         file_dict = {}

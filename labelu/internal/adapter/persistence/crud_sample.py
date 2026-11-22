@@ -89,11 +89,22 @@ def get(db: Session, sample_id: int) -> TaskSample:
     )
 
 
+_SQL_IN_CHUNK_SIZE = 500
+
+
 def get_by_ids(db: Session, sample_ids: List[int], task_id: Union[int, None] = None) -> List[TaskSample]:
-    query_filter = [TaskSample.id.in_(sample_ids), TaskSample.deleted_at == None]
-    if task_id is not None:
-        query_filter.append(TaskSample.task_id == task_id)
-    return db.query(TaskSample).filter(*query_filter).all()
+    if not sample_ids:
+        return []
+    unique_ids = list(dict.fromkeys(sample_ids))
+    results: List[TaskSample] = []
+    for start in range(0, len(unique_ids), _SQL_IN_CHUNK_SIZE):
+        chunk = unique_ids[start : start + _SQL_IN_CHUNK_SIZE]
+        query_filter = [TaskSample.id.in_(chunk), TaskSample.deleted_at == None]
+        if task_id is not None:
+            query_filter.append(TaskSample.task_id == task_id)
+        results.extend(db.query(TaskSample).filter(*query_filter).all())
+    results.sort(key=lambda s: s.id)
+    return results
 
 
 def list_new_samples(db: Session, task_id: int) -> List[TaskSample]:
@@ -120,9 +131,12 @@ def update(db: Session, db_obj: TaskSample, obj_in: Dict[str, Any]) -> TaskSampl
 
 
 def delete(db: Session, sample_ids: List[int]) -> None:
-    db.query(TaskSample).filter(TaskSample.id.in_(sample_ids)).update(
-        {TaskSample.deleted_at: datetime.now()}
-    )
+    now = datetime.now()
+    for start in range(0, len(sample_ids), _SQL_IN_CHUNK_SIZE):
+        chunk = sample_ids[start : start + _SQL_IN_CHUNK_SIZE]
+        db.query(TaskSample).filter(TaskSample.id.in_(chunk)).update(
+            {TaskSample.deleted_at: now}, synchronize_session=False
+        )
 
 
 def count(db: Session, task_id: int) -> int:
