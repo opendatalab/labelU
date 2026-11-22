@@ -797,17 +797,20 @@ class Converter:
         # result struct
         tf_record_examples = TF_record_converter().create_tf_examples(input_data, config)
         
-        if len(tf_record_examples) == 0:
+        sample_example_pairs = [
+            (sample, example)
+            for sample, example in zip(input_data, tf_record_examples)
+            if example is not None
+        ]
+        
+        if len(sample_example_pairs) == 0:
             raise LabelUException(
                 code=ErrorCode.CODE_61000_NO_DATA,
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
         
-        for sample in input_data:
+        for sample, example in sample_example_pairs:
             file = sample.get("file", {})
-            if len(tf_record_examples) == 0:
-                continue
-            example = tf_record_examples.pop(0)
             file_basename = os.path.splitext(file.get("filename", ""))[0]
             tf_record = f"{file_basename}.tfrecord"
             file_full_path = out_data_dir.joinpath(tf_record)

@@ -1,5 +1,8 @@
+import json
 from pathlib import Path
 from tempfile import gettempdir
+
+from PIL import Image
 
 from labelu.internal.common.converter import converter
 
@@ -143,3 +146,84 @@ def test_convert_to_json():
 
     # check
     assert file_full_path
+
+
+def _make_tf_sample(sample_id: int, filename: str, result_str: str, state: str = "DONE"):
+    return {
+        "id": sample_id,
+        "state": state,
+        "data": json.dumps({"result": result_str}),
+        "file": {
+            "filename": filename,
+            "path": f"/upload/1/{filename}",
+            "url": f"/{filename}",
+        },
+    }
+
+
+def test_convert_to_tf_record_keeps_sample_example_alignment():
+    # regression test: SKIPPED / empty-result samples must not shift the
+    # pairing between exported .tfrecord files and their annotations
+    from zipfile import ZipFile
+
+    from tfrecord import example_pb2
+
+    from labelu.internal.common.config import settings
+
+    for name in ("alpha.png", "bravo.png", "charlie.png", "delta.png"):
+        image_path = Path(settings.MEDIA_ROOT) / "upload" / "1" / name
+        image_path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGB", (20, 20), (255, 0, 0)).save(image_path)
+
+    rect_result = {
+        "width": 20,
+        "height": 20,
+        "valid": True,
+        "rotate": 0,
+        "rectTool": {
+            "toolName": "rectTool",
+            "result": [
+                {"x": 1, "y": 2, "width": 10, "height": 5, "label": "cat", "order": 1}
+            ],
+        },
+    }
+
+    input_data = [
+        _make_tf_sample(1, "alpha.png", json.dumps(rect_result)),
+        _make_tf_sample(2, "bravo.png", "{}", state="SKIPPED"),
+        _make_tf_sample(3, "charlie.png", json.dumps(rect_result)),
+        # API-created samples may carry an empty result string
+        _make_tf_sample(4, "delta.png", ""),
+    ]
+
+    file_full_path = converter.convert(
+        config={
+            "attributes": [],
+            "tools": [
+                {
+                    "tool": "rectTool",
+                    "config": {"attributes": [{"key": "cat", "value": "cat"}]},
+                }
+            ],
+        },
+        input_data=input_data,
+        out_data_dir=Path(gettempdir()),
+        out_data_file_name_prefix="task",
+        format="TF_RECORD",
+    )
+
+    with ZipFile(file_full_path) as zipf:
+        # skipped / empty samples produce no file at all
+        assert sorted(zipf.namelist()) == ["alpha.tfrecord", "charlie.tfrecord"]
+        for name, expected_filename in (
+            ("alpha.tfrecord", "alpha.png"),
+            ("charlie.tfrecord", "charlie.png"),
+        ):
+            example = example_pb2.Example()
+            example.ParseFromString(zipf.read(name))
+            filename_feature = (
+                example.features.feature["image/filename"]
+                .bytes_list.value[0]
+                .decode("utf-8")
+            )
+            assert filename_feature == expected_filename
