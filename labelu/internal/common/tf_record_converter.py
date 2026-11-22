@@ -32,9 +32,6 @@ class TF_record_converter:
                 
             return _label
         
-        classes_text = []
-        classes = []
-        
         for sample in sample_results:
             data = json.loads(sample.get("data"))
             file = sample.get("file", {})
@@ -60,6 +57,8 @@ class TF_record_converter:
                 image_width, image_height = img.size
                 encoded_image_data = img.tobytes()
             
+            classes_text = []
+            classes = []
             xmins = []
             xmaxs = []
             ymins = []
@@ -109,7 +108,7 @@ class TF_record_converter:
                         points = tool_result.get("points", [])
                         
                         label_text = get_label(tool, tool_result.get("label", ""))
-                        classes.append(label_text.encode('utf8'))
+                        classes_text.append(label_text.encode('utf8'))
                         classes.append(self._get_label_id(label_text))
                         
                         for point in points:
