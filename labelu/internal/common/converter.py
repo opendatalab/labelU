@@ -119,7 +119,7 @@ class Converter:
             file = sample.get("file", {})
             
             # change skipped result is invalid
-            annotated_result = json.loads(data.get("result"))
+            annotated_result = json.loads(data.get("result") or "{}")
             if annotated_result and sample.get("state") == "SKIPPED":
                 annotated_result["valid"] = False
 
