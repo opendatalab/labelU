@@ -300,12 +300,10 @@ class TestClassTaskSampleRouter:
             params={"sort": "annotated_count:desc", "after": after_id, "size": 10},
         )
 
-        # check
+        # check: under annotated_count:desc, items after annotated_count=4 are [3, 2, 1, 0]
         json = r.json()
         assert r.status_code == 200
-        assert len(json["data"]) == 9
-        # first item should have highest annotated_count (sorted desc)
-        assert json["data"][0]["annotated_count"] >= json["data"][1]["annotated_count"]
+        assert [item["annotated_count"] for item in json["data"]] == [3, 2, 1, 0]
         assert json["meta_data"]["total"] == 14
 
     def test_sample_list_by_params_error(
