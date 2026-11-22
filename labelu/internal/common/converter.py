@@ -159,7 +159,7 @@ class Converter:
 
         # Serializing json
         json_object = json.dumps(results, default=str)
-        with file_full_path.open("w") as outfile:
+        with file_full_path.open("w", encoding="utf-8") as outfile:
             outfile.write(json_object)
 
         logger.info("Export file path: {}", file_full_path)
@@ -296,7 +296,7 @@ class Converter:
 
         # Serializing json
         json_object = json.dumps(result, default=str)
-        with file_full_path.open("w") as outfile:
+        with file_full_path.open("w", encoding="utf-8") as outfile:
             outfile.write(json_object)
         logger.info("Export file path: {}", file_full_path)
         return file_full_path
@@ -380,7 +380,7 @@ class Converter:
         # color list
         file_full_path_colors = out_data_dir.joinpath("colors.json")
         json_object = json.dumps(color_list, default=str)
-        with file_full_path_colors.open("w") as outfile:
+        with file_full_path_colors.open("w", encoding="utf-8") as outfile:
             outfile.write(json_object)
         export_files.append(file_full_path_colors)
 
@@ -404,19 +404,8 @@ class Converter:
             "pointTool": "point",
         }
         
-        label_text_dict = {}
-        common_attributes = { attr.get("value"): attr.get("key") for attr in config.get("attributes", [])}
-        
-        for tool in config.get("tools", []):
-            label_text_dict[tool.get("tool")] = { attr.get("value"): attr.get("key") for attr in tool.get("config", {}).get("attributes", [])}
-        
         def get_label(_tool: str, _input_label: str):
-            _label = label_text_dict.get(_tool, {}).get(_input_label, "")
-            
-            if not _label:
-                _label = common_attributes.get(_input_label, "")
-                
-            return _label
+            return _input_label
         
         def convert_points(points: List[dict]):
             return [[point.get("x"), point.get("y")] for point in points]
@@ -440,7 +429,7 @@ class Converter:
             file = sample.get("file", {})
             
             # skip invalid data
-            annotated_result = json.loads(data.get("result"))
+            annotated_result = json.loads(data.get("result") or "{}")
 
             labelme_item["imagePath"] = file.get("filename", "")
             labelme_item["imageData"] = image_to_base64(file.get("path"))
@@ -520,7 +509,7 @@ class Converter:
             result.append(labelme_item)
             file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.json")
-            with file_name.open("w") as outfile:
+            with file_name.open("w", encoding="utf-8") as outfile:
                 # 格式化json，两个空格缩进
                 json.dump(labelme_item, outfile, indent=2, ensure_ascii=False)
                 
@@ -550,7 +539,7 @@ class Converter:
         
         # make classes.txt
         classes_file = out_data_dir.joinpath("classes.txt")
-        with classes_file.open("w") as outfile:
+        with classes_file.open("w", encoding="utf-8") as outfile:
             for c in classes:
                 outfile.write(f"{c}\n")
         export_files.append(classes_file)
@@ -730,7 +719,7 @@ class Converter:
                         
             file_basename = os.path.splitext(file.get("filename", ""))[0]
             file_name = out_data_dir.joinpath(f"{file_basename}.csv")
-            with file_name.open("w") as outfile:
+            with file_name.open("w", encoding="utf-8") as outfile:
                 writer = csv.writer(outfile)
                 writer.writerows(rows)
             export_files.append(file_name)
