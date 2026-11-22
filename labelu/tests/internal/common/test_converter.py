@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from tempfile import gettempdir
 
+import pytest
 from PIL import Image
 
 from labelu.internal.common.converter import converter
@@ -227,3 +228,155 @@ def test_convert_to_tf_record_keeps_sample_example_alignment():
                 .decode("utf-8")
             )
             assert filename_feature == expected_filename
+
+
+def test_tf_record_classes_do_not_leak_across_samples(tmp_path, monkeypatch):
+    from zipfile import ZipFile
+
+    from tfrecord import example_pb2
+
+    from labelu.internal.common.config import settings
+
+    monkeypatch.setattr(settings, "MEDIA_ROOT", tmp_path)
+
+    for name in ("first.png", "second.png"):
+        image_path = tmp_path / "upload" / "1" / name
+        image_path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGB", (20, 20), (255, 0, 0)).save(image_path)
+
+    first_result = {
+        "width": 20,
+        "height": 20,
+        "valid": True,
+        "rotate": 0,
+        "rectTool": {
+            "toolName": "rectTool",
+            "result": [
+                {"x": 1, "y": 2, "width": 10, "height": 5, "label": "cat", "order": 1}
+            ],
+        },
+    }
+    second_result = {
+        "width": 20,
+        "height": 20,
+        "valid": True,
+        "rotate": 0,
+        "rectTool": {
+            "toolName": "rectTool",
+            "result": [
+                {"x": 2, "y": 3, "width": 8, "height": 6, "label": "dog", "order": 1}
+            ],
+        },
+    }
+
+    input_data = [
+        _make_tf_sample(1, "first.png", json.dumps(first_result)),
+        _make_tf_sample(2, "second.png", json.dumps(second_result)),
+    ]
+
+    file_full_path = converter.convert(
+        config={
+            "attributes": [],
+            "tools": [
+                {
+                    "tool": "rectTool",
+                    "config": {
+                        "attributes": [
+                            {"key": "cat", "value": "cat"},
+                            {"key": "dog", "value": "dog"},
+                        ]
+                    },
+                }
+            ],
+        },
+        input_data=input_data,
+        out_data_dir=tmp_path / "out",
+        out_data_file_name_prefix="task",
+        format="TF_RECORD",
+    )
+
+    with ZipFile(file_full_path) as zipf:
+        first_ex = example_pb2.Example()
+        first_ex.ParseFromString(zipf.read("first.tfrecord"))
+        second_ex = example_pb2.Example()
+        second_ex.ParseFromString(zipf.read("second.tfrecord"))
+
+        assert list(
+            first_ex.features.feature["image/object/class/text"].bytes_list.value
+        ) == [b"cat"]
+        assert list(
+            first_ex.features.feature["image/object/class/label"].int64_list.value
+        ) == [1]
+
+        assert list(
+            second_ex.features.feature["image/object/class/text"].bytes_list.value
+        ) == [b"dog"]
+        assert list(
+            second_ex.features.feature["image/object/class/label"].int64_list.value
+        ) == [2]
+
+
+def test_tf_record_line_tool_populates_classes_text_and_label(tmp_path, monkeypatch):
+    from zipfile import ZipFile
+
+    from tfrecord import example_pb2
+
+    from labelu.internal.common.config import settings
+
+    monkeypatch.setattr(settings, "MEDIA_ROOT", tmp_path)
+
+    image_path = tmp_path / "upload" / "1" / "line.png"
+    image_path.parent.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", (20, 10), (0, 255, 0)).save(image_path)
+
+    line_result = {
+        "width": 20,
+        "height": 10,
+        "valid": True,
+        "rotate": 0,
+        "lineTool": {
+            "toolName": "lineTool",
+            "result": [
+                {
+                    "label": "lane",
+                    "points": [{"x": 2, "y": 5}, {"x": 10, "y": 5}],
+                    "order": 1,
+                }
+            ],
+        },
+    }
+
+    input_data = [_make_tf_sample(1, "line.png", json.dumps(line_result))]
+
+    file_full_path = converter.convert(
+        config={
+            "attributes": [],
+            "tools": [
+                {
+                    "tool": "lineTool",
+                    "config": {"attributes": [{"key": "lane", "value": "lane"}]},
+                }
+            ],
+        },
+        input_data=input_data,
+        out_data_dir=tmp_path / "out",
+        out_data_file_name_prefix="task",
+        format="TF_RECORD",
+    )
+
+    with ZipFile(file_full_path) as zipf:
+        ex = example_pb2.Example()
+        ex.ParseFromString(zipf.read("line.tfrecord"))
+
+        assert list(
+            ex.features.feature["image/object/class/text"].bytes_list.value
+        ) == [b"lane"]
+        assert list(
+            ex.features.feature["image/object/class/label"].int64_list.value
+        ) == [1]
+        assert list(
+            ex.features.feature["image/object/line/x"].float_list.value
+        ) == pytest.approx([0.1, 0.5])
+        assert list(
+            ex.features.feature["image/object/line/y"].float_list.value
+        ) == pytest.approx([0.5, 0.5])
